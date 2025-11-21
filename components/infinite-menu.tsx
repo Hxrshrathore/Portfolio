@@ -1150,78 +1150,76 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
 
       {activeItem && (
         <>
-          <h2
-  className={`
-    select-none
-    absolute
-    font-black
-    text-left
-    whitespace-normal
-    break-words
-    max-w-[10ch]   /* tight enough so 3–4 lines never reach the image */
-    text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:[font-size:4rem]
-    left-4 sm:left-8 md:left-12 lg:left-[1.6em]
-    top-1/2
-    -translate-y-1/2        /* <-- PERFECT vertical center */
-    transition-all
-    ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-    ${
-      isMoving
-        ? "opacity-0 pointer-events-none duration-[100ms]"
-        : "opacity-100 pointer-events-auto duration-[500ms]"
-    }
-  `}
->
-  {activeItem.title}
-</h2>
+          {/* DESKTOP OVERLAY TEXT (unchanged) */}
+          <div className="hidden md:block">
+            <h2
+              className={`
+                select-none absolute font-black text-left whitespace-normal break-words
+                max-w-[10ch]
+                text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:[font-size:4rem]
+                left-12 lg:left-[1.6em]
+                top-1/2 -translate-y-1/2
+                transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+                ${
+                  isMoving
+                    ? "opacity-0 pointer-events-none duration-[100ms]"
+                    : "opacity-100 pointer-events-auto duration-[500ms]"
+                }
+              `}
+            >
+              {activeItem.title}
+            </h2>
 
+            <p
+              className={`
+                select-none absolute max-w-[12ch]
+                text-xl lg:text-[1.5rem]
+                top-1/2 right-12 lg:right-[1%]
+                transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+                ${
+                  isMoving
+                    ? "opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2"
+                    : "opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2"
+                }
+              `}
+            >
+              {activeItem.description}
+            </p>
 
+            <div
+              onClick={handleButtonClick}
+              className={`
+                absolute left-1/2 z-10
+                w-14 h-14 md:w-[60px] md:h-[60px]
+                grid place-items-center bg-[#00ffff] border-[5px] border-black rounded-full
+                cursor-pointer transition-all
+                ${
+                  isMoving
+                    ? "bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2"
+                    : "bottom-16 md:bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2"
+                }
+              `}
+            >
+              <p className="select-none text-[#060010] text-2xl">&#x2197;</p>
+            </div>
+          </div>
 
+          {/* MOBILE STACKED LAYOUT */}
+          <div className="md:hidden mt-6 text-center px-6 w-full absolute bottom-4 left-0">
+            <h2 className="font-black text-white text-3xl leading-tight mb-2 break-words max-w-[90%] mx-auto">
+              {activeItem.title}
+            </h2>
 
-          <p
-            className={`
-          select-none
-          absolute
-          max-w-[10ch]
-          text-base sm:text-lg md:text-xl lg:text-[1.5rem]
-          top-1/2
-          right-4 sm:right-8 md:right-[1%]
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${
-            isMoving
-              ? "opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2"
-              : "opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2"
-          }
-        `}
-          >
-            {activeItem.description}
-          </p>
+            <p className="text-gray-300 text-base leading-snug max-w-[30ch] mx-auto mb-4">
+              {activeItem.description}
+            </p>
 
-          <div
-            onClick={handleButtonClick}
-            className={`
-          absolute
-          left-1/2
-          z-10
-          w-12 h-12 sm:w-14 sm:h-14 md:w-[60px] md:h-[60px]
-          grid
-          place-items-center
-          bg-[#00ffff]
-          border-4 md:border-[5px]
-          border-black
-          rounded-full
-          cursor-pointer
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${
-            isMoving
-              ? "bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2"
-              : "bottom-12 sm:bottom-16 md:bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2"
-          }
-        `}
-          >
-            <p className="select-none relative text-[#060010] top-[2px] text-xl sm:text-2xl md:text-[26px]">&#x2197;</p>
+            <button
+              onClick={handleButtonClick}
+              className="w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
+            >
+              <span className="text-2xl text-[#060010]">&#x2197;</span>
+            </button>
           </div>
         </>
       )}
