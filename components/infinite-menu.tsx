@@ -1151,27 +1151,32 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
       {activeItem && (
         <>
           <h2
-            className={`
-          select-none
-          absolute
-          font-black
-          text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:[font-size:4rem]
-          left-4 sm:left-8 md:left-12 lg:left-[1.6em]
-          top-1/2
-          transform
-          translate-x-0 md:translate-x-[20%]
-          -translate-y-1/2
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          ${
-            isMoving
-              ? "opacity-0 pointer-events-none duration-[100ms]"
-              : "opacity-100 pointer-events-auto duration-[500ms]"
-          }
-        `}
-          >
-            {activeItem.title}
-          </h2>
+  className={`
+    select-none
+    absolute
+    font-black
+    text-left
+    whitespace-normal
+    break-words
+    max-w-[10ch]   /* tight enough so 3–4 lines never reach the image */
+    text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:[font-size:4rem]
+    left-4 sm:left-8 md:left-12 lg:left-[1.6em]
+    top-1/2
+    -translate-y-1/2        /* <-- PERFECT vertical center */
+    transition-all
+    ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+    ${
+      isMoving
+        ? "opacity-0 pointer-events-none duration-[100ms]"
+        : "opacity-100 pointer-events-auto duration-[500ms]"
+    }
+  `}
+>
+  {activeItem.title}
+</h2>
+
+
+
 
           <p
             className={`

@@ -6,41 +6,67 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 
 const portfolioItems = [
   {
-    image: "https://picsum.photos/600/600?random=1",
+    image: "/logo/kiitmun.png",
     link: "https://github.com",
-    title: "Code Poetry",
+    title: "KIIT MUN",
     description: "Where elegant algorithms meet beautiful interfaces",
   },
   {
-    image: "https://picsum.photos/600/600?random=2",
+    image: "/rip/frame1.png",
     link: "https://dribbble.com",
-    title: "Visual Harmony",
+    title: "Chimera 6.0",
     description: "Crafting experiences that feel effortlessly intuitive",
   },
   {
-    image: "https://picsum.photos/600/600?random=3",
+    image: "/rip/frame2.png",
     link: "https://behance.net",
-    title: "User Delight",
+    title: "Acsent Coaching Center",
     description: "Designing moments that users never forget",
   },
   {
-    image: "https://picsum.photos/600/600?random=4",
+    image: "/rip/frame3.png",
     link: "https://linkedin.com",
-    title: "Speed of Light",
+    title: "Bikash Vidalya",
     description: "Performance so fast, it feels like magic",
   },
   {
-    image: "https://picsum.photos/600/600?random=5",
+    image: "/rip/frame4.png",
     link: "https://twitter.com",
-    title: "Full Spectrum",
+    title: "Indura School",
     description: "End-to-end solutions that just work",
   },
   {
-    image: "https://picsum.photos/600/600?random=6",
+    image: "/rip/frame5.png",
     link: "https://instagram.com",
-    title: "Tomorrow's Web",
+    title: "Hemsida",
     description: "Building the future, one line of code at a time",
   },
+  {
+    image: "/rip/frame6.png",
+    link: "https://behance.net",
+    title: "KIIT MUN",
+    description: "Designing moments that users never forget",
+  },
+  {
+    image: "/rip/frame7.png",
+    link: "https://behance.net",
+    title: "DMC School",
+    description: "Designing moments that users never forget",
+  },
+  {
+    image: "/rip/frame8.png",
+    link: "https://behance.net",
+    title: "Pandav Studio",
+    description: "Designing moments that users never forget",
+  },
+  {
+    image: "/rip/frame9.png",
+    link: "https://behance.net",
+    title: "Sunshine School",
+    description: "Designing moments that users never forget",
+  },
+  
+  
 ]
 
 export default function InfiniteMenuSection() {

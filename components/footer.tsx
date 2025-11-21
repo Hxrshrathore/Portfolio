@@ -29,7 +29,7 @@ export default function Footer() {
     {
       name: "Email",
       icon: <Mail className="w-5 h-5" />,
-      url: "mailto:hello@hxrshrathore.dev",
+      url: "mailto:hxrshrathore@gmail.com",
       color: "hover:text-green-400",
     },
   ]
@@ -37,8 +37,7 @@ export default function Footer() {
   const quickLinks = [
     { name: "Home", href: "/" },
     { name: "Projects", href: "/projects" },
-    { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
+    { name: "Blog", href: "/blog" },
   ]
 
   return (
@@ -148,7 +147,7 @@ export default function Footer() {
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center"
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  hello@hxrshrathore.dev
+                  Hxrshrathore@gmail.com
                 </a>
                 <p className="text-gray-400 text-sm">Ready to build something extraordinary together</p>
               </div>
