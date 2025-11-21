@@ -34,7 +34,7 @@ export default function TrustedBySection() {
     { name: "Microsoft", logo: "/logo/pandav.png" },
     { name: "Apple", logo: "/logo/ascent.png", square: true },
     { name: "Amazon", logo: "/logo/bikash.png", square: true },
-    { name: "Meta", logo: "/logo/hemsida.png", square: true },
+    { name: "Meta", logo: "/logo/hemsida.png" , square: true },
     { name: "Netflix", logo: "/logo/dmc.png" },
     { name: "Spotify", logo: "/logo/indura.png", square: true },
     { name: "Adobe", logo: "/logo/kiitmun.png", square: true },

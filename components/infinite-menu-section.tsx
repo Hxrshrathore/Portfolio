@@ -102,7 +102,7 @@ export default function InfiniteMenuSection() {
       </div>
 
       {/* Infinite Menu */}
-      <div className="h-[600px] sm:h-[700px] md:h-[800px] relative">
+        <div className="h-[450px] sm:h-[550px] md:h-[650px] relative">
         <InfiniteMenu items={portfolioItems} onNavigate={handleNavigate} />
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4 md:hidden z-20">

@@ -1206,21 +1206,22 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
 
           {/* MOBILE STACKED LAYOUT */}
           <div className="md:hidden mt-6 text-center px-6 w-full absolute bottom-4 left-0">
-            <h2 className="font-black text-white text-3xl leading-tight mb-2 break-words max-w-[90%] mx-auto">
-              {activeItem.title}
-            </h2>
+  <h2 className="font-black text-white text-3xl leading-tight mb-2 break-words max-w-[90%] mx-auto">
+    {activeItem.title}
+  </h2>
 
-            <p className="text-gray-300 text-base leading-snug max-w-[30ch] mx-auto mb-4">
-              {activeItem.description}
-            </p>
+  <p className="text-gray-300 text-base leading-snug max-w-[30ch] mx-auto mb-4">
+    {activeItem.description}
+  </p>
 
-            <button
-              onClick={handleButtonClick}
-              className="w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
-            >
-              <span className="text-2xl text-[#060010]">&#x2197;</span>
-            </button>
-          </div>
+  <button
+    onClick={handleButtonClick}
+    className="mt-100 w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
+  >
+    <span className="text-2xl text-[#060010]">&#x2197;</span>
+  </button>
+</div>
+
         </>
       )}
     </div>
