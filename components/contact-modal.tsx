@@ -106,6 +106,7 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={() => onOpenChange(false)}
             className="absolute inset-0 z-0 bg-black/80 backdrop-blur-[40px]"
           />
@@ -114,8 +115,13 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
           <motion.div
             initial={{ y: 30, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 20, opacity: 0, scale: 0.99 }}
-            transition={{ type: "spring", damping: 25, stiffness: 120 }}
+            exit={{ y: 15, opacity: 0, scale: 0.99 }}
+            transition={{ 
+              type: "spring", 
+              damping: 25, 
+              stiffness: 120,
+              exit: { duration: 0.15, ease: "easeIn" } 
+            }}
             className="relative z-10 w-full max-w-5xl bg-[#050505]/60 border border-white/5 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row min-h-[550px] max-h-[90vh] md:max-h-none overflow-y-auto"
           >
             {/* Close Button */}
