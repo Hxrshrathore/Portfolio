@@ -9,7 +9,7 @@ export default function CurvedLoopSection() {
         marqueeText="Innovation ✦ Perfection ✦ Excellence ✦ Craftsmanship ✦ "
         speed={3}
         curveAmount={500}
-        direction="right"
+        direction="left"
         interactive={true}
         className="text-white"
       />

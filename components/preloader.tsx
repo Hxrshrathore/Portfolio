@@ -12,11 +12,24 @@ interface PreloaderProps {
 }
 
 export default function Preloader({ children }: PreloaderProps) {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [showContent, setShowContent] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    // Check if we've already loaded in this session
+    const hasLoaded = sessionStorage.getItem("preloader_shown")
+    
+    if (hasLoaded) {
+      setIsLoading(false)
+      setShowContent(true)
+      return
+    }
+
+    setIsLoading(true) // Start loading if not shown before
+
     // Simulate loading progress
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -24,6 +37,7 @@ export default function Preloader({ children }: PreloaderProps) {
           clearInterval(interval)
           setTimeout(() => {
             setIsLoading(false)
+            sessionStorage.setItem("preloader_shown", "true")
             setTimeout(() => setShowContent(true), 800)
           }, 500)
           return 100
@@ -38,7 +52,7 @@ export default function Preloader({ children }: PreloaderProps) {
   return (
     <>
       <AnimatePresence>
-        {isLoading && (
+        {mounted && isLoading && (
           <motion.div
             initial={{ y: 0 }}
             exit={{ y: "-100%" }}
@@ -61,7 +75,7 @@ export default function Preloader({ children }: PreloaderProps) {
               transition={{ duration: 0.5 }}
             >
               <GradientText
-                colors={["#a855f7", "#3b82f6", "#06b6d4", "#3b82f6", "#a855f7"]}
+                colors={["#ffffff", "#f3f4f6", "#e5e7eb", "#f3f4f6", "#ffffff"]}
                 animationSpeed={3}
                 showBorder={false}
                 className="text-6xl md:text-8xl font-bold"

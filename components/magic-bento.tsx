@@ -134,6 +134,10 @@ const ParticleCard: React.FC<{
   const memoizedParticles = useRef<HTMLDivElement[]>([])
   const particlesInitialized = useRef(false)
   const magnetismAnimationRef = useRef<gsap.core.Tween | null>(null)
+  const quickToRotateX = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToRotateY = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToMagnetX = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToMagnetY = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
 
   const initializeParticles = useCallback(() => {
     if (particlesInitialized.current || !cardRef.current) return
@@ -260,25 +264,21 @@ const ParticleCard: React.FC<{
         const rotateX = ((y - centerY) / centerY) * -10
         const rotateY = ((x - centerX) / centerX) * 10
 
-        gsap.to(element, {
-          rotateX,
-          rotateY,
-          duration: 0.1,
-          ease: "power2.out",
-          transformPerspective: 1000,
-        })
+        // ✅ Use gsap.quickTo for frequently updated properties - reuses tween instead of creating new ones
+        quickToRotateX.current ??= gsap.quickTo(element, "rotateX", { duration: 0.1, ease: "power2.out" })
+        quickToRotateY.current ??= gsap.quickTo(element, "rotateY", { duration: 0.1, ease: "power2.out" })
+        quickToRotateX.current(rotateX)
+        quickToRotateY.current(rotateY)
       }
 
       if (enableMagnetism) {
         const magnetX = (x - centerX) * 0.05
         const magnetY = (y - centerY) * 0.05
 
-        magnetismAnimationRef.current = gsap.to(element, {
-          x: magnetX,
-          y: magnetY,
-          duration: 0.3,
-          ease: "power2.out",
-        })
+        quickToMagnetX.current ??= gsap.quickTo(element, "x", { duration: 0.3, ease: "power2.out" })
+        quickToMagnetY.current ??= gsap.quickTo(element, "y", { duration: 0.3, ease: "power2.out" })
+        quickToMagnetX.current(magnetX)
+        quickToMagnetY.current(magnetY)
       }
     }
 
@@ -338,6 +338,11 @@ const ParticleCard: React.FC<{
       element.removeEventListener("mouseleave", handleMouseLeave)
       element.removeEventListener("mousemove", handleMouseMove)
       element.removeEventListener("click", handleClick)
+      // ✅ Kill quickTo tweens safely to prevent memory leaks
+      quickToRotateX.current?.kill?.()
+      quickToRotateY.current?.kill?.()
+      quickToMagnetX.current?.kill?.()
+      quickToMagnetY.current?.kill?.()
       clearAllParticles()
     }
   }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor])
@@ -587,6 +592,11 @@ const MagicBento: React.FC<BentoProps> = ({
               ref={(el) => {
                 if (!el) return
 
+                const quickToRotateX = gsap.quickTo(el, "rotateX", { duration: 0.1, ease: "power2.out" })
+                const quickToRotateY = gsap.quickTo(el, "rotateY", { duration: 0.1, ease: "power2.out" })
+                const quickToMagnetX = gsap.quickTo(el, "x", { duration: 0.3, ease: "power2.out" })
+                const quickToMagnetY = gsap.quickTo(el, "y", { duration: 0.3, ease: "power2.out" })
+
                 const handleMouseMove = (e: MouseEvent) => {
                   if (shouldDisableAnimations) return
 
@@ -599,24 +609,15 @@ const MagicBento: React.FC<BentoProps> = ({
                   if (enableTilt) {
                     const rotateX = ((y - centerY) / centerY) * -10
                     const rotateY = ((x - centerX) / centerX) * 10
-                    gsap.to(el, {
-                      rotateX,
-                      rotateY,
-                      duration: 0.1,
-                      ease: "power2.out",
-                      transformPerspective: 1000,
-                    })
+                    quickToRotateX(rotateX)
+                    quickToRotateY(rotateY)
                   }
 
                   if (enableMagnetism) {
                     const magnetX = (x - centerX) * 0.05
                     const magnetY = (y - centerY) * 0.05
-                    gsap.to(el, {
-                      x: magnetX,
-                      y: magnetY,
-                      duration: 0.3,
-                      ease: "power2.out",
-                    })
+                    quickToMagnetX(magnetX)
+                    quickToMagnetY(magnetY)
                   }
                 }
 
@@ -624,21 +625,13 @@ const MagicBento: React.FC<BentoProps> = ({
                   if (shouldDisableAnimations) return
 
                   if (enableTilt) {
-                    gsap.to(el, {
-                      rotateX: 0,
-                      rotateY: 0,
-                      duration: 0.3,
-                      ease: "power2.out",
-                    })
+                    quickToRotateX(0)
+                    quickToRotateY(0)
                   }
 
                   if (enableMagnetism) {
-                    gsap.to(el, {
-                      x: 0,
-                      y: 0,
-                      duration: 0.3,
-                      ease: "power2.out",
-                    })
+                    quickToMagnetX(0)
+                    quickToMagnetY(0)
                   }
                 }
 

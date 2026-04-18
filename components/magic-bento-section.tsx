@@ -22,7 +22,7 @@ export default function MagicBentoSection() {
         </div>
 
         {/* Magic Bento Component */}
-        <div className="flex justify-center">
+        <div className="flex justify-center" data-speed="1.05">
           <MagicBento
             textAutoHide={true}
             enableStars={true}

@@ -30,7 +30,16 @@ export default function Hero() {
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
       <div className="absolute inset-0 z-0 w-full h-full">
-        <LiquidChrome baseColor={[0.1, 0.1, 0.1]} speed={1} amplitude={0.6} interactive={true} />
+        <LiquidChrome
+          baseColor={[0.015, 0.015, 0.015]}
+          speed={0.16}
+          amplitude={0.17}
+          frequencyX={2.5}
+          frequencyY={1.5}
+          interactive={false}
+        />
+        {/* Bottom Blend Overlay */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-[5]" />
       </div>
 
       {/* Main Content */}
@@ -59,16 +68,10 @@ export default function Hero() {
         <div className="flex flex-wrap justify-center gap-4">
           <Button
             size="lg"
-            className="bg-white text-black hover:bg-gray-100 rounded-full px-8 py-3 text-lg font-medium"
+            onClick={() => (window.location.href = "/projects")}
+            className="bg-white text-black hover:bg-gray-100 rounded-full px-10 py-4 text-lg font-medium transition-all hover:scale-105"
           >
             View My Work
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="text-white border-white/30 hover:bg-white/10 bg-transparent rounded-full px-8 py-3 text-lg font-medium"
-          >
-            Let's Connect
           </Button>
         </div>
       </div>

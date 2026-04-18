@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react"
 import { motion, useInView, useAnimation } from "framer-motion"
+import { gsap } from "gsap"
 
 export default function TrustedBySection() {
   const ref = useRef(null)
-  const trackRef = useRef(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
 
   const controls = useAnimation()
@@ -44,26 +45,23 @@ export default function TrustedBySection() {
 
   const loopLogos = [...logos, ...logos]
 
-  // 🔥 JS-BASED INFINITE MARQUEE (no lag, no reset)
+  // ✅ GSAP-BASED INFINITE MARQUEE - uses transform for compositor-friendly animation
   useEffect(() => {
     const track = trackRef.current
     if (!track) return
 
-    let position = 0
-    const speed = 0.4 // tweak speed
+    const halfWidth = track.scrollWidth / 2
+    let ctx = gsap.context(() => {
+      gsap.to(track, {
+        x: -halfWidth,
+        duration: 20,
+        ease: "none",
+        repeat: -1,
+        paused: isPaused,
+      })
+    }, track)
 
-    const animate = () => {
-      if (!isPaused) {
-        position -= speed
-        if (Math.abs(position) >= track.scrollWidth / 2) {
-          position = 0 // seamless reset
-        }
-        track.style.transform = `translateX(${position}px)`
-      }
-      requestAnimationFrame(animate)
-    }
-
-    requestAnimationFrame(animate)
+    return () => ctx.revert()
   }, [isPaused])
 
   return (

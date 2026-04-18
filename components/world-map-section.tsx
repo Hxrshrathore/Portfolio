@@ -37,7 +37,7 @@ export default function WorldMapSection() {
         </div>
 
         {/* World Map */}
-        <div className="mb-16">
+        <div className="mb-16" data-lag="0.2">
           <WorldMap
            dots={[
   {

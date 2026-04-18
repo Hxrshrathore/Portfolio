@@ -6,6 +6,7 @@ import ClickSpark from "@/components/click-spark"
 import Preloader from "@/components/preloader"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import SmoothScroll from "@/components/smooth-scroll"
 import AnimatedFavicon from "@/components/animated-favicon"
 import StructuredData from "@/components/structured-data"
 
@@ -107,18 +108,20 @@ export default function RootLayout({
           <AnimatedFavicon />
           <Preloader>
             <Navbar />
-            <ClickSpark
-              sparkColor="#ffffff"
-              sparkSize={12}
-              sparkRadius={20}
-              sparkCount={8}
-              duration={500}
-              easing="ease-out"
-              extraScale={1.2}
-            >
-              {children}
-            </ClickSpark>
-            <Footer />
+            <SmoothScroll>
+              <ClickSpark
+                sparkColor="#ffffff"
+                sparkSize={12}
+                sparkRadius={20}
+                sparkCount={8}
+                duration={500}
+                easing="ease-out"
+                extraScale={1.2}
+              >
+                {children}
+              </ClickSpark>
+              <Footer />
+            </SmoothScroll>
           </Preloader>
         </ThemeProvider>
       </body>

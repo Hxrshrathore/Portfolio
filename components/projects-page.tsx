@@ -75,7 +75,7 @@ export default function ProjectsPage() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Silk Background - Full Width */}
         <div className="absolute inset-0 w-full h-full">
-          <Silk />
+          <Silk speed={4.2} scale={1} color="#bbbbbb" noiseIntensity={0.9} rotation={0} />
         </div>
 
         {/* Text Overlay */}

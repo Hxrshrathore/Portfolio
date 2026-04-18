@@ -1,207 +1,264 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
+import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
+import { useForm } from "react-hook-form"
+import TextPressure from "./text-pressure"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { X, Github, Linkedin, Twitter, ArrowRight } from "lucide-react"
+import { contactSchema, type ContactFormValues } from "@/lib/schemas/contact-schema"
+import { submitContactForm } from "@/app/actions/contact"
 
 interface ContactModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
+const socialLinks = [
+  { icon: Github, href: "https://github.com", label: "GitHub" },
+  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+]
+
 export default function ContactModal({ open, onOpenChange }: ContactModalProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    projectType: "",
-    budget: "",
-    message: "",
-  })
+  const [mounted, setMounted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    toast({
-      title: "Message sent successfully!",
-      description: "I'll get back to you as soon as possible.",
-    })
-
-    setIsSubmitting(false)
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
       name: "",
       email: "",
       projectType: "",
-      budget: "",
       message: "",
-    })
-    onOpenChange(false)
+    },
+  })
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "unset"
+    }
+    return () => {
+      document.body.style.overflow = "unset"
+    }
+  }, [open])
+
+  const onFormSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true)
+    try {
+      const result = await submitContactForm(data)
+      if (result.success) {
+        toast({
+          title: "Message Sent",
+          description: result.message,
+        })
+        reset()
+        onOpenChange(false)
+      } else {
+        toast({
+          title: "Error",
+          description: result.error,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-black/90 backdrop-blur-xl border border-white/10 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Let's Create Something Amazing
-          </DialogTitle>
-          <DialogDescription className="text-white/60">
-            Fill out the form below and I'll get back to you within 24 hours.
-          </DialogDescription>
-        </DialogHeader>
+  if (!mounted) return null
 
-        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-          {/* Name Field */}
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium text-white/80">
-              Name
-            </label>
-            <Input
-              id="name"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400/50 focus:ring-cyan-400/50"
-            />
-          </div>
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop with Deep Blur */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => onOpenChange(false)}
+            className="absolute inset-0 z-0 bg-black/80 backdrop-blur-[40px]"
+          />
 
-          {/* Email Field */}
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-white/80">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400/50 focus:ring-cyan-400/50"
-            />
-          </div>
-
-          {/* Project Type Dropdown */}
-          <div className="space-y-2">
-            <label htmlFor="projectType" className="text-sm font-medium text-white/80">
-              Project Type
-            </label>
-            <Select
-              value={formData.projectType}
-              onValueChange={(value) => setFormData({ ...formData, projectType: value })}
-              required
+          {/* Modal Container - Landscape Glass Portal */}
+          <motion.div
+            initial={{ y: 30, opacity: 0, scale: 0.98 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 20, opacity: 0, scale: 0.99 }}
+            transition={{ type: "spring", damping: 25, stiffness: 120 }}
+            className="relative z-10 w-full max-w-5xl bg-[#050505]/60 border border-white/5 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row min-h-[550px] max-h-[90vh] md:max-h-none overflow-y-auto"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => onOpenChange(false)}
+              className="absolute top-6 right-6 z-50 text-white/20 hover:text-white transition-colors p-2"
             >
-              <SelectTrigger className="bg-white/5 border-white/10 text-white focus:border-cyan-400/50 focus:ring-cyan-400/50">
-                <SelectValue placeholder="Select project type" />
-              </SelectTrigger>
-              <SelectContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
-                <SelectItem value="website" className="focus:bg-white/10 focus:text-white">
-                  Website Design & Development
-                </SelectItem>
-                <SelectItem value="webapp" className="focus:bg-white/10 focus:text-white">
-                  Web Application
-                </SelectItem>
-                <SelectItem value="ecommerce" className="focus:bg-white/10 focus:text-white">
-                  E-commerce Platform
-                </SelectItem>
-                <SelectItem value="landing" className="focus:bg-white/10 focus:text-white">
-                  Landing Page
-                </SelectItem>
-                <SelectItem value="redesign" className="focus:bg-white/10 focus:text-white">
-                  Website Redesign
-                </SelectItem>
-                <SelectItem value="other" className="focus:bg-white/10 focus:text-white">
-                  Other
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <X size={20} />
+            </button>
 
-          {/* Budget Dropdown */}
-          <div className="space-y-2">
-            <label htmlFor="budget" className="text-sm font-medium text-white/80">
-              Budget Range
-            </label>
-            <Select
-              value={formData.budget}
-              onValueChange={(value) => setFormData({ ...formData, budget: value })}
-              required
-            >
-              <SelectTrigger className="bg-white/5 border-white/10 text-white focus:border-cyan-400/50 focus:ring-cyan-400/50">
-                <SelectValue placeholder="Select budget range" />
-              </SelectTrigger>
-              <SelectContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
-                <SelectItem value="small" className="focus:bg-white/10 focus:text-white">
-                  $1,000 - $5,000
-                </SelectItem>
-                <SelectItem value="medium" className="focus:bg-white/10 focus:text-white">
-                  $5,000 - $10,000
-                </SelectItem>
-                <SelectItem value="large" className="focus:bg-white/10 focus:text-white">
-                  $10,000 - $25,000
-                </SelectItem>
-                <SelectItem value="enterprise" className="focus:bg-white/10 focus:text-white">
-                  $25,000+
-                </SelectItem>
-                <SelectItem value="discuss" className="focus:bg-white/10 focus:text-white">
-                  Let's Discuss
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Message Field */}
-          <div className="space-y-2">
-            <label htmlFor="message" className="text-sm font-medium text-white/80">
-              Project Details
-            </label>
-            <Textarea
-              id="message"
-              placeholder="Tell me about your project, goals, and any specific requirements..."
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              required
-              rows={5}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-cyan-400/50 focus:ring-cyan-400/50 resize-none"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <motion.div
-                    className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            {/* Left Panel: Architectural Side Bar (30%) */}
+            <div className="w-full md:w-1/3 p-10 bg-white/[0.02] flex flex-col items-center border-b md:border-b-0 md:border-r border-white/5 relative overflow-hidden">
+              <div className="w-full space-y-10 z-10 relative">
+                <div className="space-y-3">
+                  <div className="w-8 h-[2px] bg-white/20" />
+                  <p className="text-white/20 text-xs font-bold tracking-[0.2em] uppercase">Connect</p>
+                </div>
+                
+                {/* Image Placeholder */}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                  className="relative w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/10 group shadow-2xl"
+                >
+                  <Image 
+                    src="/harsh.png" 
+                    alt="Harsh Kumar" 
+                    fill 
+                    className="object-cover object-center grayscale hover:grayscale-0 opacity-80 group-hover:opacity-100 transition-all duration-700 ease-in-out group-hover:scale-105" 
                   />
-                  Sending...
-                </span>
-              ) : (
-                "Send Message"
-              )}
-            </Button>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
+                </motion.div>
+
+                {/* Branding Text Clone */}
+                <div className="relative h-16 w-full opacity-60 hover:opacity-100 transition-opacity duration-500">
+                  <TextPressure
+                    text="@hxrshrathore"
+                    flex={true}
+                    alpha={false}
+                    stroke={false}
+                    width={true}
+                    weight={true}
+                    italic={true}
+                    textColor="#ffffff"
+                    strokeColor="#ff0000"
+                    minFontSize={18}
+                  />
+                </div>
+                
+                {/* Horizontal Social Links */}
+                <div className="flex flex-row justify-between gap-4">
+                  {socialLinks.map((social, i) => (
+                    <motion.a
+                      key={i}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + i * 0.1 }}
+                      className="group flex-1 flex items-center justify-center py-3 text-white/40 hover:text-white transition-all duration-500 border border-white/5 hover:border-white/20 rounded-xl bg-white/[0.01] hover:bg-white/[0.05]"
+                    >
+                      <social.icon size={18} className="group-hover:scale-110 transition-transform duration-500" />
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Panel: Clean Form (70%) */}
+            <div className="w-full md:w-2/3 p-10 lg:p-14 flex flex-col justify-center">
+              <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <Input
+                        {...register("name")}
+                        placeholder="NAME"
+                        className={`h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.name ? 'border-red-500/50' : ''}`}
+                      />
+                      {errors.name && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.name.message}</p>}
+                    </div>
+                    <div className="space-y-1">
+                      <Input
+                        {...register("email")}
+                        placeholder="EMAIL"
+                        type="email"
+                        className={`h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.email ? 'border-red-500/50' : ''}`}
+                      />
+                      {errors.email && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.email.message}</p>}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Select
+                      value={watch("projectType") || undefined}
+                      onValueChange={(value) => setValue("projectType", value, { shouldValidate: true })}
+                    >
+                      <SelectTrigger className={`h-14 bg-transparent border-0 border-b border-white/10 text-white focus:border-white/40 focus:ring-0 rounded-none px-0 text-lg placeholder:text-white/10 ${errors.projectType ? 'border-red-500/50' : ''}`}>
+                        <SelectValue placeholder="PROJECT INQUIRY" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0a0a0a] border-white/10 text-white rounded-none overflow-hidden backdrop-blur-3xl border-0 z-[110]">
+                        <SelectItem value="web" className="focus:bg-white/5 transition-colors cursor-pointer">Web Experience</SelectItem>
+                        <SelectItem value="design" className="focus:bg-white/5 transition-colors cursor-pointer">UI/UX Design</SelectItem>
+                        <SelectItem value="fullstack" className="focus:bg-white/5 transition-colors cursor-pointer">Full Stack Engineering</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.projectType && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.projectType.message}</p>}
+                  </div>
+
+                  <div className="space-y-1">
+                    <Textarea
+                      {...register("message")}
+                      placeholder="MESSAGE"
+                      className={`min-h-[120px] bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg resize-none py-4 ${errors.message ? 'border-red-500/50' : ''}`}
+                    />
+                    {errors.message && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.message.message}</p>}
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="group relative w-full h-16 bg-white text-black hover:bg-white/90 font-bold text-sm tracking-[0.2em] uppercase transition-all disabled:opacity-50 overflow-hidden"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {isSubmitting ? "TRANSMITTING..." : (
+                        <>
+                          Initiate Connection
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </span>
+                  </Button>
+                </div>
+              </form>
+            </div>
           </motion.div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+    </AnimatePresence>,
+    document.body
   )
 }
