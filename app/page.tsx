@@ -1,35 +1,31 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Hero from "@/components/hero"
-import CurvedLoopSection from "@/components/curved-loop-section"
-import FlowingMenuSection from "@/components/flowing-menu-section"
-import InfiniteMenuSection from "@/components/infinite-menu-section"
-import WorldMapSection from "@/components/world-map-section"
-import MagicBentoSection from "@/components/magic-bento-section"
-import OrbSection from "@/components/orb-section"
-import TrustedBySection from "@/components/trusted-by-section"
+import dynamic from "next/dynamic"
+
+// Code splitting: Automatically breaks down the giant >1MB Javascript chunk into tiny manageable pieces.
+// ssr: false prevents "window is not defined" server crashing since these are heavily WebGL/DOM based.
+
+const Hero = dynamic(() => import("@/components/hero"), { 
+  ssr: false,
+  loading: () => (
+    <div className="h-screen w-full bg-black flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+    </div>
+  )
+})
+
+// Below-the-fold sections are lazy-loaded. Client only evaluates their JS when necessary.
+const CurvedLoopSection = dynamic(() => import("@/components/curved-loop-section"), { ssr: false })
+const FlowingMenuSection = dynamic(() => import("@/components/flowing-menu-section"), { ssr: false })
+const MagicBentoSection = dynamic(() => import("@/components/magic-bento-section"), { ssr: false })
+const InfiniteMenuSection = dynamic(() => import("@/components/infinite-menu-section"), { ssr: false })
+const WorldMapSection = dynamic(() => import("@/components/world-map-section"), { ssr: false })
+const TrustedBySection = dynamic(() => import("@/components/trusted-by-section"), { ssr: false })
+const OrbSection = dynamic(() => import("@/components/orb-section"), { ssr: false })
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </main>
-    )
-  }
-
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-black overflow-hidden relative">
       <Hero />
       <CurvedLoopSection />
       <FlowingMenuSection />

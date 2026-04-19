@@ -129,22 +129,24 @@ export default function ProjectsPage() {
           >
             A curated showcase of architectural digital experiences, building the future of web design and AI technology.
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.4 }}
-            className="relative w-[100vw] left-1/2 -translate-x-1/2 mt-12" style={{ height: '350px' }}
-          >
-            <CircularGallery 
-              bend={3} 
-              textColor="#ffffff" 
-              borderRadius={0.05} 
-              scrollSpeed={2}
-              scrollEase={0.06}
-              font="bold 20px 'Geist', sans-serif"
-            />
-          </motion.div>
+          <div className="relative w-[100vw] left-1/2 -translate-x-1/2 mt-12" style={{ height: '350px' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.4 }}
+              className="w-full h-full"
+            >
+              <CircularGallery 
+                bend={3} 
+                textColor="#ffffff" 
+                borderRadius={0.05} 
+                scrollSpeed={2}
+                scrollEase={0.06}
+                font="bold 20px 'Geist', sans-serif"
+              />
+            </motion.div>
+          </div>
         </div>
         <motion.div
           initial={{ opacity: 0 }}
