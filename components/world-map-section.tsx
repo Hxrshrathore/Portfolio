@@ -153,17 +153,24 @@ export default function WorldMapSection() {
                       {/* Bright glow behind the active card */}
                       <div className="absolute inset-0 bg-white/20 blur-xl rounded-xl -z-10" />
                       
-                      <div className="bg-black/90 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 shadow-2xl whitespace-nowrap relative">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-base">{client.flag}</span>
-                          <span className="text-white font-bold text-sm tracking-wide">{client.country}</span>
+                      <div className="bg-black/95 backdrop-blur-xl border border-white/20 rounded-full px-2 py-1 shadow-2xl relative whitespace-nowrap">
+                        {/* Mobile: Ultra-concise tiny tag */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs md:text-base">{client.flag}</span>
+                          <span className="text-white font-bold text-[9px] md:text-sm tracking-wide uppercase">{client.country}</span>
+                          
+                          <div className="w-[1px] h-2.5 bg-white/10 mx-0.5" />
+                          
+                          <div className="flex items-center gap-1 text-white/50 text-[8px] md:text-[10px] font-mono">
+                            <span className="md:hidden">×</span>
+                            {client.projects} 
+                            <span className="hidden md:inline">PROJECTS</span>
+                          </div>
                         </div>
-                        <div className="text-white/50 text-[10px] tracking-[0.2em] uppercase font-mono">
+
+                        {/* Desktop only Label */}
+                        <div className="hidden md:block text-white/40 text-[9px] mt-0.5 uppercase tracking-widest font-mono pl-7">
                           {client.label}
-                        </div>
-                        <div className="text-white/80 text-xs mt-2 flex items-center gap-1.5 font-medium">
-                          <div className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_white]" />
-                          {client.projects} {client.projects === 1 ? "project" : "projects"} delivered
                         </div>
                       </div>
                       
