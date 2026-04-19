@@ -60,7 +60,7 @@ export default function WorldMapSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 tracking-tight"
+            className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 tracking-tight px-2"
           >
             Based in India,{" "}
             <span className="italic font-light text-gray-400" style={{ WebkitTextFillColor: "rgba(156, 163, 175, 0.8)" }}>
@@ -72,7 +72,7 @@ export default function WorldMapSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base md:text-lg text-white/40 max-w-2xl mx-auto font-light leading-relaxed"
+            className="text-sm md:text-lg text-white/40 max-w-2xl mx-auto font-light leading-relaxed px-4"
           >
             Collaborating with teams and founders across continents — from concept to launch, timezone-proof.
           </motion.p>
@@ -84,18 +84,18 @@ export default function WorldMapSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center items-center gap-10 md:gap-16 mb-16"
+          className="flex justify-center items-center gap-6 md:gap-16 mb-16 px-4"
         >
           {[
             { value: `${CLIENTS.length}`, suffix: "+", label: "Countries" },
-            { value: `${totalProjects}`, suffix: "+", label: "Projects Delivered" },
-            { value: "24", suffix: "/7", label: "Availability" },
+            { value: `${totalProjects}`, suffix: "+", label: "Projects" },
+            { value: "24", suffix: "/7", label: "Service" },
           ].map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-3xl md:text-5xl font-bold text-white tracking-tight tabular-nums">
+              <div className="text-2xl md:text-5xl font-bold text-white tracking-tight tabular-nums">
                 {stat.value}<span className="text-white/30">{stat.suffix}</span>
               </div>
-              <div className="text-[10px] uppercase tracking-[0.2em] text-white/30 mt-1 font-mono">
+              <div className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/30 mt-1 font-mono">
                 {stat.label}
               </div>
             </div>
@@ -189,26 +189,28 @@ export default function WorldMapSection() {
         </motion.div>
 
         {/* ── Interactive Country Pills ── */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2.5" data-no-cursor="true">
+        <div className="mt-10 flex flex-wrap justify-center gap-2 md:gap-2.5 px-4" data-no-cursor="true">
           {CLIENTS.map((client, i) => {
-            // Use simple math: active = 1.0, inactive = 0.4 base opacity
-            const o = activeClient === null ? 0.5 : (activeClient === i ? 1 : 0.3)
+            const isActive = activeClient === i
+            const o = activeClient === null ? 0.5 : (isActive ? 1 : 0.3)
             return (
               <div
                 key={client.country}
                 onMouseEnter={() => setActiveClient(i)}
                 onMouseLeave={() => setActiveClient(null)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/5 bg-white/[0.02] cursor-default select-none"
+                onClick={() => setActiveClient(isActive ? null : i)}
+                className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-full border border-white/5 bg-white/[0.02] cursor-default select-none transition-all duration-300"
                 style={{
                   opacity: o,
-                  transition: "opacity 0.2s ease",
+                  transform: isActive ? "scale(1.05)" : "scale(1)",
+                  borderColor: isActive ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)"
                 }}
               >
-                <span className="text-base">{client.flag}</span>
-                <span className="text-xs font-medium text-white/70 tracking-wide">
+                <span className="text-sm md:text-base">{client.flag}</span>
+                <span className="text-[11px] md:text-xs font-medium text-white/70 tracking-wide">
                   {client.country}
                 </span>
-                <span className="text-[9px] text-white/30 font-mono">
+                <span className="hidden sm:inline text-[9px] text-white/30 font-mono">
                   {client.label}
                 </span>
                 <span className="text-[10px] font-mono text-white/20 tabular-nums ml-1">

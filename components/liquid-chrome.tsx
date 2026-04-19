@@ -17,8 +17,9 @@ export const LiquidChrome = ({
   useEffect(() => {
     if (!containerRef.current) return
 
+    const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768
     const container = containerRef.current
-    const renderer = new Renderer({ antialias: true })
+    const renderer = new Renderer({ antialias: !isMobile })
     const gl = renderer.gl
     gl.clearColor(1, 1, 1, 1)
 
@@ -47,7 +48,10 @@ export const LiquidChrome = ({
           vec2 fragCoord = uvCoord * uResolution.xy;
           vec2 uv = (2.0 * fragCoord - uResolution.xy) / min(uResolution.x, uResolution.y);
 
-          for (float i = 1.0; i < 10.0; i++){
+          // Optimization: Fewer iterations on mobile
+          float iterations = ${isMobile ? "4.0" : "10.0"};
+          for (float i = 1.0; i < 20.0; i++){
+              if(i >= iterations) break;
               uv.x += uAmplitude / i * cos(i * uFrequencyX * uv.y + uTime + uMouse.x * 3.14159);
               uv.y += uAmplitude / i * cos(i * uFrequencyY * uv.x + uTime + uMouse.y * 3.14159);
           }
@@ -64,6 +68,10 @@ export const LiquidChrome = ({
 
       void main() {
           vec4 col = vec4(0.0);
+          // Optimization: 1 sample on mobile instead of 9
+          ${isMobile ? `
+          col = renderImage(vUv);
+          ` : `
           int samples = 0;
           for (int i = -1; i <= 1; i++){
               for (int j = -1; j <= 1; j++){
@@ -72,7 +80,9 @@ export const LiquidChrome = ({
                   samples++;
               }
           }
-          gl_FragColor = col / float(samples);
+          col /= float(samples);
+          `}
+          gl_FragColor = col;
       }
     `
 
@@ -95,7 +105,8 @@ export const LiquidChrome = ({
     const mesh = new Mesh(gl, { geometry, program })
 
     function resize() {
-      const scale = 1
+      // Optimization: Render at 0.75x resolution on mobile to save fill rate
+      const scale = isMobile ? 0.75 : 1
       renderer.setSize(container.offsetWidth * scale, container.offsetHeight * scale)
       const resUniform = program.uniforms.uResolution.value
       resUniform[0] = gl.canvas.width

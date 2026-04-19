@@ -33,8 +33,8 @@ export default function Footer() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
         
         {/* ── @hxrshrathore Text Pressure Section (Kept exactly as it is) ── */}
-        <div className="mb-24">
-          <div className="relative h-[150px] md:h-[250px] flex items-center justify-center mb-8">
+        <div className="mb-12 md:mb-24">
+          <div className="relative h-[100px] md:h-[250px] flex items-center justify-center mb-6">
             <TextPressure
               text="@hxrshrathore"
               flex={true}
@@ -45,21 +45,21 @@ export default function Footer() {
               italic={true}
               textColor="#ffffff"
               strokeColor="#ffffff"
-              minFontSize={36}
+              minFontSize={28}
             />
           </div>
-          <div className="text-center">
-            <p className="text-[10px] md:text-xs font-sans font-bold tracking-[0.4em] text-white/30 uppercase">
+          <div className="text-center px-4">
+            <p className="text-[9px] md:text-xs font-sans font-bold tracking-[0.4em] text-white/30 uppercase leading-relaxed">
               Crafted with precision • Powered by innovation
             </p>
           </div>
         </div>
 
         {/* ── Divider ── */}
-        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-24" />
+        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-16 md:mb-24" />
 
         {/* ── Main Footer Content ── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-24 px-4 md:px-0">
           
           {/* Brand & Bio (Left Col) */}
           <div className="md:col-span-5 flex flex-col justify-between">
@@ -69,12 +69,12 @@ export default function Footer() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.02] mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.02] mb-6 md:mb-8">
                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span className="text-[10px] uppercase tracking-widest text-white/60 font-mono">Available for Work</span>
               </div>
               
-              <h3 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent mb-6 tracking-tight">
+              <h3 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent mb-6 tracking-tight">
                 Let's build something<br />extraordinary.
               </h3>
               

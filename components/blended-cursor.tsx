@@ -123,7 +123,9 @@ export default function BlendedCursor() {
   const onUp   = useCallback(() => { state.current.clicked = false; }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
+    // Hard early return for mobile/touch devices to prevent ANY background CPU usage
+    const isTouch = typeof window !== "undefined" && (window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768);
+    if (isTouch) return;
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
