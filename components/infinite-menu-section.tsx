@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import InfiniteMenu from "./infinite-menu"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
@@ -150,9 +150,13 @@ const sideContentVariants = {
 export default function InfiniteMenuSection() {
   const [canNavigate, setCanNavigate] = useState(true)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [displayIndex, setDisplayIndex] = useState(0)
   const [isGlobeMoving, setIsGlobeMoving] = useState(false)
 
-  const activeItem = portfolioItems[activeIndex]
+  // Ref always holds the latest activeIndex — avoids stale closure in callbacks
+  const activeIndexRef = useRef(0)
+
+  const activeItem = portfolioItems[displayIndex]
 
   const handleNavigate = (direction: "prev" | "next") => {
     if (!canNavigate) return
@@ -160,16 +164,22 @@ export default function InfiniteMenuSection() {
     if ((window as any).__infiniteMenuNavigate) {
       ;(window as any).__infiniteMenuNavigate(direction)
     }
-    setTimeout(() => setCanNavigate(true), 600)
+    setTimeout(() => setCanNavigate(true), 800)
   }
 
   const handleActiveItemChange = useCallback((index: number) => {
-    setActiveIndex(index)
+    const mapped = index % portfolioItems.length
+    setActiveIndex(mapped)
+    activeIndexRef.current = mapped // keep ref in sync every frame
   }, [])
 
   const handleMovementChange = useCallback((moving: boolean) => {
     setIsGlobeMoving(moving)
-  }, [])
+    // Read from ref — not stale closure — so we get the real settled index
+    if (!moving) {
+      setDisplayIndex(activeIndexRef.current)
+    }
+  }, []) // empty deps: stable callback, reads latest via ref
 
   return (
     <section className="relative w-full bg-black overflow-hidden border-t border-white/5">
@@ -189,12 +199,17 @@ export default function InfiniteMenuSection() {
 
           {/* ─── LEFT COLUMN: Client Info ─── */}
           <div className="hidden md:flex flex-col items-center gap-6 min-h-[500px] justify-center">
+            <motion.div
+              animate={{ opacity: isGlobeMoving ? 0.3 : 1, filter: isGlobeMoving ? "blur(4px)" : "blur(0px)" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="w-full h-full flex flex-col items-center"
+            >
             <AnimatePresence mode="wait">
               <motion.div
-                key={`left-${activeIndex}`}
+                key={`left-${displayIndex}`}
                 variants={sideContentVariants}
                 initial="hidden"
-                animate={isGlobeMoving ? "exit" : "visible"}
+                animate="visible"
                 exit="exit"
                 className="flex flex-col items-center gap-5 w-full"
               >
@@ -239,6 +254,7 @@ export default function InfiniteMenuSection() {
                 </a>
               </motion.div>
             </AnimatePresence>
+            </motion.div>
           </div>
 
           {/* ─── CENTER COLUMN: Globe + Arrows ─── */}
@@ -275,7 +291,7 @@ export default function InfiniteMenuSection() {
                   <div
                     key={i}
                     className={`rounded-full transition-all duration-300 ${
-                      i === activeIndex
+                      i === displayIndex
                         ? "w-6 h-1.5 bg-white/60"
                         : "w-1.5 h-1.5 bg-white/15"
                     }`}
@@ -300,12 +316,17 @@ export default function InfiniteMenuSection() {
 
           {/* ─── RIGHT COLUMN: Testimonial + Rating ─── */}
           <div className="hidden md:flex flex-col items-center gap-6 min-h-[500px] justify-center">
+            <motion.div
+              animate={{ opacity: isGlobeMoving ? 0.3 : 1, filter: isGlobeMoving ? "blur(4px)" : "blur(0px)" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="w-full h-full flex flex-col"
+            >
             <AnimatePresence mode="wait">
               <motion.div
-                key={`right-${activeIndex}`}
+                key={`right-${displayIndex}`}
                 variants={sideContentVariants}
                 initial="hidden"
-                animate={isGlobeMoving ? "exit" : "visible"}
+                animate="visible"
                 exit="exit"
                 className="flex flex-col gap-5 w-full"
               >
@@ -345,6 +366,7 @@ export default function InfiniteMenuSection() {
                 </div>
               </motion.div>
             </AnimatePresence>
+            </motion.div>
           </div>
         </div>
 
@@ -352,10 +374,10 @@ export default function InfiniteMenuSection() {
         <div className="md:hidden mt-8 space-y-6">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`mobile-${activeIndex}`}
+              key={`mobile-${displayIndex}`}
               variants={sideContentVariants}
               initial="hidden"
-              animate={isGlobeMoving ? "exit" : "visible"}
+              animate="visible"
               exit="exit"
               className="space-y-6"
             >

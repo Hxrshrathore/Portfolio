@@ -1056,11 +1056,19 @@ class InfiniteGridMenu {
     const currentPos = this.getVertexWorldPosition(currentIndex)
     const targetPos = this.getVertexWorldPosition(targetIndex)
 
-    const axis = vec3.cross(vec3.create(), currentPos, targetPos)
-    vec3.normalize(axis, axis)
-    const angle = Math.acos(
-      Math.max(-1, Math.min(1, vec3.dot(vec3.normalize(vec3.create(), currentPos), vec3.normalize(vec3.create(), targetPos)))),
-    )
+    const currentPosNorm = vec3.normalize(vec3.create(), currentPos)
+    const targetPosNorm = vec3.normalize(vec3.create(), targetPos)
+
+    let axis = vec3.cross(vec3.create(), currentPosNorm, targetPosNorm)
+    if (vec3.length(axis) < 0.001) {
+      // If points are collinear/antipodal, fallback to Y-axis
+      axis = vec3.fromValues(0, 1, 0)
+    } else {
+      vec3.normalize(axis, axis)
+    }
+
+    const angle = Math.acos(Math.max(-1, Math.min(1, vec3.dot(currentPosNorm, targetPosNorm))))
+
 
     // Spread the rotation over ~30 frames for a smooth animated transition
     const totalFrames = 30
@@ -1145,6 +1153,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
         handleMovementChange,
         (sk) => {
           sketchRef.current = sk
+          ;(window as any).__infiniteMenuNavigate = (direction: "prev" | "next") => sk.navigate(direction)
           sk.run()
         },
       )
@@ -1161,20 +1170,9 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
 
     return () => {
       window.removeEventListener("resize", handleResize)
+      delete (window as any).__infiniteMenuNavigate
     }
   }, [items, onActiveItemChangeProp, onMovementChangeProp])
-
-  useEffect(() => {
-    if (onNavigate && sketchRef.current) {
-      const handleNav = (direction: "prev" | "next") => {
-        const sketch = sketchRef.current
-        if (!sketch) return
-
-        sketch.navigate(direction)
-      }
-      ;(window as any).__infiniteMenuNavigate = handleNav
-    }
-  }, [onNavigate, items])
 
   const handleButtonClick = () => {
     if (!activeItem?.link) return
