@@ -111,32 +111,50 @@ export default function ProjectsPage() {
           <Silk speed={4.2} scale={1} color="#ffffff" noiseIntensity={0.9} rotation={0} />
         </div>
         <div className="relative z-10 text-center max-w-5xl mx-auto px-4 pt-32">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.1 }}
+            className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-transparent"
           >
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-transparent">
-              Selected Works
-            </h1>
-            <p className="text-base md:text-lg text-white/40 max-w-xl mx-auto font-light leading-relaxed mb-4">
-              A curated showcase of architectural digital experiences, building the future of web design and AI technology.
-            </p>
-            <div className="relative w-[100vw] left-1/2 -translate-x-1/2 mt-12" style={{ height: '350px' }}>
-              <CircularGallery 
-                bend={3} 
-                textColor="#ffffff" 
-                borderRadius={0.05} 
-                scrollSpeed={2}
-                scrollEase={0.06}
-                font="bold 20px 'Geist', sans-serif"
-              />
-            </div>
+            Selected Works
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.25 }}
+            className="text-base md:text-lg text-white/40 max-w-xl mx-auto font-light leading-relaxed mb-4"
+          >
+            A curated showcase of architectural digital experiences, building the future of web design and AI technology.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.4 }}
+            className="relative w-[100vw] left-1/2 -translate-x-1/2 mt-12" style={{ height: '350px' }}
+          >
+            <CircularGallery 
+              bend={3} 
+              textColor="#ffffff" 
+              borderRadius={0.05} 
+              scrollSpeed={2}
+              scrollEase={0.06}
+              font="bold 20px 'Geist', sans-serif"
+            />
           </motion.div>
         </div>
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-20">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 0.2 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce"
+        >
           <ChevronDown className="w-6 h-6" />
-        </div>
+        </motion.div>
       </section>
 
       {/* Filter System */}
