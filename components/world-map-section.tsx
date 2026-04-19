@@ -153,18 +153,17 @@ export default function WorldMapSection() {
                       {/* Bright glow behind the active card */}
                       <div className="absolute inset-0 bg-white/20 blur-xl rounded-xl -z-10" />
                       
-                      <div className="bg-black/95 backdrop-blur-xl border border-white/20 rounded-full px-2 py-1 shadow-2xl relative whitespace-nowrap">
-                        {/* Mobile: Ultra-concise tiny tag */}
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs md:text-base">{client.flag}</span>
-                          <span className="text-white font-bold text-[9px] md:text-sm tracking-wide uppercase">{client.country}</span>
+                      <div className="bg-black/95 backdrop-blur-xl border border-white/20 rounded-full px-1.5 py-0.5 shadow-2xl relative whitespace-nowrap">
+                        {/* Mobile: Micro-badge */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] md:text-base">{client.flag}</span>
+                          <span className="text-white font-bold text-[8px] md:text-sm tracking-wide uppercase">{client.country}</span>
                           
-                          <div className="w-[1px] h-2.5 bg-white/10 mx-0.5" />
+                          <div className="w-[1px] h-2 bg-white/10 mx-0.5 hidden md:block" />
                           
-                          <div className="flex items-center gap-1 text-white/50 text-[8px] md:text-[10px] font-mono">
-                            <span className="md:hidden">×</span>
+                          <div className="flex items-center gap-0.5 text-white/50 text-[7px] md:text-[10px] font-mono">
+                            <span className="opacity-50">×</span>
                             {client.projects} 
-                            <span className="hidden md:inline">PROJECTS</span>
                           </div>
                         </div>
 

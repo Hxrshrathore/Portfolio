@@ -46,18 +46,20 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     // Sync Lenis scroll events to GSAP ScrollTrigger to keep pinned headers & animations working
     lenis.on('scroll', ScrollTrigger.update)
 
-    // Add Lenis's requestAnimationFrame directly into GSAP's global ticker master loop
-    gsap.ticker.add((time) => {
+    // Assign the callback to a stable reference so it can be cleanly removed on unmount
+    const update = (time: number) => {
       lenis.raf(time * 1000)
-    })
+    }
+
+    // Add Lenis's requestAnimationFrame directly into GSAP's global ticker master loop
+    gsap.ticker.add(update)
 
     // Disable lag smoothing in GSAP to prevent any jitter between ScrollTrigger & Lenis
     gsap.ticker.lagSmoothing(0)
 
     return () => {
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000)
-      })
+      // Must pass the exact same function reference to remove it!
+      gsap.ticker.remove(update)
       lenis.destroy()
     }
   }, [])

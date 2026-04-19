@@ -276,7 +276,9 @@ export default function Orb({
       window.removeEventListener("resize", resize)
       container.removeEventListener("mousemove", handleMouseMove)
       container.removeEventListener("mouseleave", handleMouseLeave)
-      container.removeChild(gl.canvas)
+      if (gl.canvas.parentElement === container) {
+        container.removeChild(gl.canvas)
+      }
       gl.getExtension("WEBGL_lose_context")?.loseContext()
     }
   }, [hue, hoverIntensity, rotateOnHover, forceHoverState])
