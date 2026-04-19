@@ -65,46 +65,66 @@ export default function TrustedBySection() {
   }, [isPaused])
 
   return (
-    <section className="relative min-h-screen bg-black text-white py-24 overflow-hidden border-t border-white/5">
+    <section className="relative min-h-screen bg-black text-white py-24 border-t border-white/5 flex flex-col justify-center">
       <div className="container mx-auto px-4" ref={ref}>
         <motion.div variants={containerVariants} initial="hidden" animate={controls} className="text-center">
 
           <motion.h2
             variants={itemVariants}
-            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 uppercase tracking-tight"
+            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 tracking-tight"
           >
             Trusted by Visionaries
           </motion.h2>
 
-          <motion.p variants={itemVariants} className="text-base md:text-lg text-gray-300 mb-16 max-w-2xl mx-auto tracking-wide">
-            Partnering with forward-thinking companies who dare to push boundaries
+          <motion.p variants={itemVariants} className="text-base md:text-lg text-gray-400 mb-20 max-w-2xl mx-auto font-light tracking-wide">
+            Partnering with forward-thinking companies who dare to push boundaries.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="relative overflow-hidden mx-auto max-w-6xl">
+          <motion.div 
+            variants={itemVariants} 
+            className="relative overflow-hidden mx-auto max-w-6xl w-full"
+            style={{
+              maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+              WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)"
+            }}
+          >
+            
+            {/* CSS-driven marquee avoiding GSAP load race conditions */}
+            <style>
+              {`
+                @keyframes marquee {
+                  0% { transform: translateX(0); }
+                  100% { transform: translateX(-50%); }
+                }
+                .css-marquee-track {
+                  animation: marquee 30s linear infinite;
+                  width: max-content;
+                }
+                .css-marquee-track:hover {
+                  animation-play-state: paused;
+                }
+              `}
+            </style>
             
             <div
-              ref={trackRef}
-              className="flex whitespace-nowrap will-change-transform"
-              style={{ transform: "translateX(0px)" }}
+              className="flex css-marquee-track will-change-transform items-center py-4"
+              data-no-cursor="true"
             >
               {loopLogos.map((company, i) => (
                 <div
                   key={`${company.name}-${i}`}
-                  className="flex items-center justify-center px-6 py-6 cursor-pointer"
-                  style={{ minWidth: 200 }}
-                  onMouseEnter={() => setIsPaused(true)}
-                  onMouseLeave={() => setIsPaused(false)}
+                  className="flex items-center justify-center px-10 md:px-16"
                 >
                   <img
                     src={company.logo}
                     alt={company.name}
                     className={`
-                      object-contain 
-                      filter grayscale brightness-75 
+                      object-contain
+                      filter grayscale opacity-60
                       transition-all duration-500 ease-out
-                      hover:grayscale-0 hover:brightness-100 hover:scale-110 hover:drop-shadow-lg
-                      ${company.square ? "h-20" : "h-12"}
-                      w-auto max-w-[160px]
+                      hover:grayscale-0 hover:opacity-100 hover:scale-110 hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]
+                      ${company.square ? "h-16 md:h-20" : "h-10 md:h-12"}
+                      w-auto max-w-[180px]
                     `}
                   />
                 </div>

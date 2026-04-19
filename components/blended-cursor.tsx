@@ -92,6 +92,13 @@ export default function BlendedCursor() {
     const target = e.target as HTMLElement;
     const s = state.current;
 
+    // Globally respect data-no-cursor on any parent
+    if (target.closest('[data-no-cursor]')) {
+      s.mode = STATE.DEFAULT;
+      s.hoverEl = null;
+      return;
+    }
+
     const link = target.closest(LINK_SELECTOR) as HTMLElement | null;
     if (link) {
       s.mode = STATE.HOVER;

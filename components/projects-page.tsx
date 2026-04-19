@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Filter, Calendar, Zap, LayoutGrid, Clock, ChevronDown } from "lucide-react"
-import Silk from "@/components/ui/silk"
+import SilkLoader from "@/components/ui/silk"
+// We'll replace Silk and CircularGallery with dynamic versions below
 import { FocusCards } from "@/components/ui/focus-cards"
 import Footer from "@/components/footer"
 import { getAllProjects, type Project, type ProjectDomain, type ProjectStatus } from "@/lib/projects-data"
@@ -13,8 +14,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { cn } from "@/lib/utils"
 // Import our custom scroll context instead of ScrollSmoother
 import { useScroll } from "@/components/smooth-scroll"
-import CircularGallery from "@/components/CircularGallery"
+import CircularGalleryLoader from "@/components/CircularGallery"
+import dynamic from "next/dynamic"
 
+const Silk = dynamic(() => import("@/components/ui/silk"), { ssr: false })
+const CircularGallery = dynamic(() => import("@/components/CircularGallery"), { ssr: false })
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
 }
@@ -100,8 +104,6 @@ export default function ProjectsPage() {
       prev.includes(domain) ? prev.filter(d => d !== domain) : [...prev, domain]
     )
   }
-
-  if (!mounted) return null
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">

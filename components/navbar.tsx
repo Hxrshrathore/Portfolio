@@ -3,6 +3,7 @@
 import { useState } from "react"
 import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
+import { ShoppingCart } from "lucide-react"
 import PixelBat from "./ui/pixel-bat"
 
 export default function Navbar() {
@@ -30,6 +31,10 @@ export default function Navbar() {
               <a href="#about" className="text-white hover:text-gray-300 transition-colors">
                 About
               </a>
+              <div className="w-[1px] h-4 bg-white/20 mx-2" />
+              <TransitionLink href="/cart" aria-label="Cart" className="text-white hover:text-gray-300 transition-transform hover:scale-110 active:scale-95 duration-300">
+                <ShoppingCart className="w-5 h-5" />
+              </TransitionLink>
             </div>
 
             <button
@@ -97,6 +102,15 @@ export default function Navbar() {
                   >
                     About
                   </a>
+                  <div className="w-12 h-[1px] bg-white/20 my-2" />
+                  <TransitionLink
+                    href="/cart"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors flex items-center gap-3"
+                  >
+                    Cart
+                    <ShoppingCart className="w-6 h-6" />
+                  </TransitionLink>
                 </nav>
               </div>
             </motion.div>
