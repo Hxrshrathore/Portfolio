@@ -14,7 +14,7 @@ export default function MagicBentoSection() {
         {/* Header */}
         <div className="text-center mb-20">
           <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6  tracking-tight">But, why me?</h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto tracking-wide">
+          <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto tracking-wide">
             Because I'm Cool, just kidding ;)
             <br />
             Experience the magic of thoughtful interaction design. Every hover, every click, every moment is crafted to

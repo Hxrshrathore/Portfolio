@@ -28,7 +28,7 @@ export default function Hero() {
   }
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative h-[95vh] w-full overflow-hidden bg-black">
       <div className="absolute inset-0 z-0 w-full h-full">
         <LiquidChrome
           baseColor={[0.015, 0.015, 0.015]}

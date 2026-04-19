@@ -3,6 +3,7 @@ import "./globals.css"
 import { Geist, Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import ClickSpark from "@/components/click-spark"
+import BlendedCursor from "@/components/blended-cursor"
 import Preloader from "@/components/preloader"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -118,6 +119,7 @@ export default function RootLayout({
           <AnimatedFavicon />
           <Preloader>
             <Navbar />
+            <BlendedCursor />
             <SmoothScroll>
               <ClickSpark
                 sparkColor="#ffffff"

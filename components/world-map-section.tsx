@@ -31,7 +31,7 @@ export default function WorldMapSection() {
               ))}
             </span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto tracking-wide">
+          <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto tracking-wide">
             Based in INDIA but working around the Globe.
           </p>
         </div>

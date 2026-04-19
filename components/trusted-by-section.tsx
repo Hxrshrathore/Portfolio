@@ -76,7 +76,7 @@ export default function TrustedBySection() {
             Trusted by Visionaries
           </motion.h2>
 
-          <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-300 mb-16 max-w-2xl mx-auto tracking-wide">
+          <motion.p variants={itemVariants} className="text-base md:text-lg text-gray-300 mb-16 max-w-2xl mx-auto tracking-wide">
             Partnering with forward-thinking companies who dare to push boundaries
           </motion.p>
 

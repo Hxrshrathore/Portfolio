@@ -98,6 +98,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
         href={link}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        data-no-cursor="true"
       >
         {text}
       </a>

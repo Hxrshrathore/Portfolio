@@ -2,6 +2,7 @@ import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
 import readingTime from "reading-time"
+import yaml from "js-yaml"
 
 const postsDirectory = path.join(process.cwd(), "content/blog")
 
@@ -47,7 +48,11 @@ export function getAllPosts(): BlogPostMetadata[] {
       const slug = fileName.replace(/\.mdx$/, "")
       const fullPath = path.join(postsDirectory, fileName)
       const fileContents = fs.readFileSync(fullPath, "utf8")
-      const { data, content } = matter(fileContents)
+      const { data, content } = matter(fileContents, {
+        engines: {
+          yaml: (str) => yaml.load(str) as object
+        }
+      })
       const stats = readingTime(content)
 
       return {
@@ -74,7 +79,11 @@ export function getPostBySlug(slug: string): BlogPost | null {
   try {
     const fullPath = path.join(postsDirectory, `${slug}.mdx`)
     const fileContents = fs.readFileSync(fullPath, "utf8")
-    const { data, content } = matter(fileContents)
+    const { data, content } = matter(fileContents, {
+      engines: {
+        yaml: (str) => yaml.load(str) as object
+      }
+    })
     const stats = readingTime(content)
 
     return {

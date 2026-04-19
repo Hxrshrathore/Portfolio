@@ -10,11 +10,13 @@ import { getAllProjects, type Project, type ProjectDomain, type ProjectStatus } 
 import { useGSAP } from "@gsap/react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollSmoother } from "gsap/ScrollSmoother"
 import { cn } from "@/lib/utils"
+// Import our custom scroll context instead of ScrollSmoother
+import { useScroll } from "@/components/smooth-scroll"
+import CircularGallery from "@/components/CircularGallery"
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
+  gsap.registerPlugin(ScrollTrigger)
 }
 
 const DOMAINS: ProjectDomain[] = ["DATA ANALYST", "WEB DESIGN", "WEB DEVELOPMENT", "AI/ML", "GD"]
@@ -27,6 +29,8 @@ export default function ProjectsPage() {
   const [selectedDomains, setSelectedDomains] = useState<ProjectDomain[]>([])
   const [selectedStatus, setSelectedStatus] = useState<ProjectStatus | "All">("All")
   const [selectedTime, setSelectedTime] = useState<string>("All")
+  
+  const { lenis } = useScroll()
   
   const filterRef = useRef<HTMLElement>(null)
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
@@ -81,10 +85,9 @@ export default function ProjectsPage() {
     const section = sectionRefs.current[domain]
     if (section) {
       if (typeof window !== "undefined") {
-        const smoother = ScrollSmoother.get()
-        if (smoother) {
-          // Scroll with a slight offset for the pinned header
-          smoother.scrollTo(section, true, "top 120px")
+        if (lenis) {
+          // Lenis scrollTo natively handles offsets for headers nicely
+          lenis.scrollTo(section, { offset: -120, duration: 1.2 })
         } else {
           section.scrollIntoView({ behavior: "smooth", block: "start" })
         }
@@ -103,22 +106,32 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-[92vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full opacity-40">
           <Silk speed={4.2} scale={1} color="#ffffff" noiseIntensity={0.9} rotation={0} />
         </div>
-        <div className="relative z-10 text-center max-w-5xl mx-auto px-4">
+        <div className="relative z-10 text-center max-w-5xl mx-auto px-4 pt-32">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="text-6xl md:text-9xl font-bold tracking-tighter mb-8 bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-transparent">
               Selected Works
             </h1>
-            <p className="text-lg md:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed">
+            <p className="text-base md:text-lg text-white/40 max-w-xl mx-auto font-light leading-relaxed mb-4">
               A curated showcase of architectural digital experiences, building the future of web design and AI technology.
             </p>
+            <div className="relative w-[100vw] left-1/2 -translate-x-1/2 mt-12" style={{ height: '350px' }}>
+              <CircularGallery 
+                bend={3} 
+                textColor="#ffffff" 
+                borderRadius={0.05} 
+                scrollSpeed={2}
+                scrollEase={0.06}
+                font="bold 20px 'Geist', sans-serif"
+              />
+            </div>
           </motion.div>
         </div>
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-20">

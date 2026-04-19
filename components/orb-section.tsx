@@ -25,7 +25,7 @@ export default function OrbSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h2 className="text-7xl md:text-[9rem] font-bold tracking-tighter leading-[0.8] flex flex-col uppercase select-none cursor-default">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[0.8] flex flex-col uppercase select-none cursor-default">
               <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">LET&apos;S</span>
               <span className="font-light italic text-white/10 -mt-2 md:-mt-8 transition-all duration-700 hover:text-white/30">TALK</span>
             </h2>
@@ -38,7 +38,7 @@ export default function OrbSection() {
             viewport={{ once: true }}
             className="flex flex-col space-y-4"
           >
-            <p className="text-gray-300 text-sm md:text-base font-bold tracking-[0.3em] uppercase">
+            <p className="text-gray-300 text-base md:text-lg font-bold tracking-[0.3em] uppercase">
               HAVE A PROJECT IN MIND?
             </p>
             <div className="h-px w-24 bg-white/20" />

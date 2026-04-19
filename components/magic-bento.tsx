@@ -6,6 +6,7 @@ import { gsap } from "gsap"
 import "./magic-bento.css"
 import BentoPerformanceChart from "./bento-performance-chart"
 import BentoDesignVisual from "./bento-design-visual"
+import { BentoTechStack, BentoCodeSnippet, BentoStackLayers, BentoStatsCounter } from "./bento-card-visuals"
 
 export interface BentoCardProps {
   color?: string
@@ -39,15 +40,17 @@ const MOBILE_BREAKPOINT = 768
 const cardData: BentoCardProps[] = [
   {
     color: "#000000",
-    title: "Web Architecture",
-    description: "Building digital foundations that scale beautifully",
-    label: "Development",
+    title: "",
+    description: "",
+    label: "Tech Arsenal",
+    customContent: <BentoTechStack />,
   },
   {
     color: "#000000",
-    title: "Creative Code",
-    description: "Where art meets technology in perfect harmony",
-    label: "Innovation",
+    title: "",
+    description: "",
+    label: "Code is Poetry",
+    customContent: <BentoCodeSnippet />,
   },
   {
     color: "#000000",
@@ -59,23 +62,26 @@ const cardData: BentoCardProps[] = [
   {
     color: "#000000",
     title: "Performance",
-    description: "Speed so fast, it feels instantaneous",
+    description: "Core Web Vitals optimized — every millisecond counts",
     label: "Optimization",
     customContent: <BentoPerformanceChart />,
   },
   {
     color: "#000000",
-    title: "Full-Stack",
-    description: "End-to-end solutions that just work",
-    label: "Engineering",
+    title: "",
+    description: "",
+    label: "Full-Stack",
+    customContent: <BentoStackLayers />,
   },
   {
     color: "#000000",
-    title: "Innovation",
-    description: "Building tomorrow's web today",
-    label: "Future",
+    title: "",
+    description: "",
+    label: "By The Numbers",
+    customContent: <BentoStatsCounter />,
   },
 ]
+
 
 const createParticleElement = (x: number, y: number, color: string = DEFAULT_GLOW_COLOR): HTMLDivElement => {
   const el = document.createElement("div")
@@ -343,11 +349,11 @@ const ParticleCard: React.FC<{
       element.removeEventListener("mouseleave", handleMouseLeave)
       element.removeEventListener("mousemove", handleMouseMove)
       element.removeEventListener("click", handleClick)
-      // ✅ Kill quickTo tweens safely to prevent memory leaks
-      quickToRotateX.current?.kill?.()
-      quickToRotateY.current?.kill?.()
-      quickToMagnetX.current?.kill?.()
-      quickToMagnetY.current?.kill?.()
+      // Nullify quickTo refs — tweens are GC'd when dereferenced
+      quickToRotateX.current = null
+      quickToRotateY.current = null
+      quickToMagnetX.current = null
+      quickToMagnetY.current = null
       clearAllParticles()
     }
   }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor])

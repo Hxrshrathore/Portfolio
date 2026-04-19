@@ -1,58 +1,78 @@
 "use client"
 
 import type React from "react"
+import { useEffect, useState, createContext, useContext } from "react"
+import Lenis from "lenis"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollSmoother } from "gsap/ScrollSmoother"
-import { useGSAP } from "@gsap/react"
 
-// No need to manually register ScrollSmoother if using latest gsap, 
-// but it's safe to do so.
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
+  gsap.registerPlugin(ScrollTrigger)
 }
+
+interface ScrollContextType {
+  lenis: Lenis | null
+  setWeight: (weight: number) => void
+}
+
+const ScrollContext = createContext<ScrollContextType>({
+  lenis: null,
+  setWeight: () => {},
+})
+
+// Custom hook allowing any component to get the Lenis instance and alter global scroll weight
+export const useScroll = () => useContext(ScrollContext)
 
 interface SmoothScrollProps {
   children: React.ReactNode
 }
 
 export default function SmoothScroll({ children }: SmoothScrollProps) {
-  useGSAP(() => {
-    /**
-     * [SMOOTH_SCROLL_SENSITIVITY]
-     * Tuning the 'glide' feel.
-     * Scale: 1 (Native-like) to 5 (Very floaty/heavy)
-     * Current Setting: 3 (Balanced)
-     * 
-     * Mathematical Note: 'smooth' represents the time (in seconds) it takes 
-     * for the visual position to catch up to the actual scroll position.
-     * Higher = smoother but more 'lag'.
-     */
-    const smoothValue = 0.8 // Lower value = faster response, less perceived "lag".
+  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null)
 
-    ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: smoothValue,
-      effects: true,
-      normalizeScroll: false, // Disabling this often fixes choppiness/jitter.
-      smoothTouch: 0.1, // Smoothness on touch devices.
-      ignoreMobileResize: true,
+  useEffect(() => {
+    // Initialize Lenis natively. 
+    // Higher duration = heavier/floaty feel. Lower = snappier/faster.
+    const lenis = new Lenis({
+      duration: 1.2, 
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
     })
 
-    // PERFORMANCE: Disable lagSmoothing to prevent GSAP from "jumping" to catch up.
+    setLenisInstance(lenis)
+    
+    // Sync Lenis scroll events to GSAP ScrollTrigger to keep pinned headers & animations working
+    lenis.on('scroll', ScrollTrigger.update)
+
+    // Add Lenis's requestAnimationFrame directly into GSAP's global ticker master loop
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000)
+    })
+
+    // Disable lag smoothing in GSAP to prevent any jitter between ScrollTrigger & Lenis
     gsap.ticker.lagSmoothing(0)
+
+    return () => {
+      gsap.ticker.remove((time) => {
+        lenis.raf(time * 1000)
+      })
+      lenis.destroy()
+    }
   }, [])
 
+  const setWeight = (weight: number) => {
+    if (lenisInstance) {
+      // Dynamic alteration of scroll weight/duration for different components/pages
+      lenisInstance.options.duration = weight
+    }
+  }
+
   return (
-    <div id="smooth-wrapper" className="overflow-hidden w-full h-full">
-      <div 
-        id="smooth-content" 
-        className="relative w-full overflow-hidden flex flex-col"
-        style={{ willChange: "transform" }}
-      >
-        {children}
-      </div>
-    </div>
+    <ScrollContext.Provider value={{ lenis: lenisInstance, setWeight }}>
+      {/* Lenis doesn't need wrapping structure divs like GSAP ScrollSmoother does. */}
+      {children}
+    </ScrollContext.Provider>
   )
 }

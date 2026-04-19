@@ -137,13 +137,13 @@ const sideContentVariants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] },
+    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] as const },
   },
   exit: {
     opacity: 0,
     y: -10,
     filter: "blur(4px)",
-    transition: { duration: 0.2, ease: "easeIn" },
+    transition: { duration: 0.2, ease: "easeIn" as const },
   },
 }
 
@@ -193,7 +193,7 @@ export default function InfiniteMenuSection() {
         <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 tracking-tight">
           Explore My Universe
         </h2>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4 tracking-wide">
+        <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto px-4 tracking-wide">
           Navigate through a constellation of creativity.
         </p>
       </div>
