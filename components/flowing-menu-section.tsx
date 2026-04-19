@@ -28,7 +28,9 @@ export default function FlowingMenuSection() {
       <div className="text-center py-24 px-4">
         <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6  tracking-tight">How Can I Help You?</h2>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto tracking-wide">
-          I'm a full-stack developer with a passion for building cool stuff. I'm also a bit of a perfectionist, so I don't cut corners. I'm always looking for new challenges and opportunities to learn.
+          I mean if you are here either you need a help or you are here to check my skills.
+          <br />  
+          Anyway, I'm a full-stack developer with a passion for building cool stuff. I'm also a bit of a perfectionist, so I don't cut corners. I'm always looking for new challenges and opportunities to learn.
         </p>
       </div>
 

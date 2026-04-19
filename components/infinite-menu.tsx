@@ -890,6 +890,7 @@ class InfiniteGridMenu {
 
   private animate(deltaTime: number): void {
     if (!this.gl) return
+    this.updateNavigation()
     this.control.update(deltaTime, this.TARGET_FRAME_DURATION)
 
     const positions = this.instancePositions.map((p) => vec3.transformQuat(vec3.create(), p, this.control.orientation))
@@ -1041,9 +1042,14 @@ class InfiniteGridMenu {
     return vec3.transformQuat(vec3.create(), nearestVertexPos, this.control.orientation)
   }
 
+  private navigating = false
+  private navFramesRemaining = 0
+  private navRotationPerFrame = quat.create()
+
   public navigate(direction: "prev" | "next"): void {
+    if (this.navigating) return
+
     const currentIndex = this.findNearestVertexIndex()
-    const itemCount = this.items.length || 1
     const step = direction === "next" ? 1 : -1
     const targetIndex = (currentIndex + step + this.DISC_INSTANCE_COUNT) % this.DISC_INSTANCE_COUNT
 
@@ -1053,14 +1059,44 @@ class InfiniteGridMenu {
     const axis = vec3.cross(vec3.create(), currentPos, targetPos)
     vec3.normalize(axis, axis)
     const angle = Math.acos(
-      vec3.dot(vec3.normalize(vec3.create(), currentPos), vec3.normalize(vec3.create(), targetPos)),
+      Math.max(-1, Math.min(1, vec3.dot(vec3.normalize(vec3.create(), currentPos), vec3.normalize(vec3.create(), targetPos)))),
     )
-    const rotation = quat.setAxisAngle(quat.create(), axis, angle)
 
-    quat.multiply(this.control.orientation, rotation, this.control.orientation)
-    quat.normalize(this.control.orientation, this.control.orientation)
+    // Spread the rotation over ~30 frames for a smooth animated transition
+    const totalFrames = 30
+    const anglePerFrame = angle / totalFrames
+    quat.setAxisAngle(this.navRotationPerFrame, axis, anglePerFrame)
+
+    this.navigating = true
+    this.navFramesRemaining = totalFrames
+
+    // Simulate pointer down to trigger zoom-out in onControlUpdate
+    this.control.isPointerDown = true
+  }
+
+  private updateNavigation(): void {
+    if (!this.navigating || this.navFramesRemaining <= 0) {
+      if (this.navigating) {
+        this.navigating = false
+        this.control.isPointerDown = false
+      }
+      return
+    }
+
+    // Apply a small rotation increment each frame (mimics pointer dragging)
+    quat.multiply(this.control.pointerRotation, this.navRotationPerFrame, this.control.pointerRotation)
+    quat.normalize(this.control.pointerRotation, this.control.pointerRotation)
+
+    this.navFramesRemaining--
+
+    if (this.navFramesRemaining <= 0) {
+      this.navigating = false
+      // Release the simulated pointer so the globe snaps and zooms back in
+      this.control.isPointerDown = false
+    }
   }
 }
+
 
 const defaultItems: MenuItem[] = [
   {
@@ -1074,9 +1110,12 @@ const defaultItems: MenuItem[] = [
 interface InfiniteMenuProps {
   items?: MenuItem[]
   onNavigate?: (direction: "prev" | "next") => void
+  hideOverlay?: boolean
+  onActiveItemChange?: (index: number) => void
+  onMovementChange?: (isMoving: boolean) => void
 }
 
-const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
+const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverlay = false, onActiveItemChange: onActiveItemChangeProp, onMovementChange: onMovementChangeProp }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null) as MutableRefObject<HTMLCanvasElement | null>
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null)
   const [isMoving, setIsMoving] = useState<boolean>(false)
@@ -1090,6 +1129,12 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
       if (!items.length) return
       const itemIndex = index % items.length
       setActiveItem(items[itemIndex])
+      onActiveItemChangeProp?.(itemIndex)
+    }
+
+    const handleMovementChange = (moving: boolean) => {
+      setIsMoving(moving)
+      onMovementChangeProp?.(moving)
     }
 
     if (canvas) {
@@ -1097,7 +1142,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
         canvas,
         items.length ? items : defaultItems,
         handleActiveItem,
-        setIsMoving,
+        handleMovementChange,
         (sk) => {
           sketchRef.current = sk
           sk.run()
@@ -1117,7 +1162,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
     return () => {
       window.removeEventListener("resize", handleResize)
     }
-  }, [items])
+  }, [items, onActiveItemChangeProp, onMovementChangeProp])
 
   useEffect(() => {
     if (onNavigate && sketchRef.current) {
@@ -1148,9 +1193,9 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
         className="cursor-grab w-full h-full overflow-hidden relative outline-none active:cursor-grabbing"
       />
 
-      {activeItem && (
+      {!hideOverlay && activeItem && (
         <>
-          {/* DESKTOP OVERLAY TEXT (unchanged) */}
+          {/* DESKTOP OVERLAY TEXT */}
           <div className="hidden md:block">
             <h2
               className={`
@@ -1206,22 +1251,19 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
 
           {/* MOBILE STACKED LAYOUT */}
           <div className="md:hidden mt-6 text-center px-6 w-full absolute bottom-4 left-0">
-  <h2 className="font-black text-white text-3xl leading-tight mb-2 break-words max-w-[90%] mx-auto">
-    {activeItem.title}
-  </h2>
-
-  <p className="text-gray-300 text-base leading-snug max-w-[30ch] mx-auto mb-4">
-    {activeItem.description}
-  </p>
-
-  <button
-    onClick={handleButtonClick}
-    className="mt-100 w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
-  >
-    <span className="text-2xl text-[#060010]">&#x2197;</span>
-  </button>
-</div>
-
+            <h2 className="font-black text-white text-3xl leading-tight mb-2 break-words max-w-[90%] mx-auto">
+              {activeItem.title}
+            </h2>
+            <p className="text-gray-300 text-base leading-snug max-w-[30ch] mx-auto mb-4">
+              {activeItem.description}
+            </p>
+            <button
+              onClick={handleButtonClick}
+              className="mt-100 w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
+            >
+              <span className="text-2xl text-[#060010]">&#x2197;</span>
+            </button>
+          </div>
         </>
       )}
     </div>
@@ -1229,3 +1271,4 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate }) => {
 }
 
 export default InfiniteMenu
+
