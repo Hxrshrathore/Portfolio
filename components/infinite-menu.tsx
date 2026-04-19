@@ -497,7 +497,7 @@ class ArcballControl {
 
   private pointerPos = vec2.create()
   private previousPointerPos = vec2.create()
-  private _rotationVelocity = 0
+  public _rotationVelocity = 0
   private _combinedQuat = quat.create()
 
   private readonly EPSILON = 0.1
@@ -998,20 +998,31 @@ class InfiniteGridMenu {
     let damping = 5 / timeScale
     let cameraTargetZ = 3
 
-    const isMoving = this.control.isPointerDown || Math.abs(this.smoothRotationVelocity) > 0.01
+    // Movement detection: includes real pointer AND programmatic navigation
+    const isMoving = this.control.isPointerDown || this.navigating || Math.abs(this.smoothRotationVelocity) > 0.01
 
     if (isMoving !== this.movementActive) {
       this.movementActive = isMoving
       this.onMovementChange(isMoving)
     }
 
-    if (!this.control.isPointerDown) {
+    if (this.navigating) {
+      // During programmatic navigation, use controlled zoom (bell curve 0..0.6)
+      cameraTargetZ += this.navCameraZoom * 3
+      damping = 4 / timeScale
+    } else if (!this.control.isPointerDown) {
       const nearestVertexIndex = this.findNearestVertexIndex()
       const itemIndex = nearestVertexIndex % Math.max(1, this.items.length)
       this.onActiveItemChange(itemIndex)
       const snapDirection = vec3.normalize(vec3.create(), this.getVertexWorldPosition(nearestVertexIndex))
       this.control.snapTargetDirection = snapDirection
+
+      // Apply residual navCameraZoom decay
+      if (this.navCameraZoom > 0) {
+        cameraTargetZ += this.navCameraZoom * 3
+      }
     } else {
+      // Real pointer drag
       cameraTargetZ += this.control.rotationVelocity * 80 + 2.5
       damping = 7 / timeScale
     }
@@ -1042,9 +1053,13 @@ class InfiniteGridMenu {
     return vec3.transformQuat(vec3.create(), nearestVertexPos, this.control.orientation)
   }
 
+  // ─── Programmatic Navigation ───
   private navigating = false
-  private navFramesRemaining = 0
-  private navRotationPerFrame = quat.create()
+  private navProgress = 0
+  private navTotalFrames = 0
+  private navStartOrientation = quat.create()
+  private navTargetOrientation = quat.create()
+  public navCameraZoom = 0  // 0 = resting, 1 = fully zoomed out
 
   public navigate(direction: "prev" | "next"): void {
     if (this.navigating) return
@@ -1053,54 +1068,77 @@ class InfiniteGridMenu {
     const step = direction === "next" ? 1 : -1
     const targetIndex = (currentIndex + step + this.DISC_INSTANCE_COUNT) % this.DISC_INSTANCE_COUNT
 
-    const currentPos = this.getVertexWorldPosition(currentIndex)
-    const targetPos = this.getVertexWorldPosition(targetIndex)
+    // Snapshot current orientation as the start
+    quat.copy(this.navStartOrientation, this.control.orientation)
 
-    const currentPosNorm = vec3.normalize(vec3.create(), currentPos)
-    const targetPosNorm = vec3.normalize(vec3.create(), targetPos)
+    // Compute the rotation needed to bring targetIndex to the front
+    const targetLocalPos = this.instancePositions[targetIndex]
+    const snapDir = this.control.snapDirection // typically (0, 0, -1)
 
-    let axis = vec3.cross(vec3.create(), currentPosNorm, targetPosNorm)
-    if (vec3.length(axis) < 0.001) {
-      // If points are collinear/antipodal, fallback to Y-axis
+    // We need: R * targetLocalPos = snapDir (pointing at camera)
+    // So R = rotation from targetLocalPos to snapDir
+    const from = vec3.normalize(vec3.create(), targetLocalPos)
+    const to = vec3.normalize(vec3.create(), snapDir)
+
+    let axis = vec3.cross(vec3.create(), from, to)
+    const dot = vec3.dot(from, to)
+
+    if (vec3.length(axis) < 0.0001) {
+      if (dot > 0) {
+        // Already aligned, nothing to do
+        return
+      }
+      // Opposite direction — pick arbitrary perpendicular axis
       axis = vec3.fromValues(0, 1, 0)
-    } else {
-      vec3.normalize(axis, axis)
     }
+    vec3.normalize(axis, axis)
 
-    const angle = Math.acos(Math.max(-1, Math.min(1, vec3.dot(currentPosNorm, targetPosNorm))))
+    const angle = Math.acos(Math.max(-1, Math.min(1, dot)))
+    const deltaQuat = quat.setAxisAngle(quat.create(), axis, angle)
 
+    // Target orientation = deltaQuat (gets target to front)
+    quat.copy(this.navTargetOrientation, deltaQuat)
 
-    // Spread the rotation over ~30 frames for a smooth animated transition
-    const totalFrames = 30
-    const anglePerFrame = angle / totalFrames
-    quat.setAxisAngle(this.navRotationPerFrame, axis, anglePerFrame)
+    // Reset pointer rotation to identity to prevent leftover momentum
+    quat.identity(this.control.pointerRotation)
+    this.control._rotationVelocity = 0
 
     this.navigating = true
-    this.navFramesRemaining = totalFrames
-
-    // Simulate pointer down to trigger zoom-out in onControlUpdate
-    this.control.isPointerDown = true
+    this.navProgress = 0
+    this.navTotalFrames = 30
   }
 
   private updateNavigation(): void {
-    if (!this.navigating || this.navFramesRemaining <= 0) {
-      if (this.navigating) {
-        this.navigating = false
-        this.control.isPointerDown = false
-      }
+    if (!this.navigating) {
+      // Decay zoom back to 0 when not navigating
+      this.navCameraZoom *= 0.85
+      if (this.navCameraZoom < 0.005) this.navCameraZoom = 0
       return
     }
 
-    // Apply a small rotation increment each frame (mimics pointer dragging)
-    quat.multiply(this.control.pointerRotation, this.navRotationPerFrame, this.control.pointerRotation)
-    quat.normalize(this.control.pointerRotation, this.control.pointerRotation)
+    this.navProgress++
 
-    this.navFramesRemaining--
+    // Ease-in-out parameter [0..1]
+    const t = this.navProgress / this.navTotalFrames
+    const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
 
-    if (this.navFramesRemaining <= 0) {
+    // Slerp orientation from start to target
+    quat.slerp(this.control.orientation, this.navStartOrientation, this.navTargetOrientation, ease)
+    quat.normalize(this.control.orientation, this.control.orientation)
+
+    // Camera zoom: bell curve — zoom out in middle, return at end
+    this.navCameraZoom = Math.sin(t * Math.PI) * 0.6
+
+    if (this.navProgress >= this.navTotalFrames) {
+      // Snap exactly to target
+      quat.copy(this.control.orientation, this.navTargetOrientation)
+      quat.normalize(this.control.orientation, this.control.orientation)
+
       this.navigating = false
-      // Release the simulated pointer so the globe snaps and zooms back in
-      this.control.isPointerDown = false
+      this.navCameraZoom = 0
+
+      // Reset pointer rotation so snapping can take over cleanly
+      quat.identity(this.control.pointerRotation)
     }
   }
 }

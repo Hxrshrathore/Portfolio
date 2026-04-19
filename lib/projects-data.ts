@@ -1,3 +1,6 @@
+export type ProjectDomain = "DATA ANALYST" | "WEB DESIGN" | "WEB DEVELOPMENT" | "AI/ML" | "GD"
+export type ProjectStatus = "ACTIVE" | "BUILDING" | "ARCHIVED" | "DOWN" | "PROTOTYPE"
+
 export interface Project {
   id: string
   title: string
@@ -5,7 +8,10 @@ export interface Project {
   longDescription: string
   image: string
   tags: string[]
-  category: string
+  domain: ProjectDomain
+  status: ProjectStatus
+  date: string // Month Year
+  category: string // Deprecated, but keeping for compatibility if needed
   featured: boolean
   demoUrl?: string
   githubUrl?: string
@@ -35,6 +41,9 @@ export const projects: Project[] = [
     subtitle: "Where Art Meets Technology",
     slug: "liquid-chrome-portfolio",
     tags: ["React", "Next.js", "WebGL", "TypeScript"],
+    domain: "WEB DEVELOPMENT",
+    status: "ACTIVE",
+    date: "April 2024",
     category: "Web Designs",
     featured: true,
     demoUrl: "https://portfolio-demo.com",
@@ -93,6 +102,9 @@ export const projects: Project[] = [
     subtitle: "The Future of Digital Commerce",
     slug: "next-gen-ecommerce",
     tags: ["React", "Node.js", "AI/ML", "Stripe"],
+    domain: "WEB DEVELOPMENT",
+    status: "ACTIVE",
+    date: "March 2024",
     category: "Web Designs",
     featured: true,
     demoUrl: "https://ecommerce-demo.com",
@@ -147,8 +159,11 @@ export const projects: Project[] = [
     subtitle: "Amplifying Human Creativity",
     slug: "ai-creative-studio",
     tags: ["React", "Python", "OpenAI", "TensorFlow"],
+    domain: "AI/ML",
+    status: "BUILDING",
+    date: "February 2024",
     category: "AI/ML Projects",
-    featured: false,
+    featured: true,
     demoUrl: "https://ai-studio-demo.com",
     githubUrl: "https://github.com/hxrshrathore/ai-studio",
     technologies: ["React", "Python", "OpenAI API", "TensorFlow", "WebGL"],
@@ -205,6 +220,9 @@ export const projects: Project[] = [
     subtitle: "Fitness Reimagined",
     slug: "immersive-fitness-experience",
     tags: ["React Native", "HealthKit", "Firebase", "AR"],
+    domain: "WEB DESIGN",
+    status: "PROTOTYPE",
+    date: "January 2024",
     category: "UI/UX Designs",
     featured: true,
     demoUrl: "https://fitness-demo.com",
@@ -253,120 +271,119 @@ export const projects: Project[] = [
     ],
   },
   {
-  id: "kiit-mun-2025",
-  title: "KIIT MUN 2025 Website",
-  description: "Official website for KIIT Model United Nations 2025",
-  longDescription:
-    "A high-performance, fully redesigned platform built for KIIT MUN 2025 — one of India’s largest university-level MUN conferences. The website focuses on speed, clarity, and scalability while handling thousands of visitors, registrations, and daily updates.",
-  image: "/projects/kiitmun.png?height=400&width=600&text=KIIT+MUN+2025",
-  heroImage: "/projects/kiitmun.png?height=600&width=800&text=KIIT+MUN+Hero",
-  subtitle: "Modern, Scalable & Conference-Ready",
-  slug: "kiit-mun-2025",
-  tags: ["Next.js", "React", "Tailwind", "SSR"],
-  category: "Web Designs",
-  featured: true,
-  demoUrl: "https://kiitmun.org",
-  technologies: ["Next.js", "React", "Tailwind CSS", "Server Components", "Vercel"],
-  challenges: [
-    "Redesigning a legacy MUN website from scratch",
-    "Handling high traffic surges during registration windows",
-    "Ensuring fast load times across low-end devices"
-  ],
-  solutions: [
-    "Implemented a fully optimized Next.js 14 architecture",
-    "Used smart caching, ISR, and CDN optimization for instant loads",
-    "Built a modular content system for event heads to update pages quickly"
-  ],
-  results: [
-    "Achieved 98+ Lighthouse performance score",
-    "Reduced page load time by 60%",
-    "Handled thousands of visitors without downtime"
-  ],
-  process: [
-    {
-      title: "Requirement Analysis",
-      description:
-        "Worked alongside the KIIT MUN core team to plan structure, content flow, and technical requirements.",
-      contentType: "gradient-blue-cyan"
-    },
-    {
-      title: "Design & Development",
-      description:
-        "Built a clean, modern UI with reusable components optimized for speed, accessibility, and branding.",
-      contentType: "image"
-    },
-    {
-      title: "Optimization Pass",
-      description:
-        "Implemented caching strategies, ISR, compression, and asset optimization for maximum performance.",
-      contentType: "gradient-purple-pink"
-    },
-    {
-      title: "Deployment",
-      description:
-        "Deployed on Vercel with real-time monitoring, analytics, and automatic CI/CD pipelines.",
-      contentType: "gradient-emerald-green"
-    }
-  ],
-},
-{
-  id: "chimera-6",
-  title: "Chimera 6.0 Techfest Website",
-  description: "The official website for KIIT's flagship technical fest — Chimera 6.0",
-  longDescription:
-    "Chimera 6.0 is KIIT's largest technical and innovation festival. This website was built to showcase events, hackathons, workshops, schedules, and team information with a fast, animated, and completely mobile-first UI designed for massive traffic.",
-  image: "/placeholder.svg?height=400&width=600&text=Chimera+6.0",
-  heroImage: "/placeholder.svg?height=600&width=800&text=Chimera+Hero",
-  subtitle: "High-Impact Technical Fest Platform",
-  slug: "chimera-6",
-  tags: ["Next.js", "Animations", "Tailwind", "GSAP"],
-  category: "Web Designs",
-  featured: true,
-  demoUrl: "https://chimera.kiit.ac.in",
-  technologies: ["Next.js", "React", "Tailwind CSS", "GSAP", "Framer Motion"],
-  challenges: [
-    "Creating a visually striking design suitable for a technical fest",
-    "Managing large amounts of event/schedule data",
-    "Keeping the site fast while using heavy animations"
-  ],
-  solutions: [
-    "Designed a modular events architecture with dynamic routing",
-    "Used GSAP + Framer Motion for optimized animations without FPS drops",
-    "Implemented clean caching and code-splitting for performance"
-  ],
-  results: [
-    "Smooth 60fps animations across devices",
-    "Fully responsive mobile-first layout with fast navigation",
-    "Successfully supported high traffic during registration peaks"
-  ],
-  process: [
-    {
-      title: "Branding & Visual Direction",
-      description:
-        "Created a futuristic, tech-fest themed UI with neon accents and bold typography.",
-      contentType: "gradient-blue-purple"
-    },
-    {
-      title: "Animated Interface",
-      description:
-        "Integrated GSAP and Framer Motion to bring the brand identity alive with kinetic motion.",
-      contentType: "image"
-    },
-    {
-      title: "Data Architecture",
-      description:
-        "Built dynamic event pages, schedule systems, and organisers’ sections for easy updates.",
-      contentType: "gradient-green-teal"
-    },
-    {
-      title: "Launch & Testing",
-      description:
-        "Ran performance checks, device testing, SEO optimization, and deployed with monitoring.",
-      contentType: "gradient-orange-red"
-    }
-  ],
-},
-
+    id: "kiit-mun-2025",
+    title: "KIIT MUN 2025 Website",
+    description: "Official website for KIIT Model United Nations 2025",
+    longDescription:
+      "A high-performance, fully redesigned platform built for KIIT MUN 2025 — one of India’s largest university-level MUN conferences. The website focuses on speed, clarity, and scalability while handling thousands of visitors, registrations, and daily updates.",
+    image: "/projects/kiitmun.png?height=400&width=600&text=KIIT+MUN+2025",
+    heroImage: "/projects/kiitmun.png?height=600&width=800&text=KIIT+MUN+Hero",
+    subtitle: "Modern, Scalable & Conference-Ready",
+    slug: "kiit-mun-2025",
+    tags: ["Next.js", "React", "Tailwind", "SSR"],
+    domain: "WEB DEVELOPMENT",
+    status: "ACTIVE",
+    date: "December 2023",
+    category: "Web Designs",
+    featured: true,
+    demoUrl: "https://kiitmun.org",
+    technologies: ["Next.js", "React", "Tailwind CSS", "Server Components", "Vercel"],
+    challenges: [
+      "Redesigning a legacy MUN website from scratch",
+      "Handling high traffic surges during registration windows",
+      "Ensuring fast load times across low-end devices",
+    ],
+    solutions: [
+      "Implemented a fully optimized Next.js 14 architecture",
+      "Used smart caching, ISR, and CDN optimization for instant loads",
+      "Built a modular content system for event heads to update pages quickly",
+    ],
+    results: [
+      "Achieved 98+ Lighthouse performance score",
+      "Reduced page load time by 60%",
+      "Handled thousands of visitors without downtime",
+    ],
+    process: [
+      {
+        title: "Requirement Analysis",
+        description:
+          "Worked alongside the KIIT MUN core team to plan structure, content flow, and technical requirements.",
+        contentType: "gradient-blue-cyan",
+      },
+      {
+        title: "Design & Development",
+        description: "Built a clean, modern UI with reusable components optimized for speed, accessibility, and branding.",
+        contentType: "image",
+      },
+      {
+        title: "Optimization Pass",
+        description:
+          "Implemented caching strategies, ISR, compression, and asset optimization for maximum performance.",
+        contentType: "gradient-purple-pink",
+      },
+      {
+        title: "Deployment",
+        description: "Deployed on Vercel with real-time monitoring, analytics, and automatic CI/CD pipelines.",
+        contentType: "gradient-emerald-green",
+      },
+    ],
+  },
+  {
+    id: "chimera-6",
+    title: "Chimera 6.0 Techfest Website",
+    description: "The official website for KIIT's flagship technical fest — Chimera 6.0",
+    longDescription:
+      "Chimera 6.0 is KIIT's largest technical and innovation festival. This website was built to showcase events, hackathons, workshops, schedules, and team information with a fast, animated, and completely mobile-first UI designed for massive traffic.",
+    image: "/placeholder.svg?height=400&width=600&text=Chimera+6.0",
+    heroImage: "/placeholder.svg?height=600&width=800&text=Chimera+Hero",
+    subtitle: "High-Impact Technical Fest Platform",
+    slug: "chimera-6",
+    tags: ["Next.js", "Animations", "Tailwind", "GSAP"],
+    domain: "WEB DEVELOPMENT",
+    status: "ARCHIVED",
+    date: "November 2023",
+    category: "Web Designs",
+    featured: false,
+    demoUrl: "https://chimera.kiit.ac.in",
+    technologies: ["Next.js", "React", "Tailwind CSS", "GSAP", "Framer Motion"],
+    challenges: [
+      "Creating a visually striking design suitable for a technical fest",
+      "Managing large amounts of event/schedule data",
+      "Keeping the site fast while using heavy animations",
+    ],
+    solutions: [
+      "Designed a modular events architecture with dynamic routing",
+      "Used GSAP + Framer Motion for optimized animations without FPS drops",
+      "Implemented clean caching and code-splitting for performance",
+    ],
+    results: [
+      "Smooth 60fps animations across devices",
+      "Fully responsive mobile-first layout with fast navigation",
+      "Successfully supported high traffic during registration peaks",
+    ],
+    process: [
+      {
+        title: "Branding & Visual Direction",
+        description: "Created a futuristic, tech-fest themed UI with neon accents and bold typography.",
+        contentType: "gradient-blue-purple",
+      },
+      {
+        title: "Animated Interface",
+        description: "Integrated GSAP and Framer Motion to bring the brand identity alive with kinetic motion.",
+        contentType: "image",
+      },
+      {
+        title: "Data Architecture",
+        description: "Built dynamic event pages, schedule systems, and organisers’ sections for easy updates.",
+        contentType: "gradient-green-teal",
+      },
+      {
+        title: "Launch & Testing",
+        description: "Ran performance checks, device testing, SEO optimization, and deployed with monitoring.",
+        contentType: "gradient-orange-red",
+      },
+    ],
+  },
   {
     id: "data-storytelling-platform",
     title: "Data Storytelling Platform",
@@ -378,8 +395,11 @@ export const projects: Project[] = [
     subtitle: "Where Data Becomes Story",
     slug: "data-storytelling-platform",
     tags: ["D3.js", "React", "Python", "WebGL"],
+    domain: "DATA ANALYST",
+    status: "ACTIVE",
+    date: "October 2023",
     category: "Graphics",
-    featured: false,
+    featured: true,
     demoUrl: "https://dataviz-demo.com",
     githubUrl: "https://github.com/hxrshrathore/data-platform",
     technologies: ["D3.js", "React", "Python", "PostgreSQL", "WebGL"],
@@ -413,8 +433,7 @@ export const projects: Project[] = [
       },
       {
         title: "Narrative Engine",
-        description:
-          "Built AI systems that automatically generate compelling stories from data patterns and anomalies.",
+        description: "Built AI systems that automatically generate compelling stories from data patterns and anomalies.",
         contentType: "gradient-orange-red",
       },
       {
@@ -435,6 +454,9 @@ export const projects: Project[] = [
     subtitle: "Your Identity, Your Control",
     slug: "blockchain-identity-platform",
     tags: ["Solidity", "Web3", "React", "IPFS"],
+    domain: "WEB DEVELOPMENT",
+    status: "DOWN",
+    date: "September 2023",
     category: "Web Designs",
     featured: false,
     demoUrl: "https://identity-demo.com",
@@ -470,8 +492,7 @@ export const projects: Project[] = [
       },
       {
         title: "User Experience Design",
-        description:
-          "Created interfaces that make blockchain technology feel as simple as traditional web applications.",
+        description: "Created interfaces that make blockchain technology feel as simple as traditional web applications.",
         contentType: "gradient-cyan-blue",
       },
       {
@@ -481,6 +502,69 @@ export const projects: Project[] = [
         contentType: "gradient-red-pink",
       },
     ],
+  },
+  {
+    id: "gd-brand-identity",
+    title: "EcoVision Brand Identity",
+    description: "Complete visual identity for a sustainable tech initiative",
+    longDescription: "A holistic approach to sustainable branding...",
+    image: "/placeholder.svg?height=400&width=600&text=EcoVision+GD",
+    heroImage: "/placeholder.svg?height=600&width=800&text=EcoVision+Hero",
+    subtitle: "Identity for a Greener Future",
+    slug: "ecovision-identity",
+    tags: ["Illustrator", "Branding", "Concept"],
+    domain: "GD",
+    status: "ACTIVE",
+    date: "August 2023",
+    category: "Graphics",
+    featured: true,
+    technologies: ["Adobe Illustrator", "Photoshop", "Figma"],
+    challenges: ["Creating a unique yet recognizable eco-brand"],
+    solutions: ["Developed a custom typeface and color palette"],
+    results: ["Successfully launched with 50+ brand assets"],
+    process: [{ title: "Research", description: "Market study" }],
+  },
+  {
+    id: "gd-minimalist-posters",
+    title: "Minimalist Movie Series",
+    description: "Conceptual poster series for sci-fi classics",
+    longDescription: "Reimagining classic science fiction through a minimalist lens...",
+    image: "/placeholder.svg?height=400&width=600&text=Minimalist+Posters",
+    heroImage: "/placeholder.svg?height=600&width=800&text=Poster+Hero",
+    subtitle: "Less is More",
+    slug: "minimal-posters",
+    tags: ["Graphics", "Print", "Art"],
+    domain: "GD",
+    status: "ARCHIVED",
+    date: "July 2023",
+    category: "Graphics",
+    featured: true,
+    technologies: ["Adobe InDesign", "Illustrator"],
+    challenges: ["Conveying complex plots with simple icons"],
+    solutions: ["Symbolic abstraction of key themes"],
+    results: ["Featured in Design Weekly magazine"],
+    process: [{ title: "Ideation", description: "Sketching concepts" }],
+  },
+  {
+    id: "gd-3d-visuals",
+    title: "Infinite Loops 3D",
+    description: "Abstract 3D motion graphics and still renders",
+    longDescription: "Exploring mathematical patterns through 3D rendering...",
+    image: "/placeholder.svg?height=400&width=600&text=3D+Visuals",
+    heroImage: "/placeholder.svg?height=600&width=800&text=3D+Hero",
+    subtitle: "Depth and Motion",
+    slug: "3d-visuals",
+    tags: ["Blender", "3D", "Motion"],
+    domain: "GD",
+    status: "ACTIVE",
+    date: "June 2023",
+    category: "Graphics",
+    featured: true,
+    technologies: ["Blender", "Octane Render"],
+    challenges: ["Achieving photorealistic light behavior"],
+    solutions: ["Point-cloud rendering and HDR environments"],
+    results: ["Used in a major tech product launch video"],
+    process: [{ title: "Modeling", description: "Geometry creation" }],
   },
 ]
 
@@ -501,7 +585,10 @@ export const getRelatedProjects = (currentProjectId: string, limit = 3): Project
   return projects.filter((project) => project.id !== currentProjectId).slice(0, limit)
 }
 
-export const getProjectsByCategory = (category: string): Project[] => {
-  if (category === "All") return projects
-  return projects.filter((project) => project.category === category)
+export const getProjectsByDomain = (domain: ProjectDomain): Project[] => {
+  return projects.filter((project) => project.domain === domain)
+}
+
+export const getProjectsByStatus = (status: ProjectStatus): Project[] => {
+  return projects.filter((project) => project.status === status)
 }

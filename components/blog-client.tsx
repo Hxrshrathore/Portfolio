@@ -38,7 +38,7 @@ export function BlogClient({ posts }: BlogClientProps) {
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       {/* Hero Section using BackgroundPaths */}
       <section className="relative w-full">
-        <BackgroundPaths title="Architecting Digital Stories" />
+        <BackgroundPaths title="Architecting Digital Stories" showButton={false} />
       </section>
 
       {/* Blog Posts Section */}

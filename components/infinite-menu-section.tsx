@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import InfiniteMenu from "./infinite-menu"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
@@ -20,7 +20,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/logo/kiitmun.png",
     logo: "/logo/kiitmun.png",
-    link: "https://github.com",
+    link: "https://nutgram.vercel.app",
     title: "KIIT MUN",
     description: "Where elegant algorithms meet beautiful interfaces",
     projectImage: "/rip/frame6.png",
@@ -30,7 +30,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame1.png",
     logo: "/logo/chimera.png",
-    link: "https://dribbble.com",
+    link: "https://nutgram.vercel.app",
     title: "Chimera 6.0",
     description: "Crafting experiences that feel effortlessly intuitive",
     projectImage: "/rip/frame1.png",
@@ -40,7 +40,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame2.png",
     logo: "/logo/ascent.png",
-    link: "https://behance.net",
+    link: "https://nutgram.vercel.app",
     title: "Acsent Coaching",
     description: "Designing moments that users never forget",
     projectImage: "/rip/frame2.png",
@@ -50,7 +50,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame3.png",
     logo: "/logo/bikash.png",
-    link: "https://linkedin.com",
+    link: "https://nutgram.vercel.app",
     title: "Bikash Vidalya",
     description: "Performance so fast, it feels like magic",
     projectImage: "/rip/frame3.png",
@@ -60,7 +60,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame4.png",
     logo: "/logo/indura.png",
-    link: "https://twitter.com",
+    link: "https://nutgram.vercel.app",
     title: "Indura School",
     description: "End-to-end solutions that just work",
     projectImage: "/rip/frame4.png",
@@ -70,7 +70,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame5.png",
     logo: "/logo/hemsida.png",
-    link: "https://instagram.com",
+    link: "https://nutgram.vercel.app",
     title: "Hemsida",
     description: "Building the future, one line of code at a time",
     projectImage: "/rip/frame5.png",
@@ -80,7 +80,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame7.png",
     logo: "/logo/dmc.png",
-    link: "https://behance.net",
+    link: "https://nutgram.vercel.app",
     title: "DMC School",
     description: "Designing moments that users never forget",
     projectImage: "/rip/frame7.png",
@@ -90,7 +90,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame8.png",
     logo: "/logo/pandav.png",
-    link: "https://behance.net",
+    link: "https://nutgram.vercel.app",
     title: "Pandav Studio",
     description: "Designing moments that users never forget",
     projectImage: "/rip/frame8.png",
@@ -100,7 +100,7 @@ const portfolioItems: PortfolioItem[] = [
   {
     image: "/rip/frame9.png",
     logo: "/logo/sunshine.png",
-    link: "https://behance.net",
+    link: "https://nutgram.vercel.app",
     title: "Sunshine School",
     description: "Designing moments that users never forget",
     projectImage: "/rip/frame9.png",
@@ -175,11 +175,16 @@ export default function InfiniteMenuSection() {
 
   const handleMovementChange = useCallback((moving: boolean) => {
     setIsGlobeMoving(moving)
-    // Read from ref — not stale closure — so we get the real settled index
-    if (!moving) {
+  }, [])
+
+  // Sync displayIndex reactively: commit only when globe is stopped
+  // This avoids the race condition where onMovementChange(false) fires
+  // before onActiveItemChange has updated activeIndexRef in the same frame
+  useEffect(() => {
+    if (!isGlobeMoving) {
       setDisplayIndex(activeIndexRef.current)
     }
-  }, []) // empty deps: stable callback, reads latest via ref
+  }, [isGlobeMoving, activeIndex])
 
   return (
     <section className="relative w-full bg-black overflow-hidden border-t border-white/5">
@@ -199,11 +204,6 @@ export default function InfiniteMenuSection() {
 
           {/* ─── LEFT COLUMN: Client Info ─── */}
           <div className="hidden md:flex flex-col items-center gap-6 min-h-[500px] justify-center">
-            <motion.div
-              animate={{ opacity: isGlobeMoving ? 0.3 : 1, filter: isGlobeMoving ? "blur(4px)" : "blur(0px)" }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="w-full h-full flex flex-col items-center"
-            >
             <AnimatePresence mode="wait">
               <motion.div
                 key={`left-${displayIndex}`}
@@ -213,7 +213,7 @@ export default function InfiniteMenuSection() {
                 exit="exit"
                 className="flex flex-col items-center gap-5 w-full"
               >
-                {/* Client Logo Circle */}
+                {/* ... client info ... */}
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden flex items-center justify-center">
                     <img
@@ -222,25 +222,23 @@ export default function InfiniteMenuSection() {
                       className="w-14 h-14 object-contain"
                     />
                   </div>
-                  {/* Subtle glow ring */}
                   <div className="absolute inset-0 rounded-full border border-white/5 scale-125 opacity-50" />
                 </div>
-
-                {/* Client Name */}
                 <h3 className="text-xl font-bold text-white tracking-tight text-center">
                   {activeItem.title}
                 </h3>
-
-                {/* Project Preview Image */}
-                <div className="w-full aspect-[4/3] rounded-lg border border-white/10 overflow-hidden bg-white/5">
-                  <img
-                    src={activeItem.projectImage}
-                    alt={`${activeItem.title} preview`}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-full aspect-[19/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative group/iframe">
+                  <div className="absolute inset-0 w-[1280px] h-[606px] origin-top-left scale-[0.22] md:scale-[0.22] lg:scale-[0.25]">
+                    <iframe
+                      src={activeItem.link}
+                      scrolling="no"
+                      className="w-full h-full border-none pointer-events-none"
+                      title={`${activeItem.title} desktop preview`}
+                    />
+                  </div>
+                  {/* Glassy overlay to reinforce non-interaction and depth */}
+                  <div className="absolute inset-0 bg-white/[0.02] pointer-events-none" />
                 </div>
-
-                {/* View Case Study Button */}
                 <a
                   href={activeItem.link}
                   target="_blank"
@@ -254,7 +252,6 @@ export default function InfiniteMenuSection() {
                 </a>
               </motion.div>
             </AnimatePresence>
-            </motion.div>
           </div>
 
           {/* ─── CENTER COLUMN: Globe + Arrows ─── */}
@@ -316,11 +313,6 @@ export default function InfiniteMenuSection() {
 
           {/* ─── RIGHT COLUMN: Testimonial + Rating ─── */}
           <div className="hidden md:flex flex-col items-center gap-6 min-h-[500px] justify-center">
-            <motion.div
-              animate={{ opacity: isGlobeMoving ? 0.3 : 1, filter: isGlobeMoving ? "blur(4px)" : "blur(0px)" }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="w-full h-full flex flex-col"
-            >
             <AnimatePresence mode="wait">
               <motion.div
                 key={`right-${displayIndex}`}
@@ -332,14 +324,10 @@ export default function InfiniteMenuSection() {
               >
                 {/* Testimonial Card */}
                 <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6">
-                  {/* Quote mark */}
                   <div className="text-white/10 text-5xl font-serif leading-none mb-3">"</div>
-
                   <p className="text-gray-300 text-sm leading-relaxed mb-4">
                     {activeItem.testimonial}
                   </p>
-
-                  {/* Attribution */}
                   <div className="flex items-center gap-3 pt-3 border-t border-white/5">
                     <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center">
                       <img
@@ -366,7 +354,6 @@ export default function InfiniteMenuSection() {
                 </div>
               </motion.div>
             </AnimatePresence>
-            </motion.div>
           </div>
         </div>
 
@@ -396,13 +383,17 @@ export default function InfiniteMenuSection() {
                 </div>
               </div>
 
-              {/* Project image */}
-              <div className="w-full aspect-video rounded-lg border border-white/10 overflow-hidden">
-                <img
-                  src={activeItem.projectImage}
-                  alt={`${activeItem.title} preview`}
-                  className="w-full h-full object-cover"
-                />
+              {/* Live Preview (Mobile) - Forced Desktop scale in 19:9 */}
+              <div className="w-full aspect-[19/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative">
+                <div className="absolute inset-0 w-[1280px] h-[606px] origin-top-left scale-[0.3] sm:scale-[0.4]">
+                  <iframe
+                    src={activeItem.link}
+                    scrolling="no"
+                    className="w-full h-full border-none pointer-events-none"
+                    title={`${activeItem.title} mobile desktop preview`}
+                  />
+                </div>
+                <div className="absolute inset-0 bg-white/[0.02] pointer-events-none" />
               </div>
 
               {/* Testimonial */}
