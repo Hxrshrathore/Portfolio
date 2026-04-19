@@ -79,7 +79,7 @@
     "react-native": "latest",
     "react-resizable-panels": "^2.1.9",
     "reading-time": "latest",
-    "recharts": "^2.15.0",
+    "recharts": "^2.15.4",
     "remark-gfm": "latest",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",

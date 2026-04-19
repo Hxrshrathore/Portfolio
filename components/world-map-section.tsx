@@ -5,33 +5,33 @@ import { motion } from "framer-motion"
 
 export default function WorldMapSection() {
   return (
-    <section className="relative w-full bg-black py-20 overflow-hidden">
-      {/* Background Pattern */}
+    <section className="relative w-full bg-black py-24 overflow-hidden border-t border-white/5">
+      {/* Background Pattern - Strictly Monochromatic */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-black"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.1),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02),transparent_50%)]"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="font-bold text-4xl md:text-6xl text-white mb-4">
+        <div className="text-center mb-20">
+          <h2 className="font-bold text-5xl md:text-7xl bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 uppercase tracking-tight">
             Working around the{" "}
-            <span className="text-neutral-400">
+            <span className="opacity-40">
               {"Globe".split("").map((word, idx) => (
                 <motion.span
                   key={idx}
                   className="inline-block"
                   initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
+                  whileInView={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: idx * 0.04 }}
+                  viewport={{ once: true }}
                 >
                   {word}
                 </motion.span>
               ))}
             </span>
-          </p>
-          <p className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto">
+          </h2>
+          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto tracking-wide">
             Based in INDIA but working around the Globe.
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function WorldMapSection() {
   },
 ]}
 
-            lineColor="#06b6d4"
+            lineColor="#ffffff"
           />
         </div>
 

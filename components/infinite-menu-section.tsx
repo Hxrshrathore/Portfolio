@@ -85,19 +85,19 @@ export default function InfiniteMenuSection() {
   }
 
   return (
-    <section className="relative w-full bg-black overflow-hidden">
+    <section className="relative w-full bg-black overflow-hidden border-t border-white/5">
       {/* Header */}
-      <div className="text-center py-12 sm:py-16 px-4">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
+      <div className="text-center py-24 px-4">
+        <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 uppercase tracking-tight">
           Explore My Universe
         </h2>
-        <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
+        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4 tracking-wide">
           Navigate through a constellation of creativity. Each project tells a story of innovation and craftsmanship.
         </p>
         {/* Instructions */}
-        <p className="text-gray-400 text-xs sm:text-sm mt-4 sm:mt-6">
+        <p className="text-white/20 text-xs font-sans font-bold tracking-[0.3em] uppercase mt-10">
           <span className="hidden md:inline">Drag to explore • Click to discover • Experience the extraordinary</span>
-          <span className="md:hidden">Swipe or use arrows • Tap to discover • Experience the extraordinary</span>
+          <span className="md:hidden">Swipe or use arrows • Tap to discover</span>
         </p>
       </div>
 

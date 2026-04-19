@@ -25,9 +25,9 @@ export default function OrbSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h2 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-tighter text-white leading-[0.85]">
-              LET&apos;S <br />
-              <span className="text-white/20">TALK</span>
+            <h2 className="text-7xl md:text-[9rem] font-bold tracking-tighter leading-[0.8] flex flex-col uppercase select-none cursor-default">
+              <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">LET&apos;S</span>
+              <span className="font-light italic text-white/10 -mt-2 md:-mt-8 transition-all duration-700 hover:text-white/30">TALK</span>
             </h2>
           </motion.div>
           
@@ -36,9 +36,9 @@ export default function OrbSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="flex flex-col space-y-2"
+            className="flex flex-col space-y-4"
           >
-            <p className="text-white/40 text-lg md:text-xl font-medium tracking-wide">
+            <p className="text-gray-300 text-sm md:text-base font-bold tracking-[0.3em] uppercase">
               HAVE A PROJECT IN MIND?
             </p>
             <div className="h-px w-24 bg-white/20" />
@@ -68,7 +68,7 @@ export default function OrbSection() {
               {/* Rotating "CONTACT ME" Circular Text */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
                 <CircularText
-                  text="LET'S CONNECT • LET'S CONNECT • LET'S CONNECT • LET'S CONNECT • LET'S CONNECT • "
+                  text="LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * "
                   spinDuration={25}
                   onHover="slowDown"
                   className="w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[460px] md:h-[460px]"

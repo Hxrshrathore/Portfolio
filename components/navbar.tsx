@@ -79,21 +79,21 @@ export default function Navbar() {
                   <Link
                     href="/projects"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-cyan-400 transition-colors"
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
                     Work
                   </Link>
                   <Link
                     href="/blog"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-cyan-400 transition-colors"
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
                     Blog
                   </Link>
                   <a
                     href="#about"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-cyan-400 transition-colors"
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
                     About
                   </a>

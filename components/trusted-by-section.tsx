@@ -65,18 +65,18 @@ export default function TrustedBySection() {
   }, [isPaused])
 
   return (
-    <section className="relative min-h-screen bg-black text-white py-20 overflow-hidden">
+    <section className="relative min-h-screen bg-black text-white py-24 overflow-hidden border-t border-white/5">
       <div className="container mx-auto px-4" ref={ref}>
         <motion.div variants={containerVariants} initial="hidden" animate={controls} className="text-center">
 
           <motion.h2
             variants={itemVariants}
-            className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent"
+            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 uppercase tracking-tight"
           >
             Trusted by Visionaries
           </motion.h2>
 
-          <motion.p variants={itemVariants} className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-300 mb-16 max-w-2xl mx-auto tracking-wide">
             Partnering with forward-thinking companies who dare to push boundaries
           </motion.p>
 

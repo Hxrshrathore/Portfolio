@@ -119,8 +119,8 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
             transition={{ 
               type: "spring", 
               damping: 25, 
-              stiffness: 120,
-              exit: { duration: 0.15, ease: "easeIn" } 
+              stiffness: 150,
+              mass: 0.5
             }}
             className="relative z-10 w-full max-w-5xl bg-[#050505]/60 border border-white/5 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row min-h-[550px] max-h-[90vh] md:max-h-none overflow-y-auto"
           >
@@ -201,18 +201,18 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
                       <Input
                         {...register("name")}
                         placeholder="NAME"
-                        className={`h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.name ? 'border-red-500/50' : ''}`}
+                        className={`font-sans h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.name ? 'border-red-500/50' : ''}`}
                       />
-                      {errors.name && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.name.message}</p>}
+                      {errors.name && <p className="font-sans text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-1">
                       <Input
                         {...register("email")}
                         placeholder="EMAIL"
                         type="email"
-                        className={`h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.email ? 'border-red-500/50' : ''}`}
+                        className={`font-sans h-14 bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg ${errors.email ? 'border-red-500/50' : ''}`}
                       />
-                      {errors.email && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.email.message}</p>}
+                      {errors.email && <p className="font-sans text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.email.message}</p>}
                     </div>
                   </div>
 
@@ -221,25 +221,25 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
                       value={watch("projectType") || undefined}
                       onValueChange={(value) => setValue("projectType", value, { shouldValidate: true })}
                     >
-                      <SelectTrigger className={`h-14 bg-transparent border-0 border-b border-white/10 text-white focus:border-white/40 focus:ring-0 rounded-none px-0 text-lg placeholder:text-white/10 ${errors.projectType ? 'border-red-500/50' : ''}`}>
+                      <SelectTrigger className={`font-sans h-14 bg-transparent border-0 border-b border-white/10 text-white focus:border-white/40 focus:ring-0 rounded-none px-0 text-lg placeholder:text-white/10 ${errors.projectType ? 'border-red-500/50' : ''}`}>
                         <SelectValue placeholder="PROJECT INQUIRY" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0a0a0a] border-white/10 text-white rounded-none overflow-hidden backdrop-blur-3xl border-0 z-[110]">
-                        <SelectItem value="web" className="focus:bg-white/5 transition-colors cursor-pointer">Web Experience</SelectItem>
-                        <SelectItem value="design" className="focus:bg-white/5 transition-colors cursor-pointer">UI/UX Design</SelectItem>
-                        <SelectItem value="fullstack" className="focus:bg-white/5 transition-colors cursor-pointer">Full Stack Engineering</SelectItem>
+                        <SelectItem value="web" className="font-sans focus:bg-white/5 transition-colors cursor-pointer">Web Experience</SelectItem>
+                        <SelectItem value="design" className="font-sans focus:bg-white/5 transition-colors cursor-pointer">UI/UX Design</SelectItem>
+                        <SelectItem value="fullstack" className="font-sans focus:bg-white/5 transition-colors cursor-pointer">Full Stack Engineering</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.projectType && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.projectType.message}</p>}
+                    {errors.projectType && <p className="font-sans text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.projectType.message}</p>}
                   </div>
 
                   <div className="space-y-1">
                     <Textarea
                       {...register("message")}
                       placeholder="MESSAGE"
-                      className={`min-h-[120px] bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg resize-none py-4 ${errors.message ? 'border-red-500/50' : ''}`}
+                      className={`font-sans min-h-[120px] bg-transparent border-0 border-b border-white/10 text-white placeholder:text-white/10 focus:border-white/40 focus:ring-0 transition-all rounded-none px-0 text-lg resize-none py-4 ${errors.message ? 'border-red-500/50' : ''}`}
                     />
-                    {errors.message && <p className="text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.message.message}</p>}
+                    {errors.message && <p className="font-sans text-[10px] text-red-500/60 uppercase tracking-tighter">{errors.message.message}</p>}
                   </div>
                 </div>
 
@@ -247,7 +247,7 @@ export default function ContactModal({ open, onOpenChange }: ContactModalProps) 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="group relative w-full h-16 bg-white text-black hover:bg-white/90 font-bold text-sm tracking-[0.2em] uppercase transition-all disabled:opacity-50 overflow-hidden"
+                    className="group relative w-full h-16 bg-white text-black hover:bg-white/90 font-sans font-bold text-sm tracking-[0.2em] uppercase transition-all disabled:opacity-50 overflow-hidden"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {isSubmitting ? "TRANSMITTING..." : (

@@ -25,10 +25,10 @@ export default function FlowingMenuSection() {
   return (
     <section className="relative w-full bg-black overflow-hidden">
       {/* Header */}
-      <div className="text-center py-16 px-4">
-        <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">What I Create</h2>
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-          From concept to reality. Explore the different dimensions of digital craftsmanship.
+      <div className="text-center py-24 px-4">
+        <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6  tracking-tight">How Can I Help You?</h2>
+        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto tracking-wide">
+          I'm a full-stack developer with a passion for building cool stuff. I'm also a bit of a perfectionist, so I don't cut corners. I'm always looking for new challenges and opportunities to learn.
         </p>
       </div>
 

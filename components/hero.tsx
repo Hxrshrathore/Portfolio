@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import LiquidChrome from "@/components/liquid-chrome"
-import BlurText from "@/components/ui/blur-text"
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false)
@@ -54,24 +54,36 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Main Heading with BlurText Effect */}
-        <BlurText
-          text="Think different. Build extraordinary."
-          delay={150}
-          animateBy="words"
-          direction="top"
-          onAnimationComplete={handleAnimationComplete}
-          className="mb-12 text-5xl md:text-7xl font-bold text-white leading-tight max-w-4xl"
-        />
+        {/* Main Heading scaled and styled as per /work hero */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-6 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent max-w-5xl tracking-tight"
+        >
+          I'm Harsh
+        </motion.h1>
+
+        {/* Paragraph styled as per /work hero */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl px-4"
+        >
+          Ready to dive in?
+          <br />
+          Where Design & Code meets.
+        </motion.p>
 
         {/* Buttons */}
         <div className="flex flex-wrap justify-center gap-4">
           <Button
             size="lg"
             onClick={() => (window.location.href = "/projects")}
-            className="bg-white text-black hover:bg-gray-100 rounded-full px-10 py-4 text-lg font-medium transition-all hover:scale-105"
+            className="bg-white text-black hover:bg-gray-100 rounded-full px-12 py-6 text-sm font-bold tracking-[0.2em] uppercase transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
-            View My Work
+            Explore Projects
           </Button>
         </div>
       </div>

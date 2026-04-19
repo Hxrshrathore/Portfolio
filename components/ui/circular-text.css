@@ -2,13 +2,14 @@
   margin: 0 auto;
   border-radius: 50%;
   position: relative;
-  font-weight: bold;
+  font-family: var(--font-inter), sans-serif;
   color: #fff;
-  font-weight: 900;
+  font-weight: 800;
   text-align: center;
   cursor: pointer;
   transform-origin: 50% 50%;
   -webkit-transform-origin: 50% 50%;
+  font-variation-settings: "opsz" 32; /* Explicitly set a headline optical size */
 }
 
 .circular-text span {

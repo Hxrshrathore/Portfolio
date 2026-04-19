@@ -4,6 +4,8 @@ import type React from "react"
 import { useRef, useEffect, useCallback, useState } from "react"
 import { gsap } from "gsap"
 import "./magic-bento.css"
+import BentoPerformanceChart from "./bento-performance-chart"
+import BentoDesignVisual from "./bento-design-visual"
 
 export interface BentoCardProps {
   color?: string
@@ -12,6 +14,7 @@ export interface BentoCardProps {
   label?: string
   textAutoHide?: boolean
   disableAnimations?: boolean
+  customContent?: React.ReactNode
 }
 
 export interface BentoProps {
@@ -30,42 +33,44 @@ export interface BentoProps {
 
 const DEFAULT_PARTICLE_COUNT = 12
 const DEFAULT_SPOTLIGHT_RADIUS = 300
-const DEFAULT_GLOW_COLOR = "132, 0, 255"
+const DEFAULT_GLOW_COLOR = "255, 255, 255"
 const MOBILE_BREAKPOINT = 768
 
 const cardData: BentoCardProps[] = [
   {
-    color: "#060010",
+    color: "#000000",
     title: "Web Architecture",
     description: "Building digital foundations that scale beautifully",
     label: "Development",
   },
   {
-    color: "#060010",
+    color: "#000000",
     title: "Creative Code",
     description: "Where art meets technology in perfect harmony",
     label: "Innovation",
   },
   {
-    color: "#060010",
+    color: "#000000",
     title: "Experience Design",
     description: "Interfaces that feel like magic to use",
     label: "Design",
+    customContent: <BentoDesignVisual />,
   },
   {
-    color: "#060010",
+    color: "#000000",
     title: "Performance",
     description: "Speed so fast, it feels instantaneous",
     label: "Optimization",
+    customContent: <BentoPerformanceChart />,
   },
   {
-    color: "#060010",
+    color: "#000000",
     title: "Full-Stack",
     description: "End-to-end solutions that just work",
     label: "Engineering",
   },
   {
-    color: "#060010",
+    color: "#000000",
     title: "Innovation",
     description: "Building tomorrow's web today",
     label: "Future",
@@ -302,7 +307,7 @@ const ParticleCard: React.FC<{
         width: ${maxDistance * 2}px;
         height: ${maxDistance * 2}px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
+        background: radial-gradient(circle, rgba(${glowColor}, 0.2) 0%, rgba(${glowColor}, 0.1) 30%, transparent 70%);
         left: ${x - maxDistance}px;
         top: ${y - maxDistance}px;
         pointer-events: none;
@@ -386,11 +391,10 @@ const GlobalSpotlight: React.FC<{
       border-radius: 50%;
       pointer-events: none;
       background: radial-gradient(circle,
-        rgba(${glowColor}, 0.15) 0%,
-        rgba(${glowColor}, 0.08) 15%,
-        rgba(${glowColor}, 0.04) 25%,
-        rgba(${glowColor}, 0.02) 40%,
-        rgba(${glowColor}, 0.01) 65%,
+        rgba(${glowColor}, 0.05) 0%,
+        rgba(${glowColor}, 0.03) 15%,
+        rgba(${glowColor}, 0.02) 25%,
+        rgba(${glowColor}, 0.01) 40%,
         transparent 70%
       );
       z-index: 200;
@@ -457,9 +461,9 @@ const GlobalSpotlight: React.FC<{
 
       const targetOpacity =
         minDistance <= proximity
-          ? 0.8
+          ? 0.15
           : minDistance <= fadeDistance
-            ? ((fadeDistance - minDistance) / (fadeDistance - proximity)) * 0.8
+            ? ((fadeDistance - minDistance) / (fadeDistance - proximity)) * 0.15
             : 0
 
       gsap.to(spotlightRef.current, {
@@ -574,9 +578,10 @@ const MagicBento: React.FC<BentoProps> = ({
                 clickEffect={clickEffect}
                 enableMagnetism={enableMagnetism}
               >
-                <div className="card__header">
+              <div className="card__header">
                   <div className="card__label">{card.label}</div>
                 </div>
+                {card.customContent && card.customContent}
                 <div className="card__content">
                   <h2 className="card__title">{card.title}</h2>
                   <p className="card__description">{card.description}</p>
@@ -655,7 +660,7 @@ const MagicBento: React.FC<BentoProps> = ({
                     width: ${maxDistance * 2}px;
                     height: ${maxDistance * 2}px;
                     border-radius: 50%;
-                    background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
+                    background: radial-gradient(circle, rgba(${glowColor}, 0.2) 0%, rgba(${glowColor}, 0.1) 30%, transparent 70%);
                     left: ${x - maxDistance}px;
                     top: ${y - maxDistance}px;
                     pointer-events: none;
@@ -688,6 +693,7 @@ const MagicBento: React.FC<BentoProps> = ({
               <div className="card__header">
                 <div className="card__label">{card.label}</div>
               </div>
+              {card.customContent && card.customContent}
               <div className="card__content">
                 <h2 className="card__title">{card.title}</h2>
                 <p className="card__description">{card.description}</p>

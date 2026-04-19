@@ -1,6 +1,6 @@
 import type React from "react"
 import "./globals.css"
-import { Inter } from "next/font/google"
+import { Geist, Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import ClickSpark from "@/components/click-spark"
 import Preloader from "@/components/preloader"
@@ -10,7 +10,17 @@ import SmoothScroll from "@/components/smooth-scroll"
 import AnimatedFavicon from "@/components/animated-favicon"
 import StructuredData from "@/components/structured-data"
 
-const inter = Inter({ subsets: ["latin"] })
+const geistSans = Geist({ 
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+})
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata = {
   title: "Harsh Kumar | Web Designer, UI/UX & Front-End Developer – KIIT Student Portfolio 2025",
@@ -103,7 +113,7 @@ export default function RootLayout({
       <head>
         <StructuredData />
       </head>
-      <body className={`${inter.className} bg-black text-white`}>
+      <body className={`${geistSans.variable} ${inter.variable} font-sans bg-black text-white`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AnimatedFavicon />
           <Preloader>
