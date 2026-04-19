@@ -25,17 +25,17 @@ export default function FlowingMenuSection() {
   return (
     <section className="relative w-full bg-black overflow-hidden">
       {/* Header */}
-      <div className="text-center py-24 px-4">
-        <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6  tracking-tight">How Can I Help You?</h2>
-        <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto tracking-wide">
-          I mean if you are here either you need a help or you are here to check my skills.
-          <br />  
-          Anyway, I'm a full-stack developer with a passion for building cool stuff. I'm also a bit of a perfectionist, so I don't cut corners. I'm always looking for new challenges and opportunities to learn.
+      <div className="text-center py-16 md:py-24 px-4">
+        <h2 className="text-3xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2">How Can I Help You?</h2>
+        <p className="text-sm md:text-lg text-gray-300 max-w-3xl mx-auto tracking-wide px-4">
+          Full-stack developer with a passion for building cool stuff.
+          <br className="hidden md:block" />
+          <span className="hidden md:inline">I don&apos;t cut corners — always looking for new challenges and opportunities to learn.</span>
         </p>
       </div>
 
       {/* Flowing Menu */}
-      <div className="h-[600px] relative">
+      <div className="h-[450px] md:h-[600px] relative">
         <FlowingMenu items={demoItems} />
       </div>
 

@@ -34,6 +34,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sparksRef = useRef<Spark[]>([])
   const startTimeRef = useRef<number | null>(null)
+  const startLoopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -91,6 +92,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     if (!ctx) return
 
     let animationId: number
+    let running = false
 
     const draw = (timestamp: number) => {
       if (!startTimeRef.current) {
@@ -125,10 +127,21 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
         return true
       })
 
-      animationId = requestAnimationFrame(draw)
+      // Only continue the loop if there are remaining sparks
+      if (sparksRef.current.length > 0) {
+        animationId = requestAnimationFrame(draw)
+      } else {
+        running = false
+      }
     }
 
-    animationId = requestAnimationFrame(draw)
+    // Expose a start function for the click handler
+    startLoopRef.current = () => {
+      if (!running) {
+        running = true
+        animationId = requestAnimationFrame(draw)
+      }
+    }
 
     return () => {
       cancelAnimationFrame(animationId)
@@ -151,6 +164,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     }))
 
     sparksRef.current.push(...newSparks)
+    // Start the draw loop on demand
+    startLoopRef.current?.()
   }
 
   return (

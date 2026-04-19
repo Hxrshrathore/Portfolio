@@ -94,7 +94,10 @@ export default function AnimatedFavicon() {
       currentFrame = (currentFrame + 1) % frames.length
     }
 
-    const interval = setInterval(updateFavicon, 57)
+    // Skip animation entirely on mobile — just show a static frame
+    const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768
+
+    const interval = setInterval(updateFavicon, isMobile ? 500 : 150)
 
     updateFavicon()
 

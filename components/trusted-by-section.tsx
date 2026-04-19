@@ -1,14 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { motion, useInView, useAnimation } from "framer-motion"
-import { gsap } from "gsap"
 
 export default function TrustedBySection() {
   const ref = useRef(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const [isPaused, setIsPaused] = useState(false)
-
   const controls = useAnimation()
   const isInView = useInView(ref, { once: true })
 
@@ -31,52 +27,32 @@ export default function TrustedBySection() {
   }
 
   const logos = [
-    { name: "Google", logo: "/logo/kiitmun.png", square: true },
-    { name: "Microsoft", logo: "/logo/pandav.png" },
-    { name: "Apple", logo: "/logo/ascent.png", square: true },
-    { name: "Amazon", logo: "/logo/bikash.png", square: true },
-    { name: "Meta", logo: "/logo/hemsida.png" , square: true },
-    { name: "Netflix", logo: "/logo/dmc.png" },
-    { name: "Spotify", logo: "/logo/indura.png", square: true },
-    { name: "Adobe", logo: "/logo/kiitmun.png", square: true },
-    { name: "Sunshine", logo: "/logo/sunshine.png", square: true },
+    { name: "KIIT MUN", logo: "/logo/kiitmun.png", square: true },
+    { name: "Pandav Studio", logo: "/logo/pandav.png" },
+    { name: "Acsent", logo: "/logo/ascent.png", square: true },
+    { name: "Bikash Vidalya", logo: "/logo/bikash.png", square: true },
+    { name: "Hemsida", logo: "/logo/hemsida.png", square: true },
+    { name: "DMC School", logo: "/logo/dmc.png" },
+    { name: "Indura School", logo: "/logo/indura.png", square: true },
+    { name: "Sunshine School", logo: "/logo/sunshine.png", square: true },
     { name: "Chimera", logo: "/logo/chimera.png", square: true },
   ]
 
   const loopLogos = [...logos, ...logos]
 
-  // ✅ GSAP-BASED INFINITE MARQUEE - uses transform for compositor-friendly animation
-  useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-
-    const halfWidth = track.scrollWidth / 2
-    let ctx = gsap.context(() => {
-      gsap.to(track, {
-        x: -halfWidth,
-        duration: 20,
-        ease: "none",
-        repeat: -1,
-        paused: isPaused,
-      })
-    }, track)
-
-    return () => ctx.revert()
-  }, [isPaused])
-
   return (
-    <section className="relative min-h-screen bg-black text-white py-24 border-t border-white/5 flex flex-col justify-center">
+    <section className="relative bg-black text-white py-20 md:py-24 border-t border-white/5 flex flex-col justify-center">
       <div className="container mx-auto px-4" ref={ref}>
         <motion.div variants={containerVariants} initial="hidden" animate={controls} className="text-center">
 
           <motion.h2
             variants={itemVariants}
-            className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 tracking-tight"
+            className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2"
           >
             Trusted by Visionaries
           </motion.h2>
 
-          <motion.p variants={itemVariants} className="text-base md:text-lg text-gray-400 mb-20 max-w-2xl mx-auto font-light tracking-wide">
+          <motion.p variants={itemVariants} className="text-sm md:text-lg text-gray-400 mb-12 md:mb-20 max-w-2xl mx-auto font-light tracking-wide px-4">
             Partnering with forward-thinking companies who dare to push boundaries.
           </motion.p>
 
@@ -89,7 +65,7 @@ export default function TrustedBySection() {
             }}
           >
             
-            {/* CSS-driven marquee avoiding GSAP load race conditions */}
+            {/* Pure CSS marquee — no GSAP, no JS, zero overhead */}
             <style>
               {`
                 @keyframes marquee {
@@ -99,32 +75,35 @@ export default function TrustedBySection() {
                 .css-marquee-track {
                   animation: marquee 30s linear infinite;
                   width: max-content;
+                  will-change: transform;
                 }
-                .css-marquee-track:hover {
-                  animation-play-state: paused;
+                @media (prefers-reduced-motion: reduce) {
+                  .css-marquee-track {
+                    animation: none;
+                  }
                 }
               `}
             </style>
             
             <div
-              className="flex css-marquee-track will-change-transform items-center py-4"
+              className="flex css-marquee-track items-center py-4"
               data-no-cursor="true"
             >
               {loopLogos.map((company, i) => (
                 <div
                   key={`${company.name}-${i}`}
-                  className="flex items-center justify-center px-10 md:px-16"
+                  className="flex items-center justify-center px-6 md:px-16"
                 >
                   <img
                     src={company.logo}
                     alt={company.name}
+                    loading="lazy"
                     className={`
                       object-contain
                       filter grayscale opacity-60
-                      transition-all duration-500 ease-out
-                      hover:grayscale-0 hover:opacity-100 hover:scale-110 hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]
-                      ${company.square ? "h-16 md:h-20" : "h-10 md:h-12"}
-                      w-auto max-w-[180px]
+                      transition-opacity duration-500
+                      ${company.square ? "h-12 md:h-20" : "h-8 md:h-12"}
+                      w-auto max-w-[120px] md:max-w-[180px]
                     `}
                   />
                 </div>

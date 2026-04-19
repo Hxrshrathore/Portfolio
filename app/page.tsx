@@ -7,11 +7,6 @@ import dynamic from "next/dynamic"
 
 const Hero = dynamic(() => import("@/components/hero"), { 
   ssr: false,
-  loading: () => (
-    <div className="h-screen w-full bg-black flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-    </div>
-  )
 })
 
 // Below-the-fold sections are lazy-loaded. Client only evaluates their JS when necessary.

@@ -1,36 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import LiquidChrome from "@/components/liquid-chrome"
 import { usePageTransition } from "@/components/page-transition"
 
 export default function Hero() {
-  const [mounted, setMounted] = useState(false)
   const { navigateTo } = usePageTransition()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const handleAnimationComplete = () => {
-    console.log("Hero title animation completed!")
-  }
-
-  if (!mounted) {
-    return (
-      <div className="relative h-screen w-full overflow-hidden bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="relative h-[95vh] w-full overflow-hidden bg-black">
+    <div className="relative h-[100svh] md:h-[95vh] w-full overflow-hidden bg-black">
       <div className="absolute inset-0 z-0 w-full h-full">
         <LiquidChrome
           baseColor={[0.015, 0.015, 0.015]}
@@ -46,53 +25,48 @@ export default function Hero() {
 
       {/* Main Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
-        {/* New Background Badge */}
-        <div className="mb-8">
+        {/* Background Badge */}
+        <div className="mb-6 md:mb-8">
           <div className="inline-flex items-center space-x-2 bg-black/30 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
             <div className="w-2 h-2 bg-white rounded-full"></div>
-            <span className="text-white text-sm font-medium">
+            <span className="text-white text-xs md:text-sm font-medium">
               Web <span className="italic font-light">Designer</span>
             </span>
           </div>
         </div>
 
-        {/* Main Heading scaled and styled as per /work hero */}
+        {/* Main Heading */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-6 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent max-w-5xl tracking-tight"
+          className="mb-4 md:mb-6 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent max-w-5xl tracking-tight"
         >
           I'm Harsh
         </motion.h1>
 
-        {/* Paragraph styled as per /work hero */}
+        {/* Paragraph */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl px-4"
+          className="text-base sm:text-lg md:text-2xl text-gray-300 mb-8 md:mb-10 max-w-2xl px-4"
         >
           Ready to dive in?
           <br />
           Where Design & Code meets.
         </motion.p>
 
-        {/* Buttons */}
+        {/* Button */}
         <div className="flex flex-wrap justify-center gap-4">
           <Button
             size="lg"
             onClick={() => navigateTo("/projects")}
-            className="bg-white text-black hover:bg-gray-100 rounded-full px-12 py-6 text-sm font-bold tracking-[0.2em] uppercase transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="bg-white text-black hover:bg-gray-100 rounded-full px-8 md:px-12 py-5 md:py-6 text-xs md:text-sm font-bold tracking-[0.2em] uppercase transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
             Explore Projects
           </Button>
         </div>
-      </div>
-
-      {/* Demo Content Toggle */}
-      <div className="absolute bottom-8 right-8 z-10">
-        <div className="flex items-center space-x-3"></div>
       </div>
     </div>
   )

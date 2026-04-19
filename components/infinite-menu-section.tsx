@@ -190,10 +190,10 @@ export default function InfiniteMenuSection() {
     <section className="relative w-full bg-black overflow-hidden border-t border-white/5">
       {/* Header — closer to the content */}
       <div className="text-center pt-16 pb-6 px-4">
-        <h2 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 tracking-tight">
+        <h2 className="text-3xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-3 md:mb-4 tracking-tight px-2">
           Explore My Universe
         </h2>
-        <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto px-4 tracking-wide">
+        <p className="text-sm md:text-lg text-gray-300 max-w-3xl mx-auto px-4 tracking-wide">
           Navigate through a constellation of creativity.
         </p>
       </div>
@@ -227,16 +227,13 @@ export default function InfiniteMenuSection() {
                 <h3 className="text-xl font-bold text-white tracking-tight text-center">
                   {activeItem.title}
                 </h3>
-                <div className="w-full aspect-[19/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative group/iframe">
-                  <div className="absolute inset-0 w-[1280px] h-[606px] origin-top-left scale-[0.22] md:scale-[0.22] lg:scale-[0.25]">
-                    <iframe
-                      src={activeItem.link}
-                      scrolling="no"
-                      className="w-full h-full border-none pointer-events-none"
-                      title={`${activeItem.title} desktop preview`}
-                    />
-                  </div>
-                  {/* Glassy overlay to reinforce non-interaction and depth */}
+                <div className="w-full aspect-[19/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative">
+                  <img
+                    src={activeItem.projectImage}
+                    alt={`${activeItem.title} preview`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-white/[0.02] pointer-events-none" />
                 </div>
                 <a
@@ -383,16 +380,14 @@ export default function InfiniteMenuSection() {
                 </div>
               </div>
 
-              {/* Live Preview (Mobile) - Forced Desktop scale in 19:9 */}
-              <div className="w-full aspect-[19/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative">
-                <div className="absolute inset-0 w-[1280px] h-[606px] origin-top-left scale-[0.3] sm:scale-[0.4]">
-                  <iframe
-                    src={activeItem.link}
-                    scrolling="no"
-                    className="w-full h-full border-none pointer-events-none"
-                    title={`${activeItem.title} mobile desktop preview`}
-                  />
-                </div>
+              {/* Static Preview (Mobile) — no iframes on mobile */}
+              <div className="w-full aspect-[16/9] rounded-lg border border-white/10 overflow-hidden bg-white/5 relative">
+                <img
+                  src={activeItem.projectImage}
+                  alt={`${activeItem.title} mobile preview`}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-white/[0.02] pointer-events-none" />
               </div>
 
