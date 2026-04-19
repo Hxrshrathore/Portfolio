@@ -3,6 +3,7 @@
 import Image from "next/image"
 import React, { useState } from "react"
 import { cn } from "@/lib/utils"
+import { usePageTransition } from "@/components/page-transition"
 
 export const Card = React.memo(
   ({
@@ -16,6 +17,8 @@ export const Card = React.memo(
     hovered: number | null
     setHovered: React.Dispatch<React.SetStateAction<number | null>>
   }) => {
+    const { navigateTo } = usePageTransition()
+
     const getStatusColor = (status: string) => {
       switch (status) {
         case "ACTIVE":
@@ -45,7 +48,11 @@ export const Card = React.memo(
           if (card.onClick) {
             card.onClick()
           } else if (card.href) {
-            window.location.href = card.href
+            if (card.href.startsWith('/')) {
+              navigateTo(card.href)
+            } else {
+              window.location.href = card.href
+            }
           }
         }}
       >

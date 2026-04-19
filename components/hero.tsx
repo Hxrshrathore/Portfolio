@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import LiquidChrome from "@/components/liquid-chrome"
+import { usePageTransition } from "@/components/page-transition"
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false)
+  const { navigateTo } = usePageTransition()
 
   useEffect(() => {
     setMounted(true)
@@ -80,7 +82,7 @@ export default function Hero() {
         <div className="flex flex-wrap justify-center gap-4">
           <Button
             size="lg"
-            onClick={() => (window.location.href = "/projects")}
+            onClick={() => navigateTo("/projects")}
             className="bg-white text-black hover:bg-gray-100 rounded-full px-12 py-6 text-sm font-bold tracking-[0.2em] uppercase transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
             Explore Projects

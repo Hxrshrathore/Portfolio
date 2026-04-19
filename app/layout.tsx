@@ -10,6 +10,7 @@ import Footer from "@/components/footer"
 import SmoothScroll from "@/components/smooth-scroll"
 import AnimatedFavicon from "@/components/animated-favicon"
 import StructuredData from "@/components/structured-data"
+import { PageTransitionProvider } from "@/components/page-transition"
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -116,6 +117,7 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${inter.variable} font-sans bg-black text-white`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <PageTransitionProvider>
           <AnimatedFavicon />
           <Preloader>
             <Navbar />
@@ -135,6 +137,7 @@ export default function RootLayout({
               <Footer />
             </SmoothScroll>
           </Preloader>
+          </PageTransitionProvider>
         </ThemeProvider>
       </body>
     </html>

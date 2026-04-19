@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
 import PixelBat from "./ui/pixel-bat"
 
@@ -13,20 +13,20 @@ export default function Navbar() {
       <div className="fixed top-0 left-0 right-0 z-50 pt-8 px-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-6 py-3">
-            <Link href="/" className="flex items-center space-x-2">
+            <TransitionLink href="/" className="flex items-center space-x-2">
               <div className="relative -top-5">
                 <PixelBat />
               </div>
               <span className="text-white font-medium text-lg">hxrshrathore</span>
-            </Link>
+            </TransitionLink>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/projects" className="text-white hover:text-gray-300 transition-colors">
+              <TransitionLink href="/projects" className="text-white hover:text-gray-300 transition-colors">
                 Work
-              </Link>
-              <Link href="/blog" className="text-white hover:text-gray-300 transition-colors">
+              </TransitionLink>
+              <TransitionLink href="/blog" className="text-white hover:text-gray-300 transition-colors">
                 Blog
-              </Link>
+              </TransitionLink>
               <a href="#about" className="text-white hover:text-gray-300 transition-colors">
                 About
               </a>
@@ -76,20 +76,20 @@ export default function Navbar() {
             >
               <div className="flex flex-col h-full pt-32 px-8">
                 <nav className="flex flex-col space-y-8">
-                  <Link
+                  <TransitionLink
                     href="/projects"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
                     Work
-                  </Link>
-                  <Link
+                  </TransitionLink>
+                  <TransitionLink
                     href="/blog"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
                     Blog
-                  </Link>
+                  </TransitionLink>
                   <a
                     href="#about"
                     onClick={() => setIsMobileMenuOpen(false)}
