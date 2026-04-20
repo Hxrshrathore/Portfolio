@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, jsonb, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, jsonb, uuid, varchar, integer } from "drizzle-orm/pg-core";
 
 export const blogPosts = pgTable("blog_posts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -42,6 +42,30 @@ export const projects = pgTable("projects", {
     description: string;
     contentType?: string;
   }[]>().default([]).notNull(),
+  metrics: jsonb("metrics").$type<{
+    label: string;
+    value: number;
+    unit?: string;
+    data?: { name: string; value: number }[];
+    type?: 'area' | 'bar' | 'pie' | 'radar';
+  }[]>().default([]).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const products = pgTable("products", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(), // Represented in cents
+  category: varchar("category", { length: 100 }).notNull(), // Templates, Assets, Components
+  images: jsonb("images").$type<string[]>().default([]).notNull(),
+  features: jsonb("features").$type<string[]>().default([]).notNull(),
+  demoUrl: text("demo_url"),
+  downloadUrl: text("download_url"),
+  tags: jsonb("tags").$type<string[]>().default([]).notNull(),
+  featured: boolean("featured").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

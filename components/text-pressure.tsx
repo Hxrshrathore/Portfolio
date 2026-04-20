@@ -160,7 +160,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
   }, [width, weight, italic, alpha, chars.length])
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-transparent">
+    <div ref={containerRef} className="relative w-full h-full bg-transparent">
       <style>{`
         @font-face {
           font-family: '${fontFamily}';

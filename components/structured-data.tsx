@@ -1,7 +1,10 @@
+import Script from "next/script"
+
 export default function StructuredData() {
   const personSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
+// ... (rest of schemas stay the same)
     name: "Harsh Kumar",
     alternateName: "hxrshrathore",
     url: "https://hxrshrathore.vercel.app",
@@ -108,10 +111,23 @@ export default function StructuredData() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(portfolioSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
-      <script
+      <Script
+        id="schema-person"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
+      <Script
+        id="schema-portfolio"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(portfolioSchema) }}
+      />
+      <Script
+        id="schema-website"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <Script
+        id="schema-professional"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(professionalServiceSchema) }}
       />

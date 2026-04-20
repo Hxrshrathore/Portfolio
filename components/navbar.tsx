@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useCart } from "@/lib/store/use-cart"
+import { useEffect, useState } from "react"
 import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ShoppingCart } from "lucide-react"
@@ -8,6 +9,12 @@ import PixelBat from "./ui/pixel-bat"
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const cartItems = useCart((state) => state.totalItems())
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <>
@@ -25,15 +32,27 @@ export default function Navbar() {
               <TransitionLink href="/projects" className="text-white hover:text-gray-300 transition-colors">
                 Work
               </TransitionLink>
+              <TransitionLink href="/shop" className="text-white hover:text-gray-300 transition-colors">
+                Shop
+              </TransitionLink>
               <TransitionLink href="/blog" className="text-white hover:text-gray-300 transition-colors">
                 Blog
               </TransitionLink>
-              <a href="#about" className="text-white hover:text-gray-300 transition-colors">
-                About
-              </a>
+              <TransitionLink href="/contact" className="text-white hover:text-gray-300 transition-colors">
+                Contact
+              </TransitionLink>
               <div className="w-[1px] h-4 bg-white/20 mx-2" />
-              <TransitionLink href="/cart" aria-label="Cart" className="text-white hover:text-gray-300 transition-transform hover:scale-110 active:scale-95 duration-300">
+              <TransitionLink href="/cart" aria-label="Cart" className="relative text-white hover:text-gray-300 transition-transform hover:scale-110 active:scale-95 duration-300">
                 <ShoppingCart className="w-5 h-5" />
+                {mounted && cartItems > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2 w-4 h-4 bg-white text-black text-[8px] font-bold rounded-full flex items-center justify-center"
+                  >
+                    {cartItems}
+                  </motion.span>
+                )}
               </TransitionLink>
             </div>
 
@@ -82,11 +101,11 @@ export default function Navbar() {
               <div className="flex flex-col h-full pt-32 px-8">
                 <nav className="flex flex-col space-y-8">
                   <TransitionLink
-                    href="/projects"
+                    href="/shop"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
-                    Work
+                    Shop
                   </TransitionLink>
                   <TransitionLink
                     href="/blog"
@@ -95,13 +114,13 @@ export default function Navbar() {
                   >
                     Blog
                   </TransitionLink>
-                  <a
-                    href="#about"
+                  <TransitionLink
+                    href="/contact"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
                   >
-                    About
-                  </a>
+                    Contact
+                  </TransitionLink>
                   <div className="w-12 h-[1px] bg-white/20 my-2" />
                   <TransitionLink
                     href="/cart"
@@ -109,7 +128,14 @@ export default function Navbar() {
                     className="text-white text-2xl font-medium hover:text-gray-300 transition-colors flex items-center gap-3"
                   >
                     Cart
-                    <ShoppingCart className="w-6 h-6" />
+                    <div className="relative">
+                      <ShoppingCart className="w-6 h-6" />
+                      {mounted && cartItems > 0 && (
+                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+                          {cartItems}
+                        </span>
+                      )}
+                    </div>
                   </TransitionLink>
                 </nav>
               </div>

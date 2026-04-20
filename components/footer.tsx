@@ -114,6 +114,17 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href="/contact"
+                    className="text-lg font-medium text-white/60 hover:text-white transition-colors duration-300 flex items-center group"
+                  >
+                    Contact
+                    <span className="inline-block overflow-hidden w-0 group-hover:w-4 transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 ml-1">
+                       <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-white" />
+                    </span>
+                  </Link>
+                </li>
               </ul>
             </motion.div>
           </div>

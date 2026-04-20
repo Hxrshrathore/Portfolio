@@ -28,6 +28,13 @@ export interface Project {
     description: string
     contentType?: string
   }[]
+  metrics: {
+    label: string
+    value: number
+    unit?: string
+    data?: { name: string; value: number }[]
+    type?: 'area' | 'bar' | 'pie' | 'radar'
+  }[]
   slug: string
   subtitle: string
   heroImage: string
@@ -35,6 +42,33 @@ export interface Project {
 
 // Map database row to Project interface
 function mapProject(p: any): Project {
+  // Sample metrics for Case Study demonstration during development
+  const sampleMetrics = [
+    {
+      label: "Performance Boost",
+      value: 40,
+      unit: "%",
+      type: "area",
+      data: [
+        { name: "Research", value: 10 },
+        { name: "Design", value: 25 },
+        { name: "Dev", value: 35 },
+        { name: "Post-Launch", value: 40 }
+      ]
+    },
+    {
+      label: "User Satisfaction",
+      value: 94,
+      unit: "%",
+      type: "bar",
+      data: [
+        { name: "Alpha", value: 40 },
+        { name: "Beta", value: 72 },
+        { name: "V1", value: 94 }
+      ]
+    }
+  ];
+
   return {
     ...p,
     domain: p.domain as ProjectDomain,
@@ -42,6 +76,7 @@ function mapProject(p: any): Project {
     demoUrl: p.demoUrl || undefined,
     githubUrl: p.githubUrl || undefined,
     category: p.category || "",
+    metrics: p.metrics && p.metrics.length > 0 ? p.metrics : sampleMetrics
   }
 }
 

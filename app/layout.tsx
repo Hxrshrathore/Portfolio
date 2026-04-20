@@ -112,10 +112,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <StructuredData />
-      </head>
       <body className={`${geistSans.variable} ${inter.variable} font-sans bg-black text-white`}>
+        <StructuredData />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <PageTransitionProvider>
           <AnimatedFavicon />

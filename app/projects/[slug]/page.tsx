@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getProjectBySlug, getAllProjects } from "@/lib/projects-data"
+import { getProjectBySlug, getAllProjects, getRelatedProjects } from "@/lib/projects-data"
 import ProjectDetailPage from "@/components/project-detail-page"
 
 interface ProjectPageProps {
@@ -44,5 +44,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  return <ProjectDetailPage project={project} />
+  const relatedProjects = await getRelatedProjects(project.id)
+
+  return <ProjectDetailPage project={project} relatedProjects={relatedProjects} />
 }

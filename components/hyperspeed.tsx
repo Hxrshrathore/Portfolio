@@ -632,6 +632,8 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions, className = "" }) => {
       }
 
       init() {
+        if (this.disposed) return
+        if (!this.renderer || !this.composer) return
         this.initPasses()
         const options = this.options
         this.road.init()
@@ -642,14 +644,13 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions, className = "" }) => {
         this.leftSticks.init()
         this.leftSticks.mesh.position.setX(-(options.roadWidth + options.islandWidth / 2))
 
-        this.container.addEventListener("mousedown", this.onMouseDown)
-        this.container.addEventListener("mouseup", this.onMouseUp)
-        this.container.addEventListener("mouseout", this.onMouseUp)
-        this.container.addEventListener("touchstart", this.onTouchStart, { passive: true })
-        this.container.addEventListener("touchend", this.onTouchEnd, { passive: true })
-        this.container.addEventListener("touchcancel", this.onTouchEnd, { passive: true })
-        this.container.addEventListener("mousemove", this.onMouseMove)
-        this.container.addEventListener("contextmenu", this.onContextMenu)
+        window.addEventListener("mousedown", this.onMouseDown)
+        window.addEventListener("mouseup", this.onMouseUp)
+        window.addEventListener("touchstart", this.onTouchStart, { passive: true })
+        window.addEventListener("touchend", this.onTouchEnd, { passive: true })
+        window.addEventListener("touchcancel", this.onTouchEnd, { passive: true })
+        window.addEventListener("mousemove", this.onMouseMove)
+        window.addEventListener("contextmenu", this.onContextMenu)
 
         this.tick()
       }
@@ -753,16 +754,13 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions, className = "" }) => {
           this.composer.dispose()
         }
         window.removeEventListener("resize", this.onWindowResize)
-        if (this.container) {
-          this.container.removeEventListener("mousedown", this.onMouseDown)
-          this.container.removeEventListener("mouseup", this.onMouseUp)
-          this.container.removeEventListener("mouseout", this.onMouseUp)
-          this.container.removeEventListener("touchstart", this.onTouchStart)
-          this.container.removeEventListener("touchend", this.onTouchEnd)
-          this.container.removeEventListener("touchcancel", this.onTouchEnd)
-          this.container.removeEventListener("mousemove", this.onMouseMove)
-          this.container.removeEventListener("contextmenu", this.onContextMenu)
-        }
+        window.removeEventListener("mousedown", this.onMouseDown)
+        window.removeEventListener("mouseup", this.onMouseUp)
+        window.removeEventListener("touchstart", this.onTouchStart)
+        window.removeEventListener("touchend", this.onTouchEnd)
+        window.removeEventListener("touchcancel", this.onTouchEnd)
+        window.removeEventListener("mousemove", this.onMouseMove)
+        window.removeEventListener("contextmenu", this.onContextMenu)
       }
 
       tick() {
