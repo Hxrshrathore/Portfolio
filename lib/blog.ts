@@ -1,10 +1,6 @@
-import fs from "fs"
-import path from "path"
-import matter from "gray-matter"
-import readingTime from "reading-time"
-import yaml from "js-yaml"
-
-const postsDirectory = path.join(process.cwd(), "content/blog")
+import { db } from "./db"
+import { blogPosts } from "./db/schema"
+import { desc, eq, not, and, isNotNull } from "drizzle-orm"
 
 export interface BlogPost {
   slug: string
@@ -31,87 +27,70 @@ export interface BlogPostMetadata {
   published: boolean
 }
 
-// Ensure the blog directory exists
-function ensureBlogDirectory() {
-  if (!fs.existsSync(postsDirectory)) {
-    fs.mkdirSync(postsDirectory, { recursive: true })
+export async function getAllPosts(): Promise<BlogPostMetadata[]> {
+  const posts = await db
+    .select({
+      slug: blogPosts.slug,
+      title: blogPosts.title,
+      description: blogPosts.description,
+      date: blogPosts.date,
+      author: blogPosts.author,
+      image: blogPosts.image,
+      tags: blogPosts.tags,
+      readingTime: blogPosts.readingTime,
+      published: blogPosts.published,
+    })
+    .from(blogPosts)
+    .where(eq(blogPosts.published, true))
+    .orderBy(desc(blogPosts.date))
+
+  return posts.map((post) => ({
+    ...post,
+    date: post.date.toISOString(),
+    readingTime: post.readingTime || "5 min read",
+    image: post.image || undefined,
+  }))
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const [post] = await db
+    .select()
+    .from(blogPosts)
+    .where(eq(blogPosts.slug, slug))
+    .limit(1)
+
+  if (!post || !post.published) return null
+
+  return {
+    ...post,
+    date: post.date.toISOString(),
+    readingTime: post.readingTime || "5 min read",
+    image: post.image || undefined,
   }
 }
 
-export function getAllPosts(): BlogPostMetadata[] {
-  ensureBlogDirectory()
-
-  const fileNames = fs.readdirSync(postsDirectory)
-  const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith(".mdx"))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, "")
-      const fullPath = path.join(postsDirectory, fileName)
-      const fileContents = fs.readFileSync(fullPath, "utf8")
-      const { data, content } = matter(fileContents, {
-        engines: {
-          yaml: (str) => yaml.load(str) as object
-        }
-      })
-      const stats = readingTime(content)
-
-      return {
-        slug,
-        title: data.title || "Untitled",
-        description: data.description || "",
-        date: data.date || new Date().toISOString(),
-        author: data.author || "hxrshrathore",
-        image: data.image,
-        tags: data.tags || [],
-        readingTime: stats.text,
-        published: data.published !== false,
-      }
+export async function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): Promise<BlogPostMetadata[]> {
+  // Simple algorithm: fetch recent posts excluding current, in a real app you'd match tags
+  const posts = await db
+    .select({
+      slug: blogPosts.slug,
+      title: blogPosts.title,
+      description: blogPosts.description,
+      date: blogPosts.date,
+      author: blogPosts.author,
+      image: blogPosts.image,
+      tags: blogPosts.tags,
+      readingTime: blogPosts.readingTime,
+      published: blogPosts.published,
     })
-    .filter((post) => post.published)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .from(blogPosts)
+    .where(and(eq(blogPosts.published, true), not(eq(blogPosts.slug, currentSlug))))
+    .limit(limit)
 
-  return allPostsData
-}
-
-export function getPostBySlug(slug: string): BlogPost | null {
-  ensureBlogDirectory()
-
-  try {
-    const fullPath = path.join(postsDirectory, `${slug}.mdx`)
-    const fileContents = fs.readFileSync(fullPath, "utf8")
-    const { data, content } = matter(fileContents, {
-      engines: {
-        yaml: (str) => yaml.load(str) as object
-      }
-    })
-    const stats = readingTime(content)
-
-    return {
-      slug,
-      title: data.title || "Untitled",
-      description: data.description || "",
-      date: data.date || new Date().toISOString(),
-      author: data.author || "hxrshrathore",
-      image: data.image,
-      tags: data.tags || [],
-      content,
-      readingTime: stats.text,
-      published: data.published !== false,
-    }
-  } catch (error) {
-    return null
-  }
-}
-
-export function getRelatedPosts(currentSlug: string, tags: string[], limit = 3): BlogPostMetadata[] {
-  const allPosts = getAllPosts()
-
-  return allPosts
-    .filter((post) => post.slug !== currentSlug)
-    .map((post) => {
-      const commonTags = post.tags.filter((tag) => tags.includes(tag))
-      return { ...post, relevance: commonTags.length }
-    })
-    .sort((a, b) => b.relevance - a.relevance)
-    .slice(0, limit)
+  return posts.map((post) => ({
+    ...post,
+    date: post.date.toISOString(),
+    readingTime: post.readingTime || "5 min read",
+    image: post.image || undefined,
+  }))
 }

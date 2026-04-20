@@ -1,10 +1,7 @@
-import createMDX from "@next/mdx";
-import remarkGfm from "remark-gfm";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // MDX + TypeScript + JS file extensions
-  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  // TypeScript + JS file extensions
+  pageExtensions: ["js", "jsx", "ts", "tsx"],
 
   // Remove deprecated configs
   typescript: {
@@ -14,12 +11,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  
+  turbopack: {
+    root: "d:/Code/portfolio",
+  },
 };
 
-// MDX wrapper (Next 16 compatible)
-const withMDX = createMDX({
-  remarkPlugins: [remarkGfm],
-  rehypePlugins: [],
-});
-
-export default withMDX(nextConfig);
+export default nextConfig;

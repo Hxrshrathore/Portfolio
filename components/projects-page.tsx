@@ -26,9 +26,9 @@ if (typeof window !== "undefined") {
 const DOMAINS: ProjectDomain[] = ["DATA ANALYST", "WEB DESIGN", "WEB DEVELOPMENT", "AI/ML", "GD"]
 const STATUSES: ProjectStatus[] = ["ACTIVE", "BUILDING", "ARCHIVED", "DOWN", "PROTOTYPE"]
 
-export default function ProjectsPage() {
+export default function ProjectsPage({ initialProjects }: { initialProjects: Project[] }) {
   const [mounted, setMounted] = useState(false)
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDomains, setSelectedDomains] = useState<ProjectDomain[]>([])
   const [selectedStatus, setSelectedStatus] = useState<ProjectStatus | "All">("All")
@@ -41,7 +41,6 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     setMounted(true)
-    setProjects(getAllProjects())
   }, [])
 
   const isFiltered = searchQuery !== "" || selectedDomains.length > 0 || selectedStatus !== "All" || selectedTime !== "All"
@@ -108,7 +107,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
       {/* Hero Section */}
-      <section className="relative h-[92vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full opacity-40">
           <Silk speed={4.2} scale={1} color="#ffffff" noiseIntensity={0.9} rotation={0} />
         </div>

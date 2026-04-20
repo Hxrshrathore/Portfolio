@@ -13,16 +13,21 @@ interface PreloaderProps {
 type Phase = "loading" | "exiting" | "done"
 
 export default function Preloader({ children }: PreloaderProps) {
-  // On repeat visits, skip the preloader entirely — render children immediately.
-  const [phase, setPhase] = useState<Phase>(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("preloader_shown")) {
-      return "done"
-    }
-    return "loading"
-  })
+  // Always start with "loading" to match SSR. 
+  // We'll check sessionStorage in useEffect to skip quickly on the client.
+  const [phase, setPhase] = useState<Phase>("loading")
   const [progress, setProgress] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
+    
+    // Check if we already showed the preloader in this session
+    if (sessionStorage.getItem("preloader_shown")) {
+      setPhase("done")
+      return
+    }
+
     if (phase !== "loading") return
 
     const interval = setInterval(() => {

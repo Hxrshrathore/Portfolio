@@ -4,25 +4,25 @@ import type { Metadata } from "next"
 import { format } from "date-fns"
 import { Calendar, Clock, ArrowLeft, Tag } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
-import { MDXRemote } from "next-mdx-remote/rsc"
+import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts()
+  const posts = await getAllPosts()
   return posts.map((post) => ({
     slug: post.slug,
   }))
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = getPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     return {
@@ -75,8 +75,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 }
 
-// MDX components configuration
-const mdxComponents = {
+// Markdown components configuration
+const markdownComponents = {
   h1: ({ children }: any) => <h1 className="text-4xl font-bold text-white mb-6 mt-8">{children}</h1>,
   h2: ({ children }: any) => <h2 className="text-3xl font-bold text-white mb-4 mt-8">{children}</h2>,
   h3: ({ children }: any) => <h3 className="text-2xl font-semibold text-white mb-3 mt-6">{children}</h3>,
@@ -100,27 +100,19 @@ const mdxComponents = {
       {children}
     </pre>
   ),
-  Image: (props: any) => (
-    <Image
-      {...props}
-      width={props.width || 800}
-      height={props.height || 400}
-      className="rounded-lg my-6"
-      alt={props.alt || ""}
-    />
-  ),
   img: (props: any) => <img {...props} className="rounded-lg my-6 w-full h-auto" alt={props.alt || ""} />,
   hr: () => <hr className="border-gray-800 my-8" />,
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = getPostBySlug(params.slug)
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
 
   if (!post) {
     notFound()
   }
 
-  const relatedPosts = getRelatedPosts(post.slug, post.tags)
+  const relatedPosts = await getRelatedPosts(post.slug, post.tags)
   const publishedDate = new Date(post.date)
   const url = `https://hxrshrathore.com/blog/${post.slug}`
 
@@ -223,15 +215,12 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Content */}
           <div className="prose prose-invert prose-cyan max-w-none">
-            <MDXRemote
-              source={post.content}
-              options={{
-                mdxOptions: {
-                  remarkPlugins: [remarkGfm],
-                },
-              }}
-              components={mdxComponents}
-            />
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents as any}
+            >
+              {post.content}
+            </ReactMarkdown>
           </div>
 
           {/* Related Posts */}
