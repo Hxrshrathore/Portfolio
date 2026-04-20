@@ -11,10 +11,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  
-  turbopack: {
-    root: "d:/Code/portfolio",
-  },
 };
 
 export default nextConfig;
