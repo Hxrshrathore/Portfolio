@@ -10,6 +10,7 @@ import { StickyScrollReveal } from "@/components/ui/sticky-scroll-reveal"
 import Iridescence from "@/components/ui/iridescence"
 import BlurText from "@/components/ui/blur-text"
 import type { Project } from "@/lib/projects-data"
+import Hyperspeed, { hyperspeedPresets } from "@/components/hyperspeed"
 
 interface ProjectDetailPageProps {
   project: Project
@@ -103,10 +104,10 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section with Iridescence Background */}
+      {/* Hero Section with Hyperspeed Background */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <Iridescence />
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Hyperspeed effectOptions={hyperspeedPresets.two} className="absolute inset-0 z-0" />
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-none">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <BlurText
               text={project.title}
@@ -141,7 +142,7 @@ export default function ProjectDetailPage({ project }: ProjectDetailPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 pointer-events-auto"
             >
               <Link href="/projects" className="w-full sm:w-auto">
                 <Button
