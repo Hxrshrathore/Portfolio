@@ -198,7 +198,7 @@ export default function ProductDetailPage() {
                         src={product.images[activeImage]} 
                         alt={product.name} 
                         fill 
-                        className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                        className="object-cover transition-transform duration-[2000ms] group-hover:scale-110"
                         priority
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
@@ -224,7 +224,7 @@ export default function ProductDetailPage() {
            <div className="container mx-auto">
               <div className="max-w-3xl mb-24">
                 <span className="text-[10px] font-bold tracking-[0.6em] uppercase text-white/30 mb-6 block">The Blueprint</span>
-                <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-8 italic font-light">Architectural Excellence In Every Byte.</h2>
+                <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-8 italic">Architectural Excellence In Every Byte.</h2>
                 <p className="text-lg text-white/40 font-light leading-relaxed">
                   Every asset we create is forged with performance first. We don't just build UI; we engineer digital environments that react, evolve, and survive the modern web.
                 </p>

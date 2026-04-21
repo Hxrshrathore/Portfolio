@@ -33,21 +33,9 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
 
   const animationDefaults = { duration: 0.6, ease: "expo" }
 
-  const findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): "top" | "bottom" => {
-    const topEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY, 2)
-    const bottomEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY - height, 2)
-    return topEdgeDist < bottomEdgeDist ? "top" : "bottom"
-  }
-
-  const handleMouseEnter = (ev: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return
-    const rect = itemRef.current.getBoundingClientRect()
-    const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height)
-
-    // ✅ Kill existing timeline to prevent conflicts
+  const animateIn = (edge: "top" | "bottom") => {
+    if (!marqueeRef.current || !marqueeInnerRef.current) return
     animationTlRef.current?.kill()
-
-    // ✅ Create timeline with defaults - killed on leave
     animationTlRef.current = gsap.timeline({ defaults: animationDefaults })
     animationTlRef.current
       .set(marqueeRef.current, { y: edge === "top" ? "-101%" : "101%" })
@@ -55,18 +43,35 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
       .to([marqueeRef.current, marqueeInnerRef.current], { y: "0%" })
   }
 
-  const handleMouseLeave = (ev: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return
-    const rect = itemRef.current.getBoundingClientRect()
-    const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height)
-
-    // ✅ Kill existing timeline to prevent conflicts
+  const animateOut = (edge: "top" | "bottom") => {
+    if (!marqueeRef.current || !marqueeInnerRef.current) return
     animationTlRef.current?.kill()
-
     animationTlRef.current = gsap.timeline({ defaults: animationDefaults })
     animationTlRef.current
       .to(marqueeRef.current, { y: edge === "top" ? "-101%" : "101%" })
       .to(marqueeInnerRef.current, { y: edge === "top" ? "101%" : "-101%" })
+  }
+
+  const findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): "top" | "bottom" => {
+    const topEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY, 2)
+    const bottomEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY - height, 2)
+    return topEdgeDist < bottomEdgeDist ? "top" : "bottom"
+  }
+
+  const handleMouseEnter = (ev: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.innerWidth <= 768) return // Ignore hover on mobile
+    if (!itemRef.current) return
+    const rect = itemRef.current.getBoundingClientRect()
+    const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height)
+    animateIn(edge)
+  }
+
+  const handleMouseLeave = (ev: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.innerWidth <= 768) return // Ignore hover on mobile
+    if (!itemRef.current) return
+    const rect = itemRef.current.getBoundingClientRect()
+    const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height)
+    animateOut(edge)
   }
 
   const repeatedMarqueeContent = React.useMemo(() => {
@@ -82,8 +87,34 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
   }, [text, image])
 
   React.useEffect(() => {
+    const isMobile = window.innerWidth <= 768
+    let observer: IntersectionObserver | null = null
+
+    if (isMobile && itemRef.current) {
+      // Intersection Observer logic for mobile midway trigger
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              animateIn("bottom")
+            } else {
+              animateOut("top")
+            }
+          })
+        },
+        {
+          // Root margin defines the active zone in the center of the viewport
+          rootMargin: "-42% 0% -42% 0%",
+          threshold: 0,
+        }
+      )
+
+      observer.observe(itemRef.current)
+    }
+
     return () => {
       animationTlRef.current?.kill()
+      if (observer) observer.disconnect()
     }
   }, [])
 

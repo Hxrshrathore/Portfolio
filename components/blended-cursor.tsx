@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useCallback, useMemo } from "react";
 
 const STATE = { DEFAULT: 0, HOVER: 1, TEXT: 2 } as const;
 
-// ── Semi-implicit Euler spring with sub-stepping for stability at high stiffness ──
+// ── Semi-implicit Euler spring with sub-stepping for stability ──
 function createSpring(stiffness: number, damping: number, mass: number) {
   let cur = 0, vel = 0, tgt = 0;
   return {
@@ -23,7 +23,6 @@ function createSpring(stiffness: number, damping: number, mass: number) {
   };
 }
 
-// ── Frame-rate independent exponential decay ──
 function dlerp(a: number, b: number, halfLife: number, dt: number) {
   return a + (b - a) * (1 - Math.pow(2, -dt / halfLife));
 }
@@ -32,8 +31,7 @@ const LINK_SELECTOR =
   "a:not([data-no-cursor]), button:not([data-no-cursor]), .cursor-pointer:not([data-no-cursor]), [role='button']:not([data-no-cursor])";
 const TEXT_SELECTOR = "p, span, h1, h2, h3, h4, h5, h6, textarea, input";
 
-// Gooey filter box size — just big enough to contain all 3 blobs + blur radius
-const FILTER_BOX = 250;
+const FILTER_BOX = 400;
 
 export default function BlendedCursor() {
   const mainRef    = useRef<HTMLDivElement>(null);
@@ -49,50 +47,27 @@ export default function BlendedCursor() {
     curW: 24, curH: 24, curScale: 1, curBR: 50,
     t1W: 16, t1H: 16, t1Scale: 1, t1Opacity: 1,
     t2W: 16, t2H: 16, t2Scale: 1, t2Opacity: 1,
-    // Raw mouse position for positioning the filter box
     mx: 0, my: 0,
   });
 
   const springs = useMemo(() => ({
-    x:  createSpring(600, 40, 0.4),
-    y:  createSpring(600, 40, 0.4),
-    x2: createSpring(200, 28, 0.6),
-    y2: createSpring(200, 28, 0.6),
-    x3: createSpring(120, 32, 0.8),
-    y3: createSpring(120, 32, 0.8),
+    x:  createSpring(450, 32, 0.4), // Snappy but controlled
+    y:  createSpring(450, 32, 0.4),
+    x2: createSpring(280, 26, 0.6),
+    y2: createSpring(280, 26, 0.6),
+    x3: createSpring(180, 28, 0.8),
+    y3: createSpring(180, 28, 0.8),
   }), []);
 
   const onMove = useCallback((e: MouseEvent) => {
-    const s = state.current;
-    const sp = springs;
-    s.mx = e.clientX;
-    s.my = e.clientY;
-
-    if (s.hoverEl) {
-      const r = s.hoverEl.getBoundingClientRect();
-      const cx = r.left + r.width * 0.5;
-      const cy = r.top  + r.height * 0.5;
-      sp.x.snap(cx);
-      sp.y.snap(cy);
-      sp.x2.set(e.clientX);
-      sp.y2.set(e.clientY);
-      sp.x3.set(e.clientX);
-      sp.y3.set(e.clientY);
-    } else {
-      sp.x.set(e.clientX);
-      sp.y.set(e.clientY);
-      sp.x2.set(e.clientX);
-      sp.y2.set(e.clientY);
-      sp.x3.set(e.clientX);
-      sp.y3.set(e.clientY);
-    }
-  }, [springs]);
+    state.current.mx = e.clientX;
+    state.current.my = e.clientY;
+  }, []);
 
   const onOver = useCallback((e: MouseEvent) => {
     const target = e.target as HTMLElement;
     const s = state.current;
 
-    // Globally respect data-no-cursor on any parent
     if (target.closest('[data-no-cursor]')) {
       s.mode = STATE.DEFAULT;
       s.hoverEl = null;
@@ -105,8 +80,8 @@ export default function BlendedCursor() {
       s.hoverEl = link;
       const r = link.getBoundingClientRect();
       const cs = getComputedStyle(link);
-      s.hoverW = r.width + 16;
-      s.hoverH = r.height + 16;
+      s.hoverW = r.width + 12;
+      s.hoverH = r.height + 12;
       s.hoverBR = cs.borderRadius === "0px" ? "8px" : cs.borderRadius;
       return;
     }
@@ -123,7 +98,6 @@ export default function BlendedCursor() {
   const onUp   = useCallback(() => { state.current.clicked = false; }, []);
 
   useEffect(() => {
-    // Hard early return for mobile/touch devices to prevent ANY background CPU usage
     const isTouch = typeof window !== "undefined" && (window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768);
     if (isTouch) return;
 
@@ -135,9 +109,9 @@ export default function BlendedCursor() {
     let prev = performance.now();
     let raf = 0;
 
-    const HL_ENTER = 0.04;
-    const HL_LEAVE = 0.10;
-    const HL_DEFAULT = 0.06;
+    const HL_ENTER = 0.05;
+    const HL_LEAVE = 0.12;
+    const HL_DEFAULT = 0.08;
     const HALF = FILTER_BOX * 0.5;
 
     const tick = (now: number) => {
@@ -145,6 +119,48 @@ export default function BlendedCursor() {
       prev = now;
       const s = state.current;
       const sp = springs;
+
+      // ── Detect if target scrolled away from stationary mouse ──
+      if (s.mode === STATE.HOVER && s.hoverEl) {
+        const r = s.hoverEl.getBoundingClientRect();
+        // Add a slight tolerance padding
+        const pad = 10;
+        if (s.mx < r.left - pad || s.mx > r.right + pad || s.my < r.top - pad || s.my > r.bottom + pad) {
+          // Element scrolled out from under the pointer
+          s.mode = STATE.DEFAULT;
+          s.hoverEl = null;
+        }
+      }
+
+      // ── Calculate targets every frame to support scrolling ──
+      if (s.mode === STATE.HOVER && s.hoverEl) {
+        const r = s.hoverEl.getBoundingClientRect();
+        const cx = r.left + r.width * 0.5;
+        const cy = r.top  + r.height * 0.5;
+        
+        const dx = cx - s.mx;
+        const dy = cy - s.my;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        // Elastic snapping: Pull toward center but stay connected to cursor
+        const MAX_STRETCH = 70; 
+        const pull = Math.min(dist, MAX_STRETCH) / (dist || 1);
+        
+        sp.x.set(s.mx + dx * pull);
+        sp.y.set(s.my + dy * pull);
+        
+        sp.x2.set(s.mx);
+        sp.y2.set(s.my);
+        sp.x3.set(s.mx);
+        sp.y3.set(s.my);
+      } else {
+        sp.x.set(s.mx);
+        sp.y.set(s.my);
+        sp.x2.set(s.mx);
+        sp.y2.set(s.my);
+        sp.x3.set(s.mx);
+        sp.y3.set(s.my);
+      }
 
       sp.x.tick(dt);  sp.y.tick(dt);
       sp.x2.tick(dt); sp.y2.tick(dt);
@@ -156,19 +172,20 @@ export default function BlendedCursor() {
 
       if (s.mode === STATE.HOVER) {
         tW = s.hoverW; tH = s.hoverH;
-        tScale = s.clicked ? 0.92 : 1;
+        tScale = s.clicked ? 0.94 : 1;
         tBR = parseFloat(s.hoverBR) || 50;
-        trailSize = 0; trailOpacity = 0;
+        trailSize = 8; 
+        trailOpacity = 0.5;
         hl = HL_ENTER;
       } else if (s.mode === STATE.TEXT) {
-        tW = 4; tH = 38;
+        tW = 4; tH = 36;
         tScale = s.clicked ? 0.8 : 1;
         tBR = 2;
         trailSize = 0; trailOpacity = 0;
         hl = HL_DEFAULT;
       } else {
         tW = 24; tH = 24;
-        tScale = s.clicked ? 0.4 : 1;
+        tScale = s.clicked ? 0.5 : 1;
         tBR = 50;
         trailSize = 16; trailOpacity = 1;
         hl = HL_LEAVE;
@@ -189,15 +206,12 @@ export default function BlendedCursor() {
       s.t2Scale   = dlerp(s.t2Scale,   trailOpacity, trailHl, dt);
       s.t2Opacity = dlerp(s.t2Opacity, trailOpacity, trailHl, dt);
 
-      // ── Position the gooey filter box around the cursor (NOT full viewport) ──
-      // This is the critical perf fix: blur only processes ~250×250px instead of 1920×1080
       if (filterRef.current) {
         const fx = s.mx - HALF;
         const fy = s.my - HALF;
         filterRef.current.style.transform = `translate3d(${fx}px,${fy}px,0)`;
       }
 
-      // Blob positions are now LOCAL to the filter box (subtract box origin)
       const boxX = s.mx - HALF;
       const boxY = s.my - HALF;
 
@@ -248,8 +262,8 @@ export default function BlendedCursor() {
       <svg className="hidden" aria-hidden="true">
         <defs>
           <filter id="gooey">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="gooey" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="gooey" />
             <feComposite in="SourceGraphic" in2="gooey" operator="over" />
           </filter>
         </defs>
@@ -259,7 +273,6 @@ export default function BlendedCursor() {
         className="fixed inset-0 pointer-events-none z-[9999] hidden md:block"
         style={{ mixBlendMode: "difference" }}
       >
-        {/* Filter box: small clipped region that follows the cursor */}
         <div
           ref={filterRef}
           className="absolute top-0 left-0 will-change-transform"

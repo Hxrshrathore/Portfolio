@@ -48,8 +48,8 @@ export const LiquidChrome = ({
           vec2 fragCoord = uvCoord * uResolution.xy;
           vec2 uv = (2.0 * fragCoord - uResolution.xy) / min(uResolution.x, uResolution.y);
 
-          // Optimization: Fewer iterations on mobile
-          float iterations = ${isMobile ? "4.0" : "10.0"};
+          // Optimization: Adjusted iterations for better balance
+          float iterations = ${isMobile ? "3.0" : "8.0"};
           for (float i = 1.0; i < 20.0; i++){
               if(i >= iterations) break;
               uv.x += uAmplitude / i * cos(i * uFrequencyX * uv.y + uTime + uMouse.x * 3.14159);
@@ -68,14 +68,14 @@ export const LiquidChrome = ({
 
       void main() {
           vec4 col = vec4(0.0);
-          // Optimization: 1 sample on mobile instead of 9
+          // Optimization: Reduced multi-sampling on desktop to prevent lag spike on mount
           ${isMobile ? `
           col = renderImage(vUv);
           ` : `
           int samples = 0;
-          for (int i = -1; i <= 1; i++){
-              for (int j = -1; j <= 1; j++){
-                  vec2 offset = vec2(float(i), float(j)) * (1.0 / min(uResolution.x, uResolution.y));
+          for (int i = 0; i <= 1; i++){
+              for (int j = 0; j <= 1; j++){
+                  vec2 offset = vec2(float(i), float(j)) * (1.5 / min(uResolution.x, uResolution.y));
                   col += renderImage(vUv + offset);
                   samples++;
               }
