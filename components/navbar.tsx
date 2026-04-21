@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 pt-4 md:pt-8 px-4 md:px-8">
+      <div className="fixed top-8 left-0 right-0 z-50 pt-2 md:pt-6 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-6 py-3">
             <TransitionLink href="/" className="flex items-center space-x-2">

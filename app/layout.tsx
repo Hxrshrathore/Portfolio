@@ -6,6 +6,7 @@ import ClickSpark from "@/components/click-spark"
 import BlendedCursor from "@/components/blended-cursor"
 import Preloader from "@/components/preloader"
 import Navbar from "@/components/navbar"
+import DevBanner from "@/components/dev-banner"
 import Footer from "@/components/footer"
 import SmoothScroll from "@/components/smooth-scroll"
 import AnimatedFavicon from "@/components/animated-favicon"
@@ -119,6 +120,7 @@ export default function RootLayout({
           <AnimatedFavicon />
           <Preloader>
             <Navbar />
+            <DevBanner />
             <BlendedCursor />
             <SmoothScroll>
               <ClickSpark
