@@ -12,6 +12,7 @@ import SmoothScroll from "@/components/smooth-scroll"
 import AnimatedFavicon from "@/components/animated-favicon"
 import StructuredData from "@/components/structured-data"
 import { PageTransitionProvider } from "@/components/page-transition"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -139,6 +140,7 @@ export default function RootLayout({
           </Preloader>
           </PageTransitionProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
