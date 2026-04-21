@@ -3,33 +3,64 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Mail, Phone, MapPin, Send } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { contactSchema, type ContactFormValues } from "@/lib/schemas/contact-schema"
+import { submitContactForm } from "@/app/actions/contact"
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      projectType: "",
+      message: "",
+    },
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission - would connect to a server action in a real app
-    console.log("Form submitted:", formData)
-    // Reset form
-    setFormData({ name: "", email: "", subject: "", message: "" })
-    // Show success message
-    alert("Thank you for your message! I'll get back to you soon.")
+  const onFormSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true)
+    try {
+      const result = await submitContactForm(data)
+      if (result.success) {
+        toast({
+          title: "TRANSMISSION SUCCESSFUL",
+          description: result.message,
+        })
+        reset()
+      } else {
+        toast({
+          title: "TRANSMISSION ERROR",
+          description: result.error,
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "SYSTEM ERROR",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -45,47 +76,47 @@ export default function Contact() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
-            <Card>
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-sm">
               <CardContent className="p-6 flex items-start space-x-4">
-                <div className="bg-blue-100 p-3 rounded-full">
+                <div className="bg-blue-500/10 p-3 rounded-full">
                   <Mail className="h-6 w-6 text-blue-500" />
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-1">Email</h3>
-                  <p className="text-gray-600">hello@example.com</p>
+                  <p className="text-gray-400">hxrshrathore@gmail.com</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-sm">
               <CardContent className="p-6 flex items-start space-x-4">
-                <div className="bg-blue-100 p-3 rounded-full">
+                <div className="bg-blue-500/10 p-3 rounded-full">
                   <Phone className="h-6 w-6 text-blue-500" />
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-1">Phone</h3>
-                  <p className="text-gray-600">+1 (555) 123-4567</p>
+                  <p className="text-gray-400">+91 123-456-7890</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-sm">
               <CardContent className="p-6 flex items-start space-x-4">
-                <div className="bg-blue-100 p-3 rounded-full">
+                <div className="bg-blue-500/10 p-3 rounded-full">
                   <MapPin className="h-6 w-6 text-blue-500" />
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-1">Location</h3>
-                  <p className="text-gray-600">San Francisco, CA</p>
+                  <p className="text-gray-400">Bhubaneswar, India</p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-sm">
               <CardContent className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label htmlFor="name" className="text-sm font-medium">
@@ -93,12 +124,11 @@ export default function Contact() {
                       </label>
                       <Input
                         id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
+                        {...register("name")}
                         placeholder="John Doe"
-                        required
+                        className={`bg-white/5 border-white/10 focus:border-blue-500 transition-colors ${errors.name ? 'border-red-500/50' : ''}`}
                       />
+                      {errors.name && <p className="text-xs text-red-500/60 mt-1">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium">
@@ -106,28 +136,32 @@ export default function Contact() {
                       </label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
-                        value={formData.email}
-                        onChange={handleChange}
+                        {...register("email")}
                         placeholder="john@example.com"
-                        required
+                        className={`bg-white/5 border-white/10 focus:border-blue-500 transition-colors ${errors.email ? 'border-red-500/50' : ''}`}
                       />
+                      {errors.email && <p className="text-xs text-red-500/60 mt-1">{errors.email.message}</p>}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-medium">
-                      Subject
+                    <label htmlFor="projectType" className="text-sm font-medium">
+                      Project Inquiry
                     </label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      placeholder="Project Inquiry"
-                      required
-                    />
+                    <Select
+                      onValueChange={(value) => setValue("projectType", value, { shouldValidate: true })}
+                    >
+                      <SelectTrigger className={`bg-white/5 border-white/10 focus:border-blue-500 transition-colors ${errors.projectType ? 'border-red-500/50' : ''}`}>
+                        <SelectValue placeholder="Select interest" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                        <SelectItem value="web">Web Experience</SelectItem>
+                        <SelectItem value="design">UI/UX Design</SelectItem>
+                        <SelectItem value="fullstack">Full Stack Engineering</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.projectType && <p className="text-xs text-red-500/60 mt-1">{errors.projectType.message}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -136,18 +170,30 @@ export default function Contact() {
                     </label>
                     <Textarea
                       id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
+                      {...register("message")}
                       placeholder="Tell me about your project..."
                       rows={6}
-                      required
+                      className={`bg-white/5 border-white/10 focus:border-blue-500 transition-colors resize-none ${errors.message ? 'border-red-500/50' : ''}`}
                     />
+                    {errors.message && <p className="text-xs text-red-500/60 mt-1">{errors.message.message}</p>}
                   </div>
 
-                  <Button type="submit" className="w-full flex items-center justify-center gap-2">
-                    <Send className="h-4 w-4" />
-                    Send Message
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 transition-colors h-12 text-sm font-bold uppercase tracking-widest"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Transmitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>

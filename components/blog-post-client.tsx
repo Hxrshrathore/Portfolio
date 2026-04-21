@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import PlasmaWave from "@/components/PlasmaWave"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 interface BlogPostClientProps {
   post: any
@@ -21,6 +22,33 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
     damping: 30,
     restDelta: 0.001
   })
+
+  const handlePrint = () => {
+    window.print()
+  }
+
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : ""
+    const shareData = {
+      title: post.title,
+      text: post.description,
+      url: url,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        toast.success("Shared successfully")
+      } else {
+        await navigator.clipboard.writeText(url)
+        toast.success("Link copied to clipboard")
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        toast.error("Failed to share")
+      }
+    }
+  }
 
   // Specialized Markdown Components for Architectural Style
   const markdownComponents = {
@@ -127,7 +155,12 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
               Return to Index
             </Link>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full border border-white/5 hover:bg-white/5 text-white/40 hover:text-white">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleShare}
+                className="w-10 h-10 rounded-full border border-white/5 hover:bg-white/5 text-white/40 hover:text-white"
+              >
                 <Share2 size={14} />
               </Button>
               <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full border border-white/5 hover:bg-white/5 text-white/40 hover:text-white">
@@ -203,11 +236,17 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
                        <div className="space-y-4">
                           <span className="text-[8px] font-mono uppercase tracking-[0.4em] text-white/20 block">Actions</span>
                           <div className="flex flex-col gap-4">
-                             <button className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors group">
+                             <button 
+                                onClick={handlePrint}
+                                className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors group"
+                             >
                                 <Printer size={12} className="group-hover:scale-110 transition-transform" />
                                 Hard Copy
                              </button>
-                             <button className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors group">
+                             <button 
+                                onClick={handleShare}
+                                className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white transition-colors group"
+                             >
                                 <Share2 size={12} className="group-hover:scale-110 transition-transform" />
                                 Distribute
                              </button>
