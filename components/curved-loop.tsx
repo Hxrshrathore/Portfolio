@@ -133,8 +133,23 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
           <path ref={pathRef} id={pathId} d={pathD} fill="none" stroke="transparent" />
         </defs>
         {ready && (
-          <text xmlSpace="preserve" className={`fill-white ${className ?? ""}`}>
-            <textPath ref={textPathRef} href={`#${pathId}`} startOffset={offset + "px"} xmlSpace="preserve">
+          <text 
+            xmlSpace="preserve" 
+            className={`fill-white ${className ?? ""}`}
+            style={{ 
+              textRendering: "optimizeLegibility",
+              WebkitFontSmoothing: "antialiased",
+              fontFeatureSettings: '"liga" 1, "kern" 1',
+              WebkitFontVariantLigatures: "common-ligatures"
+            }}
+            dy=".32em"
+          >
+            <textPath 
+              ref={textPathRef} 
+              href={`#${pathId}`} 
+              startOffset={offset + "px"} 
+              xmlSpace="preserve"
+            >
               {totalText}
             </textPath>
           </text>
