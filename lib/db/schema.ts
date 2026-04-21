@@ -78,3 +78,11 @@ export const contactMessages = pgTable("contact_messages", {
   message: text("message").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+export const bugReports = pgTable("bug_reports", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  pageUrl: text("page_url").notNull(),
+  issueType: varchar("issue_type", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

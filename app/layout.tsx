@@ -13,6 +13,7 @@ import AnimatedFavicon from "@/components/animated-favicon"
 import StructuredData from "@/components/structured-data"
 import { PageTransitionProvider } from "@/components/page-transition"
 import { Analytics } from "@vercel/analytics/next"
+import BugReportWidget from "@/components/bug-report-widget"
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -137,6 +138,7 @@ export default function RootLayout({
               </ClickSpark>
               <Footer />
             </SmoothScroll>
+            <BugReportWidget />
           </Preloader>
           </PageTransitionProvider>
         </ThemeProvider>
