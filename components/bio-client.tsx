@@ -20,10 +20,10 @@ const Silk = dynamic(() => import("@/components/ui/silk"), { ssr: false })
 export default function BioClient({ featuredProjects }: { featuredProjects: Project[] }) {
   const socialLinks = [
     { name: "Portfolio", icon: <Globe className="w-5 h-5" />, href: "/", color: "bg-white/10" },
+    { name: "Instagram", icon: <Instagram className="w-5 h-5" />, href: "https://instagram.com/hxrshrathore", color: "bg-[#E4405F]/20" },
     { name: "LinkedIn", icon: <Linkedin className="w-5 h-5" />, href: "https://linkedin.com/in/hxrshrathore", color: "bg-[#0077B5]/20" },
     { name: "GitHub", icon: <Github className="w-5 h-5" />, href: "https://github.com/hxrshrathore", color: "bg-white/10" },
-    { name: "Twitter", icon: <Twitter className="w-5 h-5" />, href: "https://twitter.com/hxrshrathore", color: "bg-[#1DA1F2]/20" },
-    { name: "Instagram", icon: <Instagram className="w-5 h-5" />, href: "https://instagram.com/hxrsh.rathore", color: "bg-[#E4405F]/20" },
+    { name: "Twitter", icon: <Twitter className="w-5 h-5" />, href: "https://x.com/hxrshrathore", color: "bg-[#1DA1F2]/20" },
   ]
 
   const containerVariants: Variants = {
