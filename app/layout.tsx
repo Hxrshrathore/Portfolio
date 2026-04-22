@@ -14,6 +14,7 @@ import StructuredData from "@/components/structured-data"
 import { PageTransitionProvider } from "@/components/page-transition"
 import { Analytics } from "@vercel/analytics/next"
 import BugReportWidget from "@/components/bug-report-widget"
+import NavigationWrapper from "@/components/navigation-wrapper"
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -120,26 +121,29 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <PageTransitionProvider>
           <AnimatedFavicon />
-          <Preloader>
-            <Navbar />
-            <DevBanner />
-            <BlendedCursor />
-            <SmoothScroll>
-              <ClickSpark
-                sparkColor="#ffffff"
-                sparkSize={12}
-                sparkRadius={20}
-                sparkCount={8}
-                duration={500}
-                easing="ease-out"
-                extraScale={1.2}
-              >
-                {children}
-              </ClickSpark>
-              <Footer />
-            </SmoothScroll>
-            <BugReportWidget />
-          </Preloader>
+            <Preloader>
+              <BlendedCursor />
+              <SmoothScroll>
+                <div className="flex flex-col min-h-screen">
+                  <NavigationWrapper>
+                    <ClickSpark
+                      sparkColor="#ffffff"
+                      sparkSize={12}
+                      sparkRadius={20}
+                      sparkCount={8}
+                      duration={500}
+                      easing="ease-out"
+                      extraScale={1.2}
+                    >
+                      <main className="flex-grow">
+                        {children}
+                      </main>
+                    </ClickSpark>
+                  </NavigationWrapper>
+                </div>
+              </SmoothScroll>
+              <BugReportWidget />
+            </Preloader>
           </PageTransitionProvider>
         </ThemeProvider>
         <Analytics />

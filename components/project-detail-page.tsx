@@ -130,14 +130,25 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 }}
-                className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2"
+                className={cn(
+                  "inline-flex items-center space-x-3 backdrop-blur-xl border rounded-full px-5 py-2.5 uppercase tracking-widest text-[10px] md:text-xs font-bold",
+                  project.status === "ACTIVE" ? "bg-green-500/10 border-green-500/20 text-green-400" :
+                  project.status === "BUILDING" ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-500" :
+                  project.status === "ARCHIVED" ? "bg-slate-400/10 border-slate-400/20 text-slate-400" :
+                  project.status === "DOWN" ? "bg-red-500/10 border-red-500/20 text-red-400" :
+                  "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                )}
               >
                 <div className={cn(
-                  "w-2 h-2 rounded-full animate-pulse",
-                  project.status === "ACTIVE" ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]"
+                  "w-1.5 h-1.5 rounded-full animate-pulse",
+                  project.status === "ACTIVE" ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" :
+                  project.status === "BUILDING" ? "bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" :
+                  project.status === "ARCHIVED" ? "bg-slate-400 shadow-[0_0_10px_rgba(148,163,184,0.5)]" :
+                  project.status === "DOWN" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" :
+                  "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                 )}></div>
-                <span className="text-white/70 text-xs md:text-sm font-bold tracking-widest uppercase">
-                  {project.status} <span className="mx-2 text-white/20">•</span> {project.category}
+                <span>
+                  {project.status} <span className="mx-2 opacity-20 text-white">•</span> {project.category}
                 </span>
               </motion.div>
             </div>
@@ -191,7 +202,7 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
                 <Button
                   variant="outline"
                   asChild
-                  className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/10 text-white hover:bg-white/10 rounded-full px-8 py-6 text-xs md:text-sm font-bold tracking-widest uppercase tracking-widest transition-all"
+                  className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/10 text-white hover:bg-white/10 rounded-full px-8 py-6 text-xs md:text-sm font-bold tracking-widest uppercase transition-all"
                 >
                   <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                     <Github className="w-4 h-4 mr-2" />
@@ -543,7 +554,7 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
                   <div className="w-8 h-px bg-white/40" />
                   <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/40">Discovery</span>
                 </div>
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight italic font-light opacity-80">Keep Exploring</h2>
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight italic opacity-80">Keep Exploring</h2>
               </motion.div>
               
               <Button

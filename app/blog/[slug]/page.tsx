@@ -78,6 +78,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 }
 
+import Script from "next/script"
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
   const post = await getPostBySlug(slug)
@@ -151,7 +153,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      <script
+      <Script
+        id="blog-post-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />

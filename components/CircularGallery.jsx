@@ -55,6 +55,9 @@ class Title {
   }
   createMesh() {
     const { texture, width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor);
+    this.textWidth = width;
+    this.textHeight = height;
+    
     const geometry = new Plane(this.gl);
     const program = new Program(this.gl, {
       vertex: `
@@ -82,12 +85,20 @@ class Title {
       transparent: true
     });
     this.mesh = new Mesh(this.gl, { geometry, program });
-    const aspect = width / height;
-    const textHeight = this.plane.scale.y * 0.15;
-    const textWidth = textHeight * aspect;
-    this.mesh.scale.set(textWidth, textHeight, 1);
-    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
     this.mesh.setParent(this.plane);
+    this.onResize();
+  }
+  onResize() {
+    if (!this.mesh) return;
+    const aspect = this.textWidth / this.textHeight;
+    const worldTextHeight = this.plane.scale.y * 0.08; // Reduced multiplier for better balance with larger cards
+    const worldTextWidth = worldTextHeight * aspect;
+    
+    // Compensate for parent scale to avoid distortion
+    this.mesh.scale.set(worldTextWidth / this.plane.scale.x, worldTextHeight / this.plane.scale.y, 1);
+    
+    // Position below the parent plane
+    this.mesh.position.y = -0.5 - (worldTextHeight * 0.5 + 0.1) / this.plane.scale.y;
   }
 }
 
@@ -175,13 +186,17 @@ class Media {
           );
           vec4 color = texture2D(tMap, uv);
           
+          // Apply Grayscale Filter
+          float grayscale = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+          vec3 finalColor = vec3(grayscale);
+          
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           
           // Smooth antialiasing for edges
           float edgeSmooth = 0.002;
           float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
           
-          gl_FragColor = vec4(color.rgb, alpha);
+          gl_FragColor = vec4(finalColor, alpha);
         }
       `,
       uniforms: {
@@ -270,8 +285,9 @@ class Media {
     }
     this.scale = this.screen.height / 1500;
     this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
-    this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width;
+    this.plane.scale.x = (this.viewport.width * (1600 * this.scale)) / this.screen.width;
     this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
+    if (this.title) this.title.onResize();
     this.padding = 2;
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;

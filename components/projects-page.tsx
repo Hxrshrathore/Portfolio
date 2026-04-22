@@ -76,7 +76,6 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
       start: "top top",
       pin: true,
       pinSpacing: false,
-      zIndex: 50,
     })
 
     return () => {
@@ -139,6 +138,7 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
               className="w-full h-full"
             >
               <CircularGallery 
+                items={Array(12).fill({ image: "/projects/test.png", text: "ARCHITECTURAL DESIGN" })}
                 bend={3} 
                 textColor="#ffffff" 
                 borderRadius={0.05} 
@@ -220,9 +220,9 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
                   key={domain}
                   onClick={() => toggleDomain(domain)}
                   className={cn(
-                    "px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest transition-all border",
+                    "px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest transition-all border backdrop-blur-md",
                     selectedDomains.includes(domain) 
-                      ? "bg-white text-black border-white" 
+                      ? "bg-white/10 text-white border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)]" 
                       : "bg-white/5 text-white/40 border-white/10 hover:border-white/30"
                   )}
                 >
@@ -306,7 +306,7 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
               return (
                 <div 
                   key={domain} 
-                  ref={el => sectionRefs.current[domain] = el}
+                  ref={(el) => { sectionRefs.current[domain] = el; }}
                   className="space-y-12 scroll-mt-40"
                 >
                   {/* Category Header */}
@@ -344,7 +344,7 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
                         <div className="h-px flex-1 bg-white/5" />
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {rest.map((project, idx) => (
                           <motion.div
                             key={project.id}
