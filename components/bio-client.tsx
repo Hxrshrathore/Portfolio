@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
 import { 
   Github, 
   Twitter, 
@@ -10,7 +10,7 @@ import {
   Globe, 
   ArrowRight
 } from "lucide-react"
-import Link from "next/link"
+import TransitionLink from "@/components/transition-link"
 import Image from "next/image"
 import { type Project } from "@/lib/projects-data"
 import dynamic from "next/dynamic"
@@ -26,7 +26,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
     { name: "Instagram", icon: <Instagram className="w-5 h-5" />, href: "https://instagram.com/hxrsh.rathore", color: "bg-[#E4405F]/20" },
   ]
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -36,7 +36,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
     },
   }
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -60,7 +60,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }}
           className="relative mb-8"
         >
           <div className="absolute -inset-4 bg-gradient-to-tr from-white/20 to-transparent blur-2xl rounded-full opacity-50" />
@@ -112,7 +112,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
         >
           {socialLinks.map((link) => (
             <motion.div key={link.name} variants={itemVariants}>
-              <Link 
+             <TransitionLink 
                 href={link.href}
                 target={link.href === "/" ? "_self" : "_blank"}
                 className={`group flex items-center justify-between w-full p-4 rounded-2xl border border-white/10 ${link.color} backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98]`}
@@ -124,7 +124,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
                   <span className="text-sm font-medium tracking-wide">{link.name}</span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all" />
-              </Link>
+              </TransitionLink>
             </motion.div>
           ))}
         </motion.div>
@@ -150,7 +150,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Link href={`/projects/${project.slug}`} className="block group relative overflow-hidden rounded-2xl border border-white/10 aspect-video">
+              <TransitionLink href={`/projects/${project.slug}`} className="block group relative overflow-hidden rounded-2xl border border-white/10 aspect-video">
                 <Image 
                   src={project.heroImage || project.image} 
                   alt={project.title} 
@@ -162,12 +162,12 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
                   <p className="text-[8px] font-bold tracking-widest text-white/40 uppercase mb-1">{project.domain}</p>
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold tracking-tight">{project.title}</h3>
-                    <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 transition-transform">
+                    <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all">
                       <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>
                 </div>
-              </Link>
+              </TransitionLink>
             </motion.div>
           ))}
         </div>
@@ -179,16 +179,16 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
           viewport={{ once: true }}
           className="w-full space-y-4"
         >
-          <Link 
+          <TransitionLink 
             href="/contact"
             className="flex flex-col items-center justify-center w-full py-8 rounded-3xl bg-white text-black font-bold tracking-[0.3em] uppercase text-xs transition-all hover:bg-gray-200 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           >
             LET'S WORK TOGETHER
-          </Link>
+          </TransitionLink>
           
           <div className="flex justify-center gap-8 py-4">
-            <Link href="/blog" className="text-[10px] font-bold tracking-widest text-white/30 uppercase hover:text-white transition-colors">Blog</Link>
-            <Link href="/shop" className="text-[10px] font-bold tracking-widest text-white/30 uppercase hover:text-white transition-colors">Shop</Link>
+            <TransitionLink href="/blog" className="text-[10px] font-bold tracking-widest text-white/30 uppercase hover:text-white transition-colors">Blog</TransitionLink>
+            <TransitionLink href="/shop" className="text-[10px] font-bold tracking-widest text-white/30 uppercase hover:text-white transition-colors">Shop</TransitionLink>
           </div>
         </motion.div>
 
