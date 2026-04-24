@@ -150,7 +150,7 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <TransitionLink href={`/projects/${project.slug}`} className="block group relative overflow-hidden rounded-2xl border border-white/10 aspect-video">
+              <TransitionLink href={`/projects/${project.slug}`} data-no-cursor className="block group relative overflow-hidden rounded-2xl border border-white/10 aspect-video">
                 <Image 
                   src={project.heroImage || project.image} 
                   alt={project.title} 

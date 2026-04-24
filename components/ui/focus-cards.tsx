@@ -42,6 +42,7 @@ export const Card = React.memo(
       <div
         onMouseEnter={() => setHovered(index)}
         onMouseLeave={() => setHovered(null)}
+        data-no-cursor
         className={cn(
           "rounded-xl relative bg-neutral-900 overflow-hidden aspect-video w-full transition-all duration-300 ease-out cursor-pointer group/card border border-white/5 hover:border-white/20",
           hovered !== null && hovered !== index && "blur-[2px] scale-[0.98] opacity-50",
