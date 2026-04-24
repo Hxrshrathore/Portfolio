@@ -120,30 +120,12 @@ export default function RootLayout({
         <StructuredData />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <PageTransitionProvider>
-          <AnimatedFavicon />
-            <Preloader>
-              <BlendedCursor />
-              <SmoothScroll>
-                <div className="flex flex-col min-h-screen">
-                  <NavigationWrapper>
-                    <ClickSpark
-                      sparkColor="#ffffff"
-                      sparkSize={12}
-                      sparkRadius={20}
-                      sparkCount={8}
-                      duration={500}
-                      easing="ease-out"
-                      extraScale={1.2}
-                    >
-                      <main className="flex-grow">
-                        {children}
-                      </main>
-                    </ClickSpark>
-                  </NavigationWrapper>
-                </div>
-              </SmoothScroll>
-              <BugReportWidget />
-            </Preloader>
+            <AnimatedFavicon />
+            <NavigationWrapper>
+              <main className="flex-grow">
+                {children}
+              </main>
+            </NavigationWrapper>
           </PageTransitionProvider>
         </ThemeProvider>
         <Analytics />
