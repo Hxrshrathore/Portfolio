@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { Cormorant, Anonymous_Pro, Annie_Use_Your_Telescope } from "next/font/google"
 import { cn } from "@/lib/utils"
 import LiquidChrome from "@/components/liquid-chrome"
+import { Highlighter } from "@/components/ui/highlighter"
 
 const cormorant = Cormorant({ subsets: ["latin"], weight: ["400", "700"] });
 const anonymous = Anonymous_Pro({ subsets: ["latin"], weight: ["400", "700"] });
@@ -37,7 +38,7 @@ export default function PlaygroundPage() {
       </div>
 
       {/* --- TOP LAYER (Nav & Intro) --- */}
-      <div className="absolute top-0 left-0 w-full h-[35vh] md:h-[25.5vh] z-40 px-[2.7vw] pt-[2vh] md:pt-[3.5vh]">
+      <div className="absolute top-0 left-0 w-full h-[35vh] md:h-[25.5vh] z-15 px-[2.7vw] pt-[2vh] md:pt-[3.5vh]">
         {/* Nav Left */}
         <div className="absolute top-[2vh] md:top-[3.5vh] left-[2.7vw] uppercase text-[3.5vw] md:text-[1.38vw] leading-[0.95] tracking-[-0.06em]">
           Harsh <br />Rathore
@@ -59,7 +60,29 @@ export default function PlaygroundPage() {
         {/* Intro - Vertically Centered on Mobile, Top Aligned on Desktop */}
         <div className="h-full flex flex-col justify-center md:justify-start md:pt-[6.5vh] pb-[2vh] md:pb-0">
           <div className="w-[93vw] text-[3.2vw] md:text-[1.4vw] text-justify leading-tight tracking-[-0.06em]">
-            HI! I’m <span className="font-bold">Harsh</span> a <span className="font-bold italic">creative developer</span> obsessed with dissolving the boundaries between design and code. I craft experiences where aesthetics aren’t just layered on top, but engineered into the <span className="font-bold">core fast, scalable</span>, and built to convert. From intuitive <span className="font-bold">UI/UX</span> to <span className="font-bold">full-stack</span> execution, I turn ideas into systems that <span className="font-bold">don’t just look good, but work relentlessly.</span>
+            HI! I’m <span className="font-bold">Harsh</span> a{" "}
+            <Highlighter action="highlight" color="rgba(255, 152, 0, 0.45)" padding={4} iterations={2} strokeWidth={1.5}>
+              <span className="font-bold italic">creative developer</span>
+            </Highlighter>{" "}
+            obsessed with dissolving the boundaries between{" "}
+            <Highlighter action="underline" color="rgba(0, 0, 0, 0.8)" strokeWidth={2} iterations={2}>
+              design and code
+            </Highlighter>
+            . I craft experiences where aesthetics aren’t just layered on top, but engineered into the{" "}
+            <span className="font-bold">
+              core{" "}
+              <Highlighter action="underline" color="rgba(255, 152, 0, 0.7)" strokeWidth={2} iterations={2}>
+                fast, scalable
+              </Highlighter>
+            </span>
+            , and built to convert. From intuitive <span className="font-bold">UI/UX</span> to{" "}
+            <Highlighter action="box" color="rgba(135, 206, 250, 0.7)" padding={2} iterations={2} strokeWidth={1.5}>
+              <span className="font-bold">full-stack</span>
+            </Highlighter>{" "}
+            execution, I turn ideas into systems that{" "}
+            <Highlighter action="highlight" color="rgba(135, 206, 250, 0.4)" padding={4} iterations={2} strokeWidth={1.5}>
+               don’t just look good, but work relentlessly.
+            </Highlighter>
           </div>
         </div>
       </div>
