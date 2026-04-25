@@ -125,7 +125,7 @@ export default function PlaygroundPage() {
         
         {/* "Hi!" Text */}
         <div className={cn("absolute top-[10%] left-[65vw] md:left-[58vw] text-black text-[6vw] md:text-[3.3vw]", annie.className)}>
-          Hi!
+          नAMASTE!
         </div>
       </div>
 
