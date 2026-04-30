@@ -138,7 +138,7 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
               className="w-full h-full"
             >
               <CircularGallery 
-                items={Array(12).fill({ image: "/projects/test.png", text: "ARCHITECTURAL DESIGN" })}
+                items={projects.slice(0, 12).map(p => ({ image: p.image || "/projects/test.png", text: p.title.toUpperCase() }))}
                 bend={3} 
                 textColor="#ffffff" 
                 borderRadius={0.05} 

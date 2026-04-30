@@ -59,7 +59,7 @@ export const Card = React.memo(
           }
         }}
       >
-        <Image src="/projects/test.png" alt={card.title} fill className="object-cover absolute inset-0 transition-transform duration-500 group-hover/card:scale-105" />
+        <Image src={card.src} alt={card.title} fill className="object-cover absolute inset-0 transition-transform duration-500 group-hover/card:scale-105" />
         
         {/* Status Badge */}
         <div className="absolute top-4 right-4 z-20">

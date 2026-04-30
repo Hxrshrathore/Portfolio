@@ -32,28 +32,14 @@ export default function Navbar() {
               <TransitionLink href="/projects" className="text-white hover:text-gray-300 transition-colors">
                 Work
               </TransitionLink>
-              <TransitionLink href="/shop" className="text-white hover:text-gray-300 transition-colors">
-                Shop
-              </TransitionLink>
+
               <TransitionLink href="/blog" className="text-white hover:text-gray-300 transition-colors">
                 Blog
               </TransitionLink>
               <TransitionLink href="/contact" className="text-white hover:text-gray-300 transition-colors">
                 Contact
               </TransitionLink>
-              <div className="w-[1px] h-4 bg-white/20 mx-2" />
-              <TransitionLink href="/cart" aria-label="Cart" className="relative text-white hover:text-gray-300 transition-transform hover:scale-110 active:scale-95 duration-300">
-                <ShoppingCart className="w-5 h-5" />
-                {mounted && cartItems > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 w-4 h-4 bg-white text-black text-[8px] font-bold rounded-full flex items-center justify-center"
-                  >
-                    {cartItems}
-                  </motion.span>
-                )}
-              </TransitionLink>
+
             </div>
 
             <button
@@ -100,13 +86,7 @@ export default function Navbar() {
             >
               <div className="flex flex-col h-full pt-32 px-8">
                 <nav className="flex flex-col space-y-8">
-                  <TransitionLink
-                    href="/shop"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
-                  >
-                    Shop
-                  </TransitionLink>
+
                   <TransitionLink
                     href="/blog"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -121,22 +101,7 @@ export default function Navbar() {
                   >
                     Contact
                   </TransitionLink>
-                  <div className="w-12 h-[1px] bg-white/20 my-2" />
-                  <TransitionLink
-                    href="/cart"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors flex items-center gap-3"
-                  >
-                    Cart
-                    <div className="relative">
-                      <ShoppingCart className="w-6 h-6" />
-                      {mounted && cartItems > 0 && (
-                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-black text-[10px] font-bold rounded-full flex items-center justify-center">
-                          {cartItems}
-                        </span>
-                      )}
-                    </div>
-                  </TransitionLink>
+
                 </nav>
               </div>
             </motion.div>
