@@ -66,8 +66,8 @@ A highly interactive, visually stunning, and performance-optimized developer por
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd <your-repo-directory>
+   git clone https://github.com/Hxrshrathore/Portfolio
+   cd Portfolio
    ```
 
 2. **Install dependencies:**
