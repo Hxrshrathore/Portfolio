@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { WorldMap } from "@/components/ui/world-map"
+import { MapPin } from "lucide-react"
 
 interface ClientInfo {
   country: string
@@ -24,11 +25,6 @@ const CLIENTS: ClientInfo[] = [
 
 const INDIA = { lat: 20.5937, lng: 78.9629 }
 
-const project = (lat: number, lng: number) => ({
-  xPct: ((lng + 180) / 360) * 100,
-  yPct: ((90 - lat) / 180) * 100,
-})
-
 const mapDots = CLIENTS.map((c) => ({
   start: INDIA,
   end: { lat: c.lat, lng: c.lng },
@@ -37,194 +33,140 @@ const mapDots = CLIENTS.map((c) => ({
 export default function WorldMapSection() {
   const [activeClient, setActiveClient] = useState<number | null>(null)
   const totalProjects = useMemo(() => CLIENTS.reduce((s, c) => s + c.projects, 0), [])
-  const projected = useMemo(() => CLIENTS.map((c) => project(c.lat, c.lng)), [])
 
   return (
-    <section className="relative w-full bg-black py-32 overflow-hidden border-t border-white/5">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.012] rounded-full blur-[100px] pointer-events-none" />
+    <section className="relative w-full bg-black overflow-hidden border-t border-white/5 h-screen min-h-[680px] max-h-[1000px]">
+      {/* Background effects */}
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-purple-500/[0.015] rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-blue-500/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
-        {/* ── Header ── */}
-        <div className="text-center mb-6">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 h-full flex flex-col" style={{ paddingTop: "clamp(100px, 14vh, 140px)" }}>
+
+        {/* ── Top: Title Row ── */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 md:mb-8 shrink-0">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center gap-2 mb-3"
+            >
+              <MapPin className="w-3 h-3 text-white/20" />
+              <span className="text-white/25 text-[10px] font-bold tracking-[0.3em] uppercase">Global Reach</span>
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]"
+            >
+              <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">Based in India,</span>
+              <br />
+              <span className="italic font-light text-white/40">shipping worldwide</span>
+            </motion.h2>
+          </div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-white/20 text-xs font-sans font-bold tracking-[0.3em] uppercase mb-4"
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="flex items-center gap-6 md:gap-10"
           >
-            Global Reach
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-6 tracking-tight px-2"
-          >
-            Based in India,{" "}
-            <span className="italic font-light text-gray-400" style={{ WebkitTextFillColor: "rgba(156, 163, 175, 0.8)" }}>
-              shipping worldwide
-            </span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-sm md:text-lg text-white/40 max-w-2xl mx-auto font-light leading-relaxed px-4"
-          >
-            Collaborating with teams and founders across continents — from concept to launch, timezone-proof.
-          </motion.p>
+            {[
+              { value: `${CLIENTS.length}`, suffix: "+", label: "Countries" },
+              { value: `${totalProjects}`, suffix: "+", label: "Projects" },
+              { value: "24", suffix: "/7", label: "Availability" },
+            ].map((stat, i) => (
+              <div key={i} className="text-left">
+                <div className="text-2xl md:text-3xl font-bold text-white tracking-tight tabular-nums leading-none">
+                  {stat.value}<span className="text-white/25 font-light">{stat.suffix}</span>
+                </div>
+                <div className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-white/25 mt-1 font-mono">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
-        {/* ── Stats Row ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center items-center gap-6 md:gap-16 mb-16 px-4"
-        >
-          {[
-            { value: `${CLIENTS.length}`, suffix: "+", label: "Countries" },
-            { value: `${totalProjects}`, suffix: "+", label: "Projects" },
-            { value: "24", suffix: "/7", label: "Service" },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-2xl md:text-5xl font-bold text-white tracking-tight tabular-nums">
-                {stat.value}<span className="text-white/30">{stat.suffix}</span>
-              </div>
-              <div className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/30 mt-1 font-mono">
-                {stat.label}
-              </div>
+        {/* ── Main Content: Map + Country Cards ── */}
+        <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 md:gap-5 pb-6">
+
+          {/* Map */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative rounded-2xl border border-white/[0.06] bg-white/[0.015] flex-1 min-h-0 overflow-hidden"
+            data-no-cursor="true"
+          >
+            {/* Subtle inner glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] via-transparent to-white/[0.01] pointer-events-none rounded-2xl" />
+            <div className="relative w-full h-full">
+              <WorldMap dots={mapDots} lineColor="#ffffff" />
             </div>
-          ))}
-        </motion.div>
+          </motion.div>
 
-        {/* ── Map ── */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative z-50 rounded-2xl border border-white/5 bg-white/[0.01]"
-          data-no-cursor="true"
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none rounded-2xl" />
-          
-          <div className="relative w-full h-full">
-            <WorldMap dots={mapDots} lineColor="#ffffff" />
-            
-            {/* Extremely lightweight CSS-only target dots */}
-            <div className="absolute inset-0 pointer-events-none">
-              {CLIENTS.map((client, i) => {
-                const isActive = activeClient === i
-                return (
-                  <div
-                    key={client.country}
-                    className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full transition-all duration-300 pointer-events-none"
-                    style={{
-                      left: `${projected[i].xPct}%`,
-                      top: `${projected[i].yPct}%`,
-                      backgroundColor: isActive ? "#ffffff" : "rgba(255,255,255,0.0)",
-                      boxShadow: isActive ? "0 0 20px rgba(255,255,255,0.8)" : "none",
-                      transform: isActive ? "scale(1.5)" : "scale(1)",
-                      zIndex: isActive ? 20 : 0
-                    }}
-                  >
-                    {isActive && (
-                      <div className="absolute -inset-2 rounded-full bg-white/20 animate-ping" />
-                    )}
-                    
-                    {/* CSS-only Tooltip */}
-                    <div
-                      className={`absolute transition-all duration-300 z-[999] ${projected[i].yPct < 45 ? "top-full mt-4" : "bottom-full mb-4"}`}
-                      style={{
-                        // Dynamically shift anchor to prevent edge overflow
-                        left: projected[i].xPct > 80 ? "auto" : projected[i].xPct < 20 ? "0" : "50%",
-                        right: projected[i].xPct > 80 ? "0" : "auto",
-                        transform: `translateX(${projected[i].xPct > 80 ? "0%" : projected[i].xPct < 20 ? "0%" : "-50%"}) scale(${isActive ? 1 : 0.8})`,
-                        opacity: isActive ? 1 : 0,
-                        transformOrigin: `${projected[i].yPct < 45 ? "top" : "bottom"} ${projected[i].xPct > 80 ? "right" : projected[i].xPct < 20 ? "left" : "center"}`,
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {/* Bright glow behind the active card */}
-                      <div className="absolute inset-0 bg-white/20 blur-xl rounded-xl -z-10" />
-                      
-                      <div className="bg-black/95 backdrop-blur-xl border border-white/20 rounded-full px-1.5 py-0.5 shadow-2xl relative whitespace-nowrap">
-                        {/* Mobile: Micro-badge */}
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] md:text-base">{client.flag}</span>
-                          <span className="text-white font-bold text-[8px] md:text-sm tracking-wide uppercase">{client.country}</span>
-                          
-                          <div className="w-[1px] h-2 bg-white/10 mx-0.5 hidden md:block" />
-                          
-                          <div className="flex items-center gap-0.5 text-white/50 text-[7px] md:text-[10px] font-mono">
-                            <span className="opacity-50">×</span>
-                            {client.projects} 
-                          </div>
-                        </div>
+          {/* Country Cards Column */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:w-[280px] xl:w-[320px] shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto"
+            data-no-cursor="true"
+          >
+            {CLIENTS.map((client, i) => {
+              const isActive = activeClient === i
+              return (
+                <motion.div
+                  key={client.country}
+                  onMouseEnter={() => setActiveClient(i)}
+                  onMouseLeave={() => setActiveClient(null)}
+                  onClick={() => setActiveClient(isActive ? null : i)}
+                  className={`
+                    relative group cursor-default select-none rounded-xl
+                    border transition-all duration-300 overflow-hidden
+                    min-w-[140px] lg:min-w-0 flex-1 lg:flex-initial
+                    ${isActive
+                      ? "bg-white/[0.08] border-white/15"
+                      : "bg-white/[0.02] border-white/[0.05] hover:border-white/10 hover:bg-white/[0.05]"
+                    }
+                  `}
+                >
+                  <div className="relative flex items-center gap-3 px-4 py-3 lg:py-2.5">
+                    {/* Flag */}
+                    <span className={`text-xl md:text-2xl leading-none transition-transform duration-300 ${isActive ? "scale-110" : ""}`}>
+                      {client.flag}
+                    </span>
 
-                        {/* Desktop only Label */}
-                        <div className="hidden md:block text-white/40 text-[9px] mt-0.5 uppercase tracking-widest font-mono pl-7">
-                          {client.label}
-                        </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`text-[11px] md:text-xs font-semibold tracking-wide truncate transition-colors duration-300 ${isActive ? "text-white" : "text-white/60"}`}>
+                          {client.country}
+                        </span>
+                        <span className={`text-[10px] font-mono tabular-nums shrink-0 transition-colors duration-300 ${isActive ? "text-white/50" : "text-white/20"}`}>
+                          ×{client.projects}
+                        </span>
                       </div>
-                      
-                      {/* Dynamic tooltip arrow - flips top/bottom based on yPct */}
-                      <div 
-                        className={`absolute w-3 h-3 bg-black/90 border-white/20 rotate-45 ${
-                          projected[i].yPct < 45 
-                            ? "bottom-full border-l border-t -mb-1.5" 
-                            : "top-full border-r border-b -mt-1.5"
-                        }`}
-                        style={{
-                           left: projected[i].xPct > 80 ? "auto" : projected[i].xPct < 20 ? "16px" : "50%",
-                           right: projected[i].xPct > 80 ? "16px" : "auto",
-                           transform: projected[i].xPct > 80 || projected[i].xPct < 20 ? "none" : "translateX(-50%)"
-                        }}
-                      />
+                      <span className={`text-[8px] md:text-[9px] font-mono tracking-wider transition-colors duration-300 block truncate ${isActive ? "text-white/40" : "text-white/20"}`}>
+                        {client.label}
+                      </span>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </motion.div>
 
-        {/* ── Interactive Country Pills ── */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2 md:gap-2.5 px-4" data-no-cursor="true">
-          {CLIENTS.map((client, i) => {
-            const isActive = activeClient === i
-            const o = activeClient === null ? 0.5 : (isActive ? 1 : 0.3)
-            return (
-              <div
-                key={client.country}
-                onMouseEnter={() => setActiveClient(i)}
-                onMouseLeave={() => setActiveClient(null)}
-                onClick={() => setActiveClient(isActive ? null : i)}
-                className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-full border border-white/5 bg-white/[0.02] cursor-default select-none transition-all duration-300"
-                style={{
-                  opacity: o,
-                  transform: isActive ? "scale(1.05)" : "scale(1)",
-                  borderColor: isActive ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)"
-                }}
-              >
-                <span className="text-sm md:text-base">{client.flag}</span>
-                <span className="text-[11px] md:text-xs font-medium text-white/70 tracking-wide">
-                  {client.country}
-                </span>
-                <span className="hidden sm:inline text-[9px] text-white/30 font-mono">
-                  {client.label}
-                </span>
-                <span className="text-[10px] font-mono text-white/20 tabular-nums ml-1">
-                  ×{client.projects}
-                </span>
-              </div>
-            )
-          })}
+                    {/* Active indicator dot */}
+                    <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-300 ${isActive ? "bg-white/60 shadow-[0_0_8px_rgba(255,255,255,0.3)]" : "bg-white/10"}`} />
+                  </div>
+                </motion.div>
+              )
+            })}
+          </motion.div>
         </div>
       </div>
     </section>

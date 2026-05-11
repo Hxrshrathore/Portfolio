@@ -9,6 +9,7 @@ import remarkGfm from "remark-gfm"
 import PlasmaWave from "@/components/PlasmaWave"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import parse, { domToReact, HTMLReactParserOptions, Element } from 'html-react-parser'
 
 interface BlogPostClientProps {
   post: any
@@ -69,11 +70,27 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
     p: ({ children }: any) => (
       <p className="text-gray-400 text-lg leading-relaxed mb-8 font-light tracking-wide">{children}</p>
     ),
-    a: ({ href, children }: any) => (
-      <Link href={href as string} className="text-white underline underline-offset-8 decoration-white/20 hover:decoration-white transition-all">
-        {children}
-      </Link>
-    ),
+    a: ({ href, children, ...props }: any) => {
+      const isExternal = href?.startsWith('http');
+      if (isExternal) {
+        return (
+          <a 
+            href={href} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-white underline underline-offset-8 decoration-white/20 hover:decoration-white transition-all cursor-pointer"
+            {...props}
+          >
+            {children}
+          </a>
+        );
+      }
+      return (
+        <Link href={href as string} className="text-white underline underline-offset-8 decoration-white/20 hover:decoration-white transition-all">
+          {children}
+        </Link>
+      );
+    },
     ul: ({ children }: any) => <ul className="list-none mb-8 space-y-4">{children}</ul>,
     ol: ({ children }: any) => <ol className="list-decimal list-inside text-gray-400 mb-8 space-y-4">{children}</ol>,
     li: ({ children }: any) => (
@@ -94,7 +111,7 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
       <code className="bg-white/5 text-white px-1.5 py-0.5 rounded font-mono text-xs border border-white/10">{children}</code>
     ),
     pre: ({ children }: any) => (
-      <pre className="relative bg-[#0a0a0a] text-gray-300 p-8 rounded-[2rem] overflow-x-auto my-12 border border-white/5 font-mono text-sm leading-relaxed group shadow-2xl">
+      <pre className="relative bg-[#0a0a0a] text-gray-300 p-8 rounded-[2rem] overflow-x-auto my-12 border border-white/5 font-mono text-sm leading-relaxed group shadow-2xl scrollbar-thin scrollbar-thumb-white/10">
          <div className="absolute top-4 right-8 flex gap-1.5 opacity-20 group-hover:opacity-40 transition-opacity">
             <div className="w-1.5 h-1.5 rounded-full bg-white" />
             <div className="w-1.5 h-1.5 rounded-full bg-white" />
@@ -102,6 +119,19 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
          {children}
       </pre>
     ),
+    table: ({ children }: any) => (
+      <div className="my-12 overflow-x-auto rounded-2xl border border-white/5">
+        <table className="w-full text-left text-sm text-gray-400 border-collapse">
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }: any) => <thead className="bg-white/5 text-white font-bold">{children}</thead>,
+    th: ({ children }: any) => <th className="px-6 py-4 border-b border-white/5">{children}</th>,
+    td: ({ children }: any) => <td className="px-6 py-4 border-b border-white/5">{children}</td>,
+    tr: ({ children }: any) => <tr className="hover:bg-white/[0.02] transition-colors">{children}</tr>,
+    figure: ({ children }: any) => <figure className="my-12 space-y-4">{children}</figure>,
+    figcaption: ({ children }: any) => <figcaption className="text-center text-[10px] font-mono text-white/20 uppercase tracking-[0.4em]">{children}</figcaption>,
     img: (props: any) => (
       <div className="my-16 space-y-4">
         <div className="rounded-[2.5rem] overflow-hidden border border-white/5">
@@ -112,6 +142,31 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
     ),
     hr: () => <hr className="border-white/5 my-16" />,
   }
+
+  const parserOptions: HTMLReactParserOptions = {
+    replace: (domNode) => {
+      if (domNode instanceof Element) {
+        const { name, attribs, children } = domNode;
+        
+        // Handle images specially to preserve attributes
+        if (name === 'img') {
+          const Component = markdownComponents.img;
+          return <Component {...attribs} src={attribs.src} alt={attribs.alt} />;
+        }
+
+        if (markdownComponents[name as keyof typeof markdownComponents]) {
+          const Component = markdownComponents[name as keyof typeof markdownComponents] as any;
+          return (
+            <Component {...attribs} href={attribs.href}>
+              {domToReact(children as any, parserOptions)}
+            </Component>
+          );
+        }
+      }
+    },
+  };
+
+  const isHTML = (str: string) => /<[a-z][\s\S]*>/i.test(str);
 
   const publishedDate = new Date(post.date)
 
@@ -273,12 +328,18 @@ export default function BlogPostClient({ post, relatedPosts }: BlogPostClientPro
                       viewport={{ once: true }}
                       className="prose prose-invert prose-white max-w-none prose-p:text-gray-400 prose-headings:tracking-tighter"
                     >
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={markdownComponents as any}
-                      >
-                        {post.content}
-                      </ReactMarkdown>
+                       {isHTML(post.content) ? (
+                         <div className="prose prose-invert prose-white max-w-none prose-p:text-gray-400 prose-headings:tracking-tighter">
+                           {parse(post.content, parserOptions)}
+                         </div>
+                       ) : (
+                         <ReactMarkdown
+                           remarkPlugins={[remarkGfm]}
+                           components={markdownComponents as any}
+                         >
+                           {post.content}
+                         </ReactMarkdown>
+                       )}
                     </motion.div>
 
                     {/* Final Signature / Bottom Bar */}

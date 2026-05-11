@@ -67,20 +67,17 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-24 px-4 md:px-0">
           
           {/* Brand & Bio (Left Col) */}
-          <div className="md:col-span-5 flex flex-col justify-between">
+          <div className="md:col-span-7 flex flex-col justify-between">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.02] mb-6 md:mb-8">
-                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-[10px] uppercase tracking-widest text-white/60 font-mono">Available for Work</span>
-              </div>
-              
-              <h3 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent mb-6 tracking-tight">
-                Let's build something<br />extraordinary.
+              <h3 className="text-3xl md:text-5xl font-bold bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent mb-6 tracking-tighter leading-tight">
+                <span className="block md:inline whitespace-nowrap">READY TO START YOUR</span>
+                <br />
+                <span>NEXT <span className="italic font-light text-white/50">BIG THING?</span></span>
               </h3>
               
               <p className="text-base text-gray-400 font-light max-w-md leading-relaxed">
@@ -89,7 +86,6 @@ export default function Footer() {
             </motion.div>
           </div>
 
-          <div className="md:col-span-2 hidden md:block" /> {/* Spacer */}
 
           {/* Navigation (Mid Col) */}
           <div className="md:col-span-2 space-y-8">

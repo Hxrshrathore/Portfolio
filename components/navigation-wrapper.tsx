@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation"
 import Navbar from "./navbar"
 import Footer from "./footer"
-import DevBanner from "./dev-banner"
 import Preloader from "./preloader"
 import BlendedCursor from "./blended-cursor"
 import SmoothScroll from "./smooth-scroll"
@@ -24,7 +23,6 @@ export default function NavigationWrapper({ children }: { children: React.ReactN
       <SmoothScroll>
         <div className="flex flex-col min-h-screen">
           <Navbar />
-          <DevBanner />
           <ClickSpark
             sparkColor="#ffffff"
             sparkSize={12}

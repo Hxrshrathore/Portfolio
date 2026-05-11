@@ -12,10 +12,11 @@
 
 .card-grid {
   display: grid;
-  gap: 0.5em;
-  padding: 0.75em;
-  max-width: 54em;
-  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
+  gap: 0.4em;
+  padding: 0.5em;
+  max-width: 48em;
+  width: 100%;
+  font-size: clamp(0.75rem, 0.65rem + 0.5vw, 1.1rem);
 }
 
 .card {
@@ -24,11 +25,11 @@
   justify-content: space-between;
   position: relative;
   aspect-ratio: 4 / 3;
-  min-height: 200px;
+  min-height: 140px;
   width: 100%;
   max-width: 100%;
-  padding: 1.25em;
-  border-radius: 20px;
+  padding: 0.9em;
+  border-radius: 16px;
   border: 1px solid var(--border-color);
   background: var(--background-dark);
   font-weight: 300;
@@ -107,12 +108,12 @@
     grid-template-columns: 1fr;
     width: 90%;
     margin: 0 auto;
-    padding: 0.5em;
+    padding: 0.4em;
   }
 
   .card {
     width: 100%;
-    min-height: 180px;
+    min-height: 120px;
   }
 }
 

@@ -44,7 +44,7 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        marquee: "marquee 15s linear infinite",
+        marquee: "marquee 120s linear infinite",
         gradient: "gradient 8s linear infinite",
       },
       colors: {

@@ -6,7 +6,6 @@ import { Search, Filter, Calendar, Zap, LayoutGrid, Clock, ChevronDown } from "l
 import SilkLoader from "@/components/ui/silk"
 // We'll replace Silk and CircularGallery with dynamic versions below
 import { FocusCards } from "@/components/ui/focus-cards"
-import Footer from "@/components/footer"
 import { getAllProjects, type Project, type ProjectDomain, type ProjectStatus } from "@/lib/projects-data"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "gsap"
@@ -344,19 +343,13 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
                         <div className="h-px flex-1 bg-white/5" />
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {rest.map((project, idx) => (
-                          <motion.div
-                            key={project.id}
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.05 }}
-                          >
-                            <CardListItem project={project} />
-                          </motion.div>
-                        ))}
-                      </div>
+                      <FocusCards 
+                        cards={rest.map(p => ({
+                          ...p,
+                          src: p.image,
+                          href: `/projects/${p.slug}`
+                        }))} 
+                      />
                     </div>
                   )}
                 </div>
@@ -366,37 +359,7 @@ export default function ProjectsPage({ initialProjects }: { initialProjects: Pro
         )}
       </main>
 
-      <Footer />
     </div>
   )
 }
 
-function CardListItem({ project }: { project: Project }) {
-  return (
-    <a 
-      href={`/projects/${project.slug}`}
-      className="group block p-4 rounded-2xl hover:bg-white/[0.03] border border-transparent hover:border-white/10 transition-all duration-300"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="space-y-1">
-          <h4 className="text-sm font-bold text-white group-hover:text-white transition-colors">
-            {project.title}
-          </h4>
-          <p className="text-[10px] text-white/40 font-mono tracking-tight">
-            {project.date}
-          </p>
-        </div>
-        <div className={cn(
-          "w-2 h-2 rounded-full",
-          project.status === "ACTIVE" ? "bg-green-500" :
-          project.status === "BUILDING" ? "bg-yellow-500" :
-          project.status === "ARCHIVED" ? "bg-slate-500" :
-          project.status === "DOWN" ? "bg-red-500" : "bg-blue-500"
-        )} />
-      </div>
-      <p className="text-[10px] leading-relaxed text-white/30 line-clamp-2 italic font-light group-hover:text-white/50 transition-colors">
-        {project.description}
-      </p>
-    </a>
-  )
-}

@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-8 left-0 right-0 z-50 pt-2 md:pt-6 px-4 md:px-8">
+      <div className="fixed top-4 left-0 right-0 z-50 pt-1 md:pt-2 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between bg-black/20 backdrop-blur-md border border-white/10 rounded-full px-6 py-3">
             <TransitionLink href="/" className="flex items-center space-x-2">
@@ -31,10 +31,6 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-8">
               <TransitionLink href="/projects" className="text-white hover:text-gray-300 transition-colors">
                 Work
-              </TransitionLink>
-
-              <TransitionLink href="/blog" className="text-white hover:text-gray-300 transition-colors">
-                Blog
               </TransitionLink>
               <TransitionLink href="/contact" className="text-white hover:text-gray-300 transition-colors">
                 Contact
@@ -87,13 +83,6 @@ export default function Navbar() {
               <div className="flex flex-col h-full pt-32 px-8">
                 <nav className="flex flex-col space-y-8">
 
-                  <TransitionLink
-                    href="/blog"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
-                  >
-                    Blog
-                  </TransitionLink>
                   <TransitionLink
                     href="/contact"
                     onClick={() => setIsMobileMenuOpen(false)}
