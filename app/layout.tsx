@@ -14,6 +14,7 @@ import { PageTransitionProvider } from "@/components/page-transition"
 import { Analytics } from "@vercel/analytics/next"
 import BugReportWidget from "@/components/bug-report-widget"
 import NavigationWrapper from "@/components/navigation-wrapper"
+import AnalyticsTracker from "@/components/analytics-tracker"
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -127,6 +128,7 @@ export default function RootLayout({
             </NavigationWrapper>
           </PageTransitionProvider>
         </ThemeProvider>
+        <AnalyticsTracker />
         <Analytics />
       </body>
     </html>

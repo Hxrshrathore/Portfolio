@@ -11,10 +11,10 @@ import BugReportWidget from "./bug-report-widget"
 
 export default function NavigationWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isExcludedPage = pathname === "/bio" || pathname === "/playground"
+  const isExcludedPage = pathname === "/bio" || pathname === "/playground" || pathname.startsWith("/admin")
 
   if (isExcludedPage) {
-    return <div className="flex flex-col min-h-screen">{children}</div>
+    return <div className="flex flex-col min-h-screen bg-black text-white">{children}</div>
   }
 
   return (

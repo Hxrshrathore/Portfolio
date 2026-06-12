@@ -144,10 +144,12 @@ async function seed() {
   let successCount = 0;
   let errorCount = 0;
 
+  const cdnUrl = process.env.R2_PUBLIC_URL || "https://pub-546a6f9534fa4f7abd35b1c5c23bb394.r2.dev";
+
   for (const p of rawProjects) {
     const slug = slugify(p.name);
     const imageFile = getImageFilename(p.name);
-    const imagePath = `/projects/${imageFile}`;
+    const imagePath = `${cdnUrl}/projects/${encodeURIComponent(imageFile)}`;
     const tagsArr = p.tags
       .split(/[+,]/)
       .map(t => t.trim().toLowerCase())

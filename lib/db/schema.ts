@@ -76,6 +76,7 @@ export const contactMessages = pgTable("contact_messages", {
   email: varchar("email", { length: 255 }).notNull(),
   projectType: varchar("project_type", { length: 100 }).notNull(),
   message: text("message").notNull(),
+  read: boolean("read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export const bugReports = pgTable("bug_reports", {
@@ -84,5 +85,40 @@ export const bugReports = pgTable("bug_reports", {
   issueType: varchar("issue_type", { length: 100 }).notNull(),
   description: text("description").notNull(),
   userAgent: text("user_agent"),
+  resolved: boolean("resolved").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Page view analytics
+export const pageViews = pgTable("page_views", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  sessionId: varchar("session_id", { length: 64 }).notNull(),
+  url: text("url").notNull(),
+  pathname: varchar("pathname", { length: 500 }).notNull(),
+  referrer: text("referrer"),
+  utmSource: varchar("utm_source", { length: 100 }),
+  utmMedium: varchar("utm_medium", { length: 100 }),
+  utmCampaign: varchar("utm_campaign", { length: 100 }),
+  utmContent: varchar("utm_content", { length: 100 }),
+  utmTerm: varchar("utm_term", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+  device: varchar("device", { length: 50 }),   // desktop | mobile | tablet
+  os: varchar("os", { length: 100 }),
+  browser: varchar("browser", { length: 100 }),
+  screenWidth: integer("screen_width"),
+  screenHeight: integer("screen_height"),
+  duration: integer("duration"),               // seconds on page
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Heatmap click events
+export const clickEvents = pgTable("click_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  sessionId: varchar("session_id", { length: 64 }).notNull(),
+  pathname: varchar("pathname", { length: 500 }).notNull(),
+  xPercent: integer("x_percent").notNull(),    // % of viewport width
+  yPercent: integer("y_percent").notNull(),    // % of viewport height (absolute scroll pos)
+  element: varchar("element", { length: 200 }), // CSS selector of clicked el
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
