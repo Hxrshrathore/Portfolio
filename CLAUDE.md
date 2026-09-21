@@ -89,7 +89,7 @@ Portfolio/
 
 **TrustedBySection**: Replaced manual `requestAnimationFrame` loop with GSAP timeline for marquee animation - uses compositor-friendly `transform: translateX`.
 
-**MagicBento**: Mouse tracking now uses `gsap.quickTo()` instead of creating new `gsap.to()` tweens on every mousemove - reuses tweens for `rotateX`, `rotateY`, `x`, and `y` properties.
+**MagicBento**: Mouse tracking now uses `gsap.quickTo()` instead of creating new `gsap.to()` tweens on every mousemove - reuses tweens for `rotationX`, `rotationY`, `x`, and `y` properties.
 
 **FlowingMenu**: Timelines are now killed before creating new ones to prevent conflicts; added `will-change: transform` hints for marquee elements.
 

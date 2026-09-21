@@ -33,7 +33,7 @@ export default function TransitionLink({ href, children, onClick, ...props }: Tr
   }
 
   return (
-    <Link href={href} onClick={handleClick} {...props}>
+    <Link href={href} onClick={handleClick} prefetch={props.prefetch ?? false} {...props}>
       {children}
     </Link>
   )

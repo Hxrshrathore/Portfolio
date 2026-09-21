@@ -230,8 +230,8 @@ const ParticleCard: React.FC<{
 
       if (enableTilt) {
         gsap.to(element, {
-          rotateX: 5,
-          rotateY: 5,
+          rotationX: 5,
+          rotationY: 5,
           duration: 0.3,
           ease: "power2.out",
           transformPerspective: 1000,
@@ -245,8 +245,8 @@ const ParticleCard: React.FC<{
 
       if (enableTilt) {
         gsap.to(element, {
-          rotateX: 0,
-          rotateY: 0,
+          rotationX: 0,
+          rotationY: 0,
           duration: 0.3,
           ease: "power2.out",
         })
@@ -275,9 +275,9 @@ const ParticleCard: React.FC<{
         const rotateX = ((y - centerY) / centerY) * -10
         const rotateY = ((x - centerX) / centerX) * 10
 
-        // ✅ Use gsap.quickTo for frequently updated properties - reuses tween instead of creating new ones
-        quickToRotateX.current ??= gsap.quickTo(element, "rotateX", { duration: 0.1, ease: "power2.out" })
-        quickToRotateY.current ??= gsap.quickTo(element, "rotateY", { duration: 0.1, ease: "power2.out" })
+        // ✅ Use gsap.quickTo with rotationX and rotationY (standard GSAP 3D transform properties)
+        quickToRotateX.current ??= gsap.quickTo(element, "rotationX", { duration: 0.1, ease: "power2.out" })
+        quickToRotateY.current ??= gsap.quickTo(element, "rotationY", { duration: 0.1, ease: "power2.out" })
         quickToRotateX.current(rotateX)
         quickToRotateY.current(rotateY)
       }
@@ -362,6 +362,163 @@ const ParticleCard: React.FC<{
     <div
       ref={cardRef}
       className={`${className} particle-container`}
+      style={{ ...style, position: "relative", overflow: "hidden" }}
+    >
+      {children}
+    </div>
+  )
+}
+
+const StandardCard: React.FC<{
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  disableAnimations?: boolean
+  enableTilt?: boolean
+  clickEffect?: boolean
+  enableMagnetism?: boolean
+  glowColor?: string
+}> = ({
+  children,
+  className = "",
+  style,
+  disableAnimations = false,
+  enableTilt = true,
+  clickEffect = false,
+  enableMagnetism = false,
+  glowColor = DEFAULT_GLOW_COLOR,
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const quickToRotateX = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToRotateY = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToMagnetX = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+  const quickToMagnetY = useRef<ReturnType<typeof gsap.quickTo> | null>(null)
+
+  useEffect(() => {
+    if (disableAnimations || !cardRef.current) return
+
+    const element = cardRef.current
+
+    const handleMouseEnter = () => {
+      if (enableTilt) {
+        gsap.to(element, {
+          rotationX: 5,
+          rotationY: 5,
+          duration: 0.3,
+          ease: "power2.out",
+          transformPerspective: 1000,
+        })
+      }
+    }
+
+    const handleMouseLeave = () => {
+      if (enableTilt) {
+        quickToRotateX.current?.(0)
+        quickToRotateY.current?.(0)
+      }
+
+      if (enableMagnetism) {
+        quickToMagnetX.current?.(0)
+        quickToMagnetY.current?.(0)
+      }
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!enableTilt && !enableMagnetism) return
+
+      const rect = element.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      const centerX = rect.width / 2
+      const centerY = rect.height / 2
+
+      if (enableTilt) {
+        const rotateX = ((y - centerY) / centerY) * -10
+        const rotateY = ((x - centerX) / centerX) * 10
+
+        quickToRotateX.current ??= gsap.quickTo(element, "rotationX", { duration: 0.1, ease: "power2.out" })
+        quickToRotateY.current ??= gsap.quickTo(element, "rotationY", { duration: 0.1, ease: "power2.out" })
+        quickToRotateX.current(rotateX)
+        quickToRotateY.current(rotateY)
+      }
+
+      if (enableMagnetism) {
+        const magnetX = (x - centerX) * 0.05
+        const magnetY = (y - centerY) * 0.05
+
+        quickToMagnetX.current ??= gsap.quickTo(element, "x", { duration: 0.3, ease: "power2.out" })
+        quickToMagnetY.current ??= gsap.quickTo(element, "y", { duration: 0.3, ease: "power2.out" })
+        quickToMagnetX.current(magnetX)
+        quickToMagnetY.current(magnetY)
+      }
+    }
+
+    const handleClick = (e: MouseEvent) => {
+      if (!clickEffect) return
+
+      const rect = element.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      const maxDistance = Math.max(
+        Math.hypot(x, y),
+        Math.hypot(x - rect.width, y),
+        Math.hypot(x, y - rect.height),
+        Math.hypot(x - rect.width, y - rect.height),
+      )
+
+      const ripple = document.createElement("div")
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${maxDistance * 2}px;
+        height: ${maxDistance * 2}px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(${glowColor}, 0.2) 0%, rgba(${glowColor}, 0.1) 30%, transparent 70%);
+        left: ${x - maxDistance}px;
+        top: ${y - maxDistance}px;
+        pointer-events: none;
+        z-index: 1000;
+      `
+
+      element.appendChild(ripple)
+
+      gsap.fromTo(
+        ripple,
+        {
+          scale: 0,
+          opacity: 1,
+        },
+        {
+          scale: 1,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          onComplete: () => ripple.remove(),
+        },
+      )
+    }
+
+    element.addEventListener("mouseenter", handleMouseEnter)
+    element.addEventListener("mouseleave", handleMouseLeave)
+    element.addEventListener("mousemove", handleMouseMove)
+    element.addEventListener("click", handleClick)
+
+    return () => {
+      element.removeEventListener("mouseenter", handleMouseEnter)
+      element.removeEventListener("mouseleave", handleMouseLeave)
+      element.removeEventListener("mousemove", handleMouseMove)
+      element.removeEventListener("click", handleClick)
+      quickToRotateX.current = null
+      quickToRotateY.current = null
+      quickToMagnetX.current = null
+      quickToMagnetY.current = null
+    }
+  }, [disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor])
+
+  return (
+    <div
+      ref={cardRef}
+      className={className}
       style={{ ...style, position: "relative", overflow: "hidden" }}
     >
       {children}
@@ -597,104 +754,14 @@ const MagicBento: React.FC<BentoProps> = ({
           }
 
           return (
-            <div
+            <StandardCard
               key={index}
               {...cardProps}
-              ref={(el) => {
-                if (!el) return
-
-                const quickToRotateX = gsap.quickTo(el, "rotateX", { duration: 0.1, ease: "power2.out" })
-                const quickToRotateY = gsap.quickTo(el, "rotateY", { duration: 0.1, ease: "power2.out" })
-                const quickToMagnetX = gsap.quickTo(el, "x", { duration: 0.3, ease: "power2.out" })
-                const quickToMagnetY = gsap.quickTo(el, "y", { duration: 0.3, ease: "power2.out" })
-
-                const handleMouseMove = (e: MouseEvent) => {
-                  if (shouldDisableAnimations) return
-
-                  const rect = el.getBoundingClientRect()
-                  const x = e.clientX - rect.left
-                  const y = e.clientY - rect.top
-                  const centerX = rect.width / 2
-                  const centerY = rect.height / 2
-
-                  if (enableTilt) {
-                    const rotateX = ((y - centerY) / centerY) * -10
-                    const rotateY = ((x - centerX) / centerX) * 10
-                    quickToRotateX(rotateX)
-                    quickToRotateY(rotateY)
-                  }
-
-                  if (enableMagnetism) {
-                    const magnetX = (x - centerX) * 0.05
-                    const magnetY = (y - centerY) * 0.05
-                    quickToMagnetX(magnetX)
-                    quickToMagnetY(magnetY)
-                  }
-                }
-
-                const handleMouseLeave = () => {
-                  if (shouldDisableAnimations) return
-
-                  if (enableTilt) {
-                    quickToRotateX(0)
-                    quickToRotateY(0)
-                  }
-
-                  if (enableMagnetism) {
-                    quickToMagnetX(0)
-                    quickToMagnetY(0)
-                  }
-                }
-
-                const handleClick = (e: MouseEvent) => {
-                  if (!clickEffect || shouldDisableAnimations) return
-
-                  const rect = el.getBoundingClientRect()
-                  const x = e.clientX - rect.left
-                  const y = e.clientY - rect.top
-
-                  const maxDistance = Math.max(
-                    Math.hypot(x, y),
-                    Math.hypot(x - rect.width, y),
-                    Math.hypot(x, y - rect.height),
-                    Math.hypot(x - rect.width, y - rect.height),
-                  )
-
-                  const ripple = document.createElement("div")
-                  ripple.style.cssText = `
-                    position: absolute;
-                    width: ${maxDistance * 2}px;
-                    height: ${maxDistance * 2}px;
-                    border-radius: 50%;
-                    background: radial-gradient(circle, rgba(${glowColor}, 0.2) 0%, rgba(${glowColor}, 0.1) 30%, transparent 70%);
-                    left: ${x - maxDistance}px;
-                    top: ${y - maxDistance}px;
-                    pointer-events: none;
-                    z-index: 1000;
-                  `
-
-                  el.appendChild(ripple)
-
-                  gsap.fromTo(
-                    ripple,
-                    {
-                      scale: 0,
-                      opacity: 1,
-                    },
-                    {
-                      scale: 1,
-                      opacity: 0,
-                      duration: 0.8,
-                      ease: "power2.out",
-                      onComplete: () => ripple.remove(),
-                    },
-                  )
-                }
-
-                el.addEventListener("mousemove", handleMouseMove)
-                el.addEventListener("mouseleave", handleMouseLeave)
-                el.addEventListener("click", handleClick)
-              }}
+              disableAnimations={shouldDisableAnimations}
+              glowColor={glowColor}
+              enableTilt={enableTilt}
+              clickEffect={clickEffect}
+              enableMagnetism={enableMagnetism}
             >
               <div className="card__header">
                 <div className="card__label">{card.label}</div>
@@ -704,7 +771,7 @@ const MagicBento: React.FC<BentoProps> = ({
                 <h2 className="card__title">{card.title}</h2>
                 <p className="card__description">{card.description}</p>
               </div>
-            </div>
+            </StandardCard>
           )
         })}
       </BentoCardGrid>

@@ -1,4 +1,5 @@
 import type React from "react"
+import { Suspense } from "react"
 import "./globals.css"
 import { Geist, Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -128,7 +129,9 @@ export default function RootLayout({
             </NavigationWrapper>
           </PageTransitionProvider>
         </ThemeProvider>
-        <AnalyticsTracker />
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <Analytics />
       </body>
     </html>

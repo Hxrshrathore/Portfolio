@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "Harshh@055"
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   // Only target admin routes
