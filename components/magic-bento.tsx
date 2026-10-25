@@ -77,7 +77,7 @@ const cardData: BentoCardProps[] = [
     color: "#000000",
     title: "",
     description: "",
-    label: "By The Numbers",
+    label: "Core Focus",
     customContent: <BentoStatsCounter />,
   },
 ]

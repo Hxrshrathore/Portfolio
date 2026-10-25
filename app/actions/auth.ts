@@ -2,13 +2,19 @@
 
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "Harshh@055"
+import { isValidAdminToken, getAdminSecret } from "@/lib/auth"
 
 export async function loginAdmin(password: string) {
-  if (password === ADMIN_SECRET) {
+  const adminSecret = getAdminSecret()
+
+  // Fail closed if server has no configured secret
+  if (!adminSecret) {
+    return { success: false, error: "Administrative authentication is currently unavailable." }
+  }
+
+  if (isValidAdminToken(password)) {
     const cookieStore = await cookies()
-    cookieStore.set("admin_token", ADMIN_SECRET, {
+    cookieStore.set("admin_token", adminSecret, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

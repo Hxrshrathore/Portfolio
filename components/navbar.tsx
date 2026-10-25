@@ -29,13 +29,18 @@ export default function Navbar() {
             </TransitionLink>
 
             <div className="hidden md:flex items-center space-x-8">
-              <TransitionLink href="/projects" className="text-white hover:text-gray-300 transition-colors">
+              <TransitionLink href="/projects" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
                 Work
               </TransitionLink>
-              <TransitionLink href="/contact" className="text-white hover:text-gray-300 transition-colors">
+              <TransitionLink href="/bio" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+                Bio
+              </TransitionLink>
+              <TransitionLink href="/blog" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+                Insights
+              </TransitionLink>
+              <TransitionLink href="/contact" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
                 Contact
               </TransitionLink>
-
             </div>
 
             <button
@@ -81,7 +86,30 @@ export default function Navbar() {
               className="fixed top-0 right-0 bottom-0 w-64 bg-black/95 backdrop-blur-xl border-l border-white/10 z-50 md:hidden"
             >
               <div className="flex flex-col h-full pt-32 px-8">
-                <nav className="flex flex-col space-y-8">
+                <nav className="flex flex-col space-y-6">
+                  <TransitionLink
+                    href="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
+                  >
+                    Home
+                  </TransitionLink>
+
+                  <TransitionLink
+                    href="/projects"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
+                  >
+                    Work
+                  </TransitionLink>
+
+                  <TransitionLink
+                    href="/blog"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-white text-2xl font-medium hover:text-gray-300 transition-colors"
+                  >
+                    Blog
+                  </TransitionLink>
 
                   <TransitionLink
                     href="/contact"
@@ -90,7 +118,6 @@ export default function Navbar() {
                   >
                     Contact
                   </TransitionLink>
-
                 </nav>
               </div>
             </motion.div>

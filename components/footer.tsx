@@ -17,7 +17,8 @@ export default function Footer() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Work", href: "/projects" },
-    { name: "Blog", href: "/blog" },
+    { name: "Bio", href: "/bio" },
+    { name: "Insights", href: "/blog" },
   ]
 
   return (
@@ -80,8 +81,8 @@ export default function Footer() {
                 <span>NEXT <span className="italic font-light text-white/50">BIG THING?</span></span>
               </h3>
               
-              <p className="text-base text-gray-400 font-light max-w-md leading-relaxed">
-                A digital designer & developer passionately crafting elevated web experiences through motion and mathematics.
+              <p className="text-base text-zinc-400 font-light max-w-md leading-relaxed">
+                Product-Minded Software Engineer & Applied AI Builder engineering high-leverage products, data pipelines, and interfaces from problem discovery to production.
               </p>
             </motion.div>
           </div>
@@ -177,10 +178,17 @@ export default function Footer() {
             © {currentYear} Harsh Kumar. All rights reserved.
           </p>
           
-          <div className="flex items-center gap-8 text-[10px] font-mono uppercase tracking-[0.1em] text-white/30">
-            <span className="hover:text-white transition-colors duration-300 cursor-pointer">Privacy</span>
-            <span className="hover:text-white transition-colors duration-300 cursor-pointer">Terms</span>
-            <span className="hover:text-white transition-colors duration-300 cursor-pointer">Impressum</span>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 sm:gap-6 text-[10px] font-mono uppercase tracking-[0.12em] text-white/40">
+            <span className="inline-flex items-center gap-2 text-white/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Available for Select Projects</span>
+            </span>
+            <span className="text-white/20">•</span>
+            <span>Bhubaneswar, IN (UTC+5:30)</span>
+            <span className="text-white/20">•</span>
+            <Link href="/contact" className="text-white/70 hover:text-white underline underline-offset-4 transition-colors">
+              Get in Touch →
+            </Link>
           </div>
         </motion.div>
         

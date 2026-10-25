@@ -1,12 +1,17 @@
 import ProjectsPage from "@/components/projects-page"
-import { getAllProjects } from "@/lib/projects-data"
+import { getPublicProjects } from "@/lib/projects-data"
 
 export const metadata = {
-  title: "Projects - React Bits",
-  description: "Explore my portfolio of web designs, UI/UX projects, AI/ML applications, and graphics work",
+  title: "Engineering Projects & Case Studies | Harsh Kumar",
+  description: "Explore engineering case studies, full-stack applications, applied AI integrations, and workflow automation pipelines by Harsh Kumar.",
+  openGraph: {
+    title: "Engineering Projects & Case Studies | Harsh Kumar",
+    description: "Explore engineering case studies, full-stack applications, applied AI integrations, and workflow automation pipelines by Harsh Kumar.",
+    url: "https://hxrshrathore.vercel.app/projects",
+  },
 }
 
 export default async function Projects() {
-  const projects = await getAllProjects()
+  const projects = await getPublicProjects()
   return <ProjectsPage initialProjects={projects} />
 }

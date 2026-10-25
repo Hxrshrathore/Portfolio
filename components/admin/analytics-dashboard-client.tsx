@@ -13,7 +13,6 @@ import HeatmapVisualizer from "@/components/admin/heatmap-visualizer"
 import {
   BarChart3,
   Globe,
-  DevicePlayPic,
   Search,
   Compass,
   ArrowUpRight,

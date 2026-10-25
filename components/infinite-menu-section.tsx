@@ -1,23 +1,10 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import InfiniteMenu from "./infinite-menu"
-import { ChevronLeft, ChevronRight, Star, TrendingUp } from "lucide-react"
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts"
-
-interface MetricDataPoint {
-  month: string
-  value: number
-}
+import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
 
 interface PortfolioItem {
   image: string
@@ -26,377 +13,231 @@ interface PortfolioItem {
   title: string
   description: string
   projectImage: string
-  testimonial: string
-  rating: number
-  metrics: {
-    conversionRate: string
-    userGrowth: string
-    label: string
-    chartData: MetricDataPoint[]
-  }
+  category: string
+  role: string
+  organization: string
+  stack: string[]
+  deliverables: string[]
+  overview: string
 }
 
 const portfolioItems: PortfolioItem[] = [
   {
-    image: "/logo/kiitmun.png",
-    logo: "/logo/kiitmun.png",
-    link: "https://nutgram.vercel.app",
-    title: "KIIT MUN",
-    description: "Where elegant algorithms meet beautiful interfaces",
-    projectImage: "/rip/frame6.png",
-    testimonial: "Harsh delivered an outstanding website that perfectly captured the spirit of our Model UN conference. The design was both professional and engaging.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+18%",
-      userGrowth: "3.2x",
-      label: "Registrations",
-      chartData: [
-        { month: "Jan", value: 120 },
-        { month: "Feb", value: 210 },
-        { month: "Mar", value: 380 },
-        { month: "Apr", value: 520 },
-        { month: "May", value: 780 },
-        { month: "Jun", value: 1100 },
-      ],
-    },
-  },
-  {
     image: "/rip/frame1.png",
-    logo: "/logo/chimera.png",
-    link: "https://nutgram.vercel.app",
-    title: "Chimera 6.0",
-    description: "Crafting experiences that feel effortlessly intuitive",
-    projectImage: "/rip/frame1.png",
-    testimonial: "The event website exceeded all expectations. Fast, responsive, and absolutely beautiful — our team couldn't be happier with the result.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+22%",
-      userGrowth: "4x",
-      label: "Attendees",
-      chartData: [
-        { month: "Jan", value: 80 },
-        { month: "Feb", value: 160 },
-        { month: "Mar", value: 290 },
-        { month: "Apr", value: 480 },
-        { month: "May", value: 700 },
-        { month: "Jun", value: 1050 },
-      ],
-    },
-  },
-  {
-    image: "/rip/frame2.png",
     logo: "/logo/ascent.png",
-    link: "https://nutgram.vercel.app",
-    title: "Acsent Coaching",
-    description: "Designing moments that users never forget",
-    projectImage: "/rip/frame2.png",
-    testimonial: "Our student enrollment increased significantly after the website redesign. Clean interface, easy navigation — exactly what we needed.",
-    rating: 4,
-    metrics: {
-      conversionRate: "+15%",
-      userGrowth: "2.8x",
-      label: "Enrollments",
-      chartData: [
-        { month: "Jan", value: 60 },
-        { month: "Feb", value: 120 },
-        { month: "Mar", value: 200 },
-        { month: "Apr", value: 310 },
-        { month: "May", value: 420 },
-        { month: "Jun", value: 560 },
-      ],
-    },
+    link: "/projects/nutgram",
+    title: "Nutgram Portal",
+    description: "Commercial operations and client workflow portal",
+    projectImage: "/rip/frame1.png",
+    category: "Full-Stack Web Application",
+    role: "Full-Stack Engineer",
+    organization: "Nutgram (Client Project)",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL"],
+    deliverables: ["Role-Based Client Portal", "Administrative Workflow", "Status Automation"],
+    overview: "Production client portal and operations dashboard engineered for deliverable management, review workflows, and automated client notifications.",
   },
   {
-    image: "/rip/frame3.png",
-    logo: "/logo/bikash.png",
-    link: "https://nutgram.vercel.app",
-    title: "Bikash Vidalya",
-    description: "Performance so fast, it feels like magic",
-    projectImage: "/rip/frame3.png",
-    testimonial: "Working with Harsh was a seamless experience. He understood our vision for an educational platform and brought it to life beautifully.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+19%",
-      userGrowth: "3.5x",
-      label: "Page Views",
-      chartData: [
-        { month: "Jan", value: 200 },
-        { month: "Feb", value: 350 },
-        { month: "Mar", value: 540 },
-        { month: "Apr", value: 720 },
-        { month: "May", value: 940 },
-        { month: "Jun", value: 1300 },
-      ],
-    },
-  },
-  {
-    image: "/rip/frame4.png",
-    logo: "/logo/indura.png",
-    link: "https://nutgram.vercel.app",
-    title: "Indura School",
-    description: "End-to-end solutions that just work",
-    projectImage: "/rip/frame4.png",
-    testimonial: "From initial concept to final deployment, the quality was consistent and impressive. Parents and students love the new digital presence.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+27%",
-      userGrowth: "4.5x",
-      label: "Enquiries",
-      chartData: [
-        { month: "Jan", value: 50 },
-        { month: "Feb", value: 110 },
-        { month: "Mar", value: 230 },
-        { month: "Apr", value: 390 },
-        { month: "May", value: 580 },
-        { month: "Jun", value: 820 },
-      ],
-    },
-  },
-  {
-    image: "/rip/frame5.png",
-    logo: "/logo/hemsida.png",
-    link: "https://nutgram.vercel.app",
-    title: "Hemsida",
-    description: "Building the future, one line of code at a time",
-    projectImage: "/rip/frame5.png",
-    testimonial: "Exceptional attention to detail and creative problem-solving. The website perfectly represents our brand identity.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+31%",
-      userGrowth: "5x",
-      label: "Conversions",
-      chartData: [
-        { month: "Jan", value: 90 },
-        { month: "Feb", value: 180 },
-        { month: "Mar", value: 330 },
-        { month: "Apr", value: 500 },
-        { month: "May", value: 750 },
-        { month: "Jun", value: 1080 },
-      ],
-    },
-  },
-  {
-    image: "/rip/frame7.png",
-    logo: "/logo/dmc.png",
-    link: "https://nutgram.vercel.app",
-    title: "DMC School",
-    description: "Designing moments that users never forget",
-    projectImage: "/rip/frame7.png",
-    testimonial: "Professional, reliable, and incredibly talented. Harsh transformed our outdated website into a modern digital experience.",
-    rating: 4,
-    metrics: {
-      conversionRate: "+14%",
-      userGrowth: "2.4x",
-      label: "Sessions",
-      chartData: [
-        { month: "Jan", value: 180 },
-        { month: "Feb", value: 260 },
-        { month: "Mar", value: 370 },
-        { month: "Apr", value: 490 },
-        { month: "May", value: 620 },
-        { month: "Jun", value: 820 },
-      ],
-    },
+    image: "/rip/frame6.png",
+    logo: "/logo/chimera.png",
+    link: "/projects/kiitfest",
+    title: "KIITFEST",
+    description: "High-concurrency university festival digital hub",
+    projectImage: "/rip/frame6.png",
+    category: "University Event Platform",
+    role: "Lead Frontend Engineer",
+    organization: "KIIT Student Activity Center",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "GSAP"],
+    deliverables: ["Multi-Track Timetable", "Category Filtering", "Mobile Registration UI"],
+    overview: "High-performance festival gateway serving thousands of attendees with real-time schedule filtering and high-impact motion architecture.",
   },
   {
     image: "/rip/frame8.png",
     logo: "/logo/pandav.png",
-    link: "https://nutgram.vercel.app",
-    title: "Pandav Studio",
-    description: "Designing moments that users never forget",
+    link: "/projects/nexus-ai",
+    title: "Nexus AI",
+    description: "Applied LLM context and workflow assistant",
     projectImage: "/rip/frame8.png",
-    testimonial: "The creative direction and technical execution were both outstanding. Our studio's online presence has never looked better.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+24%",
-      userGrowth: "3.8x",
-      label: "Bookings",
-      chartData: [
-        { month: "Jan", value: 30 },
-        { month: "Feb", value: 75 },
-        { month: "Mar", value: 140 },
-        { month: "Apr", value: 230 },
-        { month: "May", value: 370 },
-        { month: "Jun", value: 540 },
-      ],
-    },
+    category: "Applied AI Platform",
+    role: "Applied AI Engineer",
+    organization: "Independent Lab",
+    stack: ["Next.js", "TypeScript", "LLM APIs", "SSE Streaming"],
+    deliverables: ["Streaming Token Engine", "Structured Schema Parsing", "Context Pipeline"],
+    overview: "Context-aware AI assistant leveraging streaming token interfaces, structured schema extraction, and resilient model fallback handling.",
   },
   {
-    image: "/rip/frame9.png",
-    logo: "/logo/sunshine.png",
-    link: "https://nutgram.vercel.app",
-    title: "Sunshine School",
-    description: "Designing moments that users never forget",
-    projectImage: "/rip/frame9.png",
-    testimonial: "A truly collaborative process. Harsh listened to our needs and delivered a website that is both functional and visually stunning.",
-    rating: 5,
-    metrics: {
-      conversionRate: "+20%",
-      userGrowth: "3.1x",
-      label: "Applications",
-      chartData: [
-        { month: "Jan", value: 100 },
-        { month: "Feb", value: 190 },
-        { month: "Mar", value: 310 },
-        { month: "Apr", value: 450 },
-        { month: "May", value: 620 },
-        { month: "Jun", value: 860 },
-      ],
-    },
+    image: "/rip/frame1.png",
+    logo: "/logo/chimera.png",
+    link: "/projects/chimera",
+    title: "Chimera 6.0",
+    description: "Interactive technology symposium website and schedules",
+    projectImage: "/rip/frame1.png",
+    category: "Tech Symposium Website",
+    role: "Frontend Developer",
+    organization: "KIIT Student Activity Center",
+    stack: ["React", "TypeScript", "Tailwind CSS", "GSAP"],
+    deliverables: ["Event Schedule", "Timeline UI", "Team Directory"],
+    overview: "Interactive event website for the annual Chimera technology symposium, featuring animated timelines, event category details, and team showcases.",
+  },
+  {
+    image: "/logo/kiitmun.png",
+    logo: "/logo/kiitmun.png",
+    link: "/projects/kiit-mun",
+    title: "KIIT MUN",
+    description: "Annual Model United Nations conference web platform",
+    projectImage: "/rip/frame6.png",
+    category: "Model UN Conference Website",
+    role: "Frontend Developer",
+    organization: "KIIT Model UN",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    deliverables: ["Delegate Application UI", "Committee Matrix", "Responsive Navigation"],
+    overview: "Web platform engineered for the annual Model United Nations conference at KIIT, featuring multi-committee overviews, delegate registration forms, and responsive event schedules.",
+  },
+  {
+    image: "/rip/frame2.png",
+    logo: "/logo/ascent.png",
+    link: "/projects/acsent-choacing-center",
+    title: "Acsent Coaching",
+    description: "Web presence and curriculum showcase for academic coaching",
+    projectImage: "/rip/frame2.png",
+    category: "Coaching Institute Website",
+    role: "Web Developer & Designer",
+    organization: "Acsent Coaching",
+    stack: ["Next.js", "React", "Tailwind CSS", "Vercel"],
+    deliverables: ["Curriculum Overview", "Inquiry Form", "Course Catalog"],
+    overview: "Web presence developed for an educational coaching institute, presenting course curriculum, faculty information, and student inquiry channels.",
+  },
+  {
+    image: "/rip/frame3.png",
+    logo: "/logo/bikash.png",
+    link: "/projects/bikash-vidalya",
+    title: "Bikash Vidalya",
+    description: "School website with academic updates and parent notices",
+    projectImage: "/rip/frame3.png",
+    category: "School Website",
+    role: "Web Developer & Designer",
+    organization: "Bikash Vidyalaya",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL"],
+    deliverables: ["Notice Bulletin", "Academic Programs", "Parent Information"],
+    overview: "Institutional web platform built for Bikash Vidyalaya school, providing administrative updates, academic program overviews, and admissions information.",
+  },
+  {
+    image: "/rip/frame4.png",
+    logo: "/logo/indura.png",
+    link: "/projects/indura-english-highschool",
+    title: "Indura School",
+    description: "High school informational website and admissions guide",
+    projectImage: "/rip/frame4.png",
+    category: "School Website",
+    role: "Web Developer & Designer",
+    organization: "Indura English High School",
+    stack: ["Next.js", "React", "CSS Modules", "Tailwind CSS"],
+    deliverables: ["Admissions Guide", "Campus Overview", "Responsive Pages"],
+    overview: "Informational website engineered for Indura English High School, delivering clear navigation for prospective students, parents, and academic notices.",
+  },
+  {
+    image: "/rip/frame8.png",
+    logo: "/logo/pandav.png",
+    link: "/projects/pandav-studio",
+    title: "Pandav Studio",
+    description: "Minimalist portfolio for creative photography studio",
+    projectImage: "/rip/frame8.png",
+    category: "Photography & Media Showcase",
+    role: "Web Developer & Designer",
+    organization: "Pandav Studios",
+    stack: ["React", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    deliverables: ["Visual Gallery", "Service Overview", "Client Contact UI"],
+    overview: "Minimalist digital portfolio designed for a creative photography studio, emphasizing full-bleed imagery, clean typography, and service inquiries.",
   },
 ]
 
-// Metrics Chart Card
-function MetricsChart({ item, index }: { item: PortfolioItem; index: number }) {
-  const [animKey, setAnimKey] = useState(0)
-
-  useEffect(() => {
-    setAnimKey(prev => prev + 1)
-  }, [index])
-
+// Project Architecture & Deliverables Card (Left Column)
+function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
   return (
-    <div className="w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-3 space-y-2">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <TrendingUp className="w-3 h-3 text-emerald-400" />
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">{item.metrics.label} Growth</span>
-        </div>
-        <span className="text-[8px] font-mono text-white/20">6-Month Impact</span>
+    <div className="w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-3.5 space-y-3">
+      <div className="flex items-center justify-between border-b border-white/5 pb-2">
+        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Role</span>
+        <span className="text-[10px] font-medium text-white/90">{item.role}</span>
       </div>
 
-      {/* Stat Pills */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2 py-1.5 text-center">
-          <p className="text-emerald-400 text-base font-bold tracking-tight leading-none">{item.metrics.conversionRate}</p>
-          <p className="text-white/30 text-[8px] font-mono uppercase tracking-widest mt-0.5">Conversion</p>
-        </div>
-        <div className="flex-1 rounded-lg bg-blue-500/10 border border-blue-500/20 px-2 py-1.5 text-center">
-          <p className="text-blue-400 text-base font-bold tracking-tight leading-none">{item.metrics.userGrowth}</p>
-          <p className="text-white/30 text-[8px] font-mono uppercase tracking-widest mt-0.5">User Growth</p>
+      <div className="space-y-1.5">
+        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 block">Deliverables</span>
+        <div className="flex flex-wrap gap-1.5">
+          {item.deliverables.map((d, i) => (
+            <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+              {d}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="h-[72px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart key={animKey} data={item.metrics.chartData} margin={{ top: 4, right: 4, left: -30, bottom: 0 }}>
-            <defs>
-              <linearGradient id={`metricGrad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-            <XAxis
-              dataKey="month"
-              tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 9, fontFamily: "monospace" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis hide />
-            <Tooltip
-              contentStyle={{
-                background: "rgba(0,0,0,0.85)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 8,
-                fontSize: 11,
-                color: "#fff",
-              }}
-              itemStyle={{ color: "#10b981" }}
-              labelStyle={{ color: "rgba(255,255,255,0.4)" }}
-              cursor={{ stroke: "rgba(255,255,255,0.1)" }}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#10b981"
-              strokeWidth={1.5}
-              fill={`url(#metricGrad-${index})`}
-              dot={false}
-              activeDot={{ r: 4, fill: "#10b981", strokeWidth: 0 }}
-              isAnimationActive={true}
-              animationDuration={800}
-              animationEasing="ease-out"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="space-y-1.5 pt-1 border-t border-white/5">
+        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 block">Stack</span>
+        <div className="flex flex-wrap gap-1">
+          {item.stack.map((s, i) => (
+            <span key={i} className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/[0.02] border border-white/5 text-white/60">
+              {s}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
-// Star rating component
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`w-4 h-4 ${
-            star <= rating
-              ? "fill-white text-white"
-              : "fill-transparent text-white/20"
-          }`}
-        />
-      ))}
-      <span className="text-white/40 text-xs ml-2 font-mono">
-        {rating}.0
-      </span>
-    </div>
-  )
-}
-
-// Animation variants
+// Animation variants for side content
 const sideContentVariants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+  hidden: { opacity: 0, y: 15, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] as const },
+    scale: 1,
+    transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] as const },
   },
   exit: {
     opacity: 0,
-    y: -10,
-    filter: "blur(4px)",
-    transition: { duration: 0.2, ease: "easeIn" as const },
+    y: -15,
+    scale: 0.98,
+    transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1.0] as const },
   },
 }
 
 export default function InfiniteMenuSection() {
-  const [canNavigate, setCanNavigate] = useState(true)
   const [activeIndex, setActiveIndex] = useState(0)
   const [displayIndex, setDisplayIndex] = useState(0)
   const [isGlobeMoving, setIsGlobeMoving] = useState(false)
+  const [canNavigate, setCanNavigate] = useState(true)
+  const navigateRef = useRef<((direction: "prev" | "next") => void) | null>(null)
 
-  // Ref always holds the latest activeIndex — avoids stale closure in callbacks
   const activeIndexRef = useRef(0)
+  activeIndexRef.current = activeIndex
 
-  const activeItem = portfolioItems[displayIndex]
-
-  const handleNavigate = (direction: "prev" | "next") => {
-    if (!canNavigate) return
-    setCanNavigate(false)
-    if ((window as any).__infiniteMenuNavigate) {
-      ;(window as any).__infiniteMenuNavigate(direction)
-    }
-    setTimeout(() => setCanNavigate(true), 800)
-  }
+  const activeItem = portfolioItems[displayIndex] ?? portfolioItems[0]
 
   const handleActiveItemChange = useCallback((index: number) => {
-    const mapped = index % portfolioItems.length
-    setActiveIndex(mapped)
-    activeIndexRef.current = mapped // keep ref in sync every frame
+    setActiveIndex(index)
   }, [])
 
   const handleMovementChange = useCallback((moving: boolean) => {
     setIsGlobeMoving(moving)
   }, [])
 
-  // Sync displayIndex reactively: commit only when globe is stopped
-  // This avoids the race condition where onMovementChange(false) fires
-  // before onActiveItemChange has updated activeIndexRef in the same frame
+  const handleNavigate = useCallback(
+    (direction: "prev" | "next") => {
+      if (!canNavigate) return
+      setCanNavigate(false)
+
+      const win = window as any
+      if (typeof win.__infiniteMenuNavigate === "function") {
+        win.__infiniteMenuNavigate(direction)
+      } else if (navigateRef.current) {
+        navigateRef.current(direction)
+      }
+
+      setTimeout(() => setCanNavigate(true), 350)
+    },
+    [canNavigate]
+  )
+
   useEffect(() => {
     if (!isGlobeMoving) {
       setDisplayIndex(activeIndexRef.current)
@@ -407,11 +248,14 @@ export default function InfiniteMenuSection() {
     <section className="relative w-full h-screen min-h-0 bg-black overflow-hidden border-t border-white/5 flex flex-col">
       {/* Header */}
       <div className="text-center pt-6 pb-2 px-4 shrink-0">
-        <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-1 tracking-tight px-2">
-          Explore My Universe
+        <span className="text-white/40 text-[10px] font-mono tracking-[0.25em] uppercase block mb-1">
+          Interactive Archive
+        </span>
+        <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
+          Project Constellation
         </h2>
-        <p className="text-xs md:text-sm text-gray-400 max-w-2xl mx-auto px-4 tracking-wide">
-          Navigate through a constellation of creativity.
+        <p className="text-xs md:text-sm text-zinc-400 max-w-2xl mx-auto px-4 tracking-wide font-light">
+          Rotate through verified full-stack applications, event platforms, and applied AI systems.
         </p>
       </div>
 
@@ -419,7 +263,7 @@ export default function InfiniteMenuSection() {
       <div className="flex-1 min-h-0 max-w-[1400px] w-full mx-auto px-4 md:px-8 pb-4">
         <div className="grid grid-cols-1 md:grid-cols-[260px_1fr_260px] lg:grid-cols-[300px_1fr_300px] gap-4 items-center h-full">
 
-          {/* ─── LEFT COLUMN: Client Info ─── */}
+          {/* ─── LEFT COLUMN: Engineering & Architecture Focus ─── */}
           <div className="hidden md:flex flex-col items-center gap-3 h-full justify-center">
             <AnimatePresence mode="wait">
               <motion.div
@@ -440,21 +284,40 @@ export default function InfiniteMenuSection() {
                   </div>
                   <div className="absolute inset-0 rounded-full border border-white/5 scale-125 opacity-50" />
                 </div>
-                <h3 className="text-base font-bold text-white tracking-tight text-center">
-                  {activeItem.title}
-                </h3>
-                <MetricsChart item={activeItem} index={displayIndex} />
-                <a
-                  href={activeItem.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2 px-6 rounded-lg border border-white/15 bg-white/5
-                           text-white text-xs font-medium tracking-wide text-center
-                           hover:bg-white/10 hover:border-white/25 transition-all duration-300
-                           backdrop-blur-sm"
-                >
-                  View Case Study →
-                </a>
+                <div className="text-center">
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    {activeItem.title}
+                  </h3>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-white/40 block mt-0.5">
+                    {activeItem.category}
+                  </span>
+                </div>
+
+                <ProjectArchitectureCard item={activeItem} />
+
+                {activeItem.link.startsWith("/") ? (
+                  <Link
+                    href={activeItem.link}
+                    className="w-full py-2 px-6 rounded-lg border border-white/15 bg-white/5
+                             text-white text-xs font-medium tracking-wide text-center
+                             hover:bg-white/10 hover:border-white/25 transition-all duration-300
+                             backdrop-blur-sm block"
+                  >
+                    View Case Study →
+                  </Link>
+                ) : (
+                  <a
+                    href={activeItem.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2 px-6 rounded-lg border border-white/15 bg-white/5
+                             text-white text-xs font-medium tracking-wide text-center
+                             hover:bg-white/10 hover:border-white/25 transition-all duration-300
+                             backdrop-blur-sm block"
+                  >
+                    View Project →
+                  </a>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -516,7 +379,7 @@ export default function InfiniteMenuSection() {
             </div>
           </div>
 
-          {/* ─── RIGHT COLUMN: Testimonial + Rating ─── */}
+          {/* ─── RIGHT COLUMN: Project Context & Scope ─── */}
           <div className="hidden md:flex flex-col items-center gap-3 h-full justify-center">
             <AnimatePresence mode="wait">
               <motion.div
@@ -527,11 +390,14 @@ export default function InfiniteMenuSection() {
                 exit="exit"
                 className="flex flex-col gap-3 w-full"
               >
-                {/* Testimonial Card */}
+                {/* Project Context Card */}
                 <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-4">
-                  <div className="text-white/10 text-3xl font-serif leading-none mb-2">"</div>
+                  <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
+                    <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Project Context</span>
+                    <span className="text-[9px] font-mono text-emerald-400">Verified Case</span>
+                  </div>
                   <p className="text-gray-300 text-xs leading-relaxed mb-3">
-                    {activeItem.testimonial}
+                    {activeItem.overview}
                   </p>
                   <div className="flex items-center gap-3 pt-2 border-t border-white/5">
                     <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center">
@@ -543,19 +409,25 @@ export default function InfiniteMenuSection() {
                     </div>
                     <div>
                       <p className="text-white text-xs font-semibold">
-                        {activeItem.title}
+                        {activeItem.organization}
                       </p>
-                      <p className="text-white/30 text-[10px]">Client</p>
+                      <p className="text-white/30 text-[10px]">Client / Organization</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Star Rating Card */}
-                <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 flex flex-col items-center gap-3">
-                  <p className="text-white/30 text-[10px] uppercase tracking-[0.2em] font-medium">
-                    Client Satisfaction
-                  </p>
-                  <StarRating rating={activeItem.rating} />
+                {/* Project Focus & Role Card */}
+                <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-4 flex flex-col items-center gap-2 text-center">
+                  <span className="text-white/30 text-[9px] uppercase tracking-[0.2em] font-medium font-mono">
+                    Project Scope
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-white font-mono text-xs tracking-wide">{activeItem.role}</span>
+                  </div>
+                  <span className="text-white/30 text-[9px] font-mono">
+                    Custom Web Implementation
+                  </span>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -588,28 +460,42 @@ export default function InfiniteMenuSection() {
                 </div>
               </div>
 
-              {/* Metrics Chart (Mobile) */}
-              <MetricsChart item={activeItem} index={displayIndex} />
+              {/* Architecture & Deliverables (Mobile) */}
+              <ProjectArchitectureCard item={activeItem} />
 
-              {/* Testimonial */}
+              {/* Context (Mobile) */}
               <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
                 <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                  "{activeItem.testimonial}"
+                  {activeItem.overview}
                 </p>
-                <StarRating rating={activeItem.rating} />
+                <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span className="text-white/60 text-xs font-mono">{activeItem.organization}</span>
+                </div>
               </div>
 
               {/* CTA */}
-              <a
-                href={activeItem.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 rounded-lg border border-white/15 bg-white/5 
-                         text-white text-sm font-medium tracking-wide text-center
-                         hover:bg-white/10 transition-all"
-              >
-                View Case Study →
-              </a>
+              {activeItem.link.startsWith("/") ? (
+                <Link
+                  href={activeItem.link}
+                  className="block w-full py-3 rounded-lg border border-white/15 bg-white/5 
+                           text-white text-sm font-medium tracking-wide text-center
+                           hover:bg-white/10 transition-all"
+                >
+                  View Case Study →
+                </Link>
+              ) : (
+                <a
+                  href={activeItem.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-3 rounded-lg border border-white/15 bg-white/5 
+                           text-white text-sm font-medium tracking-wide text-center
+                           hover:bg-white/10 transition-all"
+                >
+                  View Project →
+                </a>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

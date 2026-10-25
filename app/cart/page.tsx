@@ -153,8 +153,8 @@ export default function CartPage() {
                       <span className="font-mono">$0.00</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-white/40 font-light">Cloud Processing Fee</span>
-                      <span className="text-green-500 text-[10px] font-bold tracking-[0.2em] uppercase">WAVIED</span>
+                      <span className="text-white/40 font-light">Payment Integration</span>
+                      <span className="text-zinc-400 text-[10px] font-mono tracking-widest uppercase">DEMO MODE</span>
                     </div>
                     <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                       <span className="text-lg font-bold">Total</span>
@@ -162,10 +162,20 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full h-16 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold tracking-[0.3em] uppercase group shadow-[0_0_40px_rgba(255,255,255,0.1)]">
-                    Secure Checkout
-                    <CreditCard size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                  <div className="p-4 rounded-2xl bg-zinc-900/80 border border-amber-500/20 text-center mb-6">
+                    <span className="text-xs font-mono text-amber-300 font-semibold block mb-1">
+                      Direct Checkout Disabled
+                    </span>
+                    <p className="text-[11px] text-zinc-400 font-light leading-relaxed">
+                      E-commerce payments are not active. To license or integrate these component architectures into your project, reach out directly.
+                    </p>
+                  </div>
+
+                  <Link href="/contact" className="block w-full">
+                    <Button className="w-full h-16 rounded-full bg-white text-black hover:bg-white/90 transition-all text-xs font-bold tracking-[0.2em] uppercase group shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+                      Inquire for Custom License →
+                    </Button>
+                  </Link>
 
                 </div>
               </div>

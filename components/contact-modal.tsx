@@ -23,9 +23,9 @@ interface ContactModalProps {
 }
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+  { icon: Github, href: "https://github.com/hxrshrathore", label: "GitHub" },
+  { icon: Linkedin, href: "https://linkedin.com/in/hxrshrathore", label: "LinkedIn" },
+  { icon: Twitter, href: "https://twitter.com/hxrshrathore", label: "Twitter" },
 ]
 
 export default function ContactModal({ open, onOpenChange }: ContactModalProps) {

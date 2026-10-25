@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-
-const BRIDGE_SECRET = process.env.BRIDGE_SECRET || "bridge_prod_key_77a9cfef12bc"
+import { isValidBridgeToken } from "@/lib/auth"
 
 export async function GET(req: Request) {
   try {
@@ -10,9 +9,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing or invalid Authorization header" }, { status: 401 })
     }
 
-    const token = authHeader.substring(7)
-    if (token !== BRIDGE_SECRET) {
-      return NextResponse.json({ error: "Unauthorized access" }, { status: 403 })
+    const token = authHeader.substring(7).trim()
+    if (!isValidBridgeToken(token)) {
+      return NextResponse.json({ error: "Unauthorized access: invalid or unconfigured bridge token" }, { status: 401 })
     }
 
     return NextResponse.json({

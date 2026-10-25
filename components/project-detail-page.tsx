@@ -9,13 +9,21 @@ import { Badge } from "@/components/ui/badge"
 import { StickyScrollReveal } from "@/components/ui/sticky-scroll-reveal"
 import Iridescence from "@/components/ui/iridescence"
 import BlurText from "@/components/ui/blur-text"
+import dynamic from "next/dynamic"
 import type { Project } from "@/lib/projects-data"
-import Hyperspeed, { hyperspeedPresets } from "@/components/hyperspeed"
+import { FEATURED_CASE_STUDIES } from "@/lib/curation"
+import { hyperspeedPresets } from "@/components/hyperspeed"
 import { FocusCards } from "@/components/ui/focus-cards"
 import { CaseStudyCharts } from "@/components/case-study-charts"
 import CountUp from "@/components/ui/count-up"
 import { usePageTransition } from "@/components/page-transition"
 import { cn } from "@/lib/utils"
+import { CheckCircle2, Cpu, Database, ShieldCheck, Terminal, Layers } from "lucide-react"
+
+const Hyperspeed = dynamic(() => import("@/components/hyperspeed"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-black" />
+})
 
 interface ProjectDetailPageProps {
   project: Project
@@ -30,16 +38,7 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    )
-  }
+  const engineering = FEATURED_CASE_STUDIES[project.slug.toLowerCase()]
 
   const renderProcessContent = (contentType?: string) => {
     if (!contentType) return null
@@ -321,6 +320,111 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
         </div>
       </section>
 
+      {/* Engineering Architecture & Technical Decisions (For Featured Case Studies) */}
+      {engineering && (
+        <section className="relative py-24 md:py-32 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-zinc-950/40">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-6">
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-8 h-px bg-emerald-400" />
+                  <span className="text-[10px] font-mono font-bold tracking-[0.3em] uppercase text-emerald-400">
+                    System Architecture & Engineering Decisions
+                  </span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                  Engineering <span className="text-white/40 font-light italic">Deep Dive</span>
+                </h2>
+              </div>
+              <p className="text-zinc-400 text-sm max-w-md font-light leading-relaxed">
+                Core architectural choices, technical trade-offs, failure modes, and debugging challenges tackled during development.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+              {/* System Design Highlights */}
+              <div className="p-8 rounded-2xl border border-white/10 bg-white/[0.02]">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                  <Layers className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-lg font-bold text-white">System Design & Data Flow</h3>
+                </div>
+                <ul className="space-y-4">
+                  {engineering.systemDesign.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm text-zinc-300 font-light leading-relaxed">
+                      <span className="text-xs font-mono text-cyan-400 mt-0.5">0{idx + 1}.</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Debugging & Reliability */}
+              <div className="p-8 rounded-2xl border border-white/10 bg-white/[0.02]">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                  <Terminal className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-lg font-bold text-white">Debugging & Reliability</h3>
+                </div>
+                <div className="space-y-6">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-1.5">
+                      Crucial Debugging Challenge
+                    </span>
+                    <p className="text-sm text-zinc-300 font-light leading-relaxed">
+                      {engineering.debuggingChallenge}
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-1.5">
+                      Security & Reliability Guarantees
+                    </span>
+                    <p className="text-sm text-zinc-300 font-light leading-relaxed">
+                      {engineering.securityAndReliability}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Architectural Trade-offs Matrix */}
+            <div className="p-8 rounded-2xl border border-white/10 bg-white/[0.02] mb-12">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+                <Cpu className="w-5 h-5 text-purple-400" />
+                <h3 className="text-lg font-bold text-white">Technical Trade-Offs & Decisions</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {engineering.technicalDecisions.map((decision, idx) => (
+                  <div key={idx} className="p-5 rounded-xl border border-white/5 bg-black/40 space-y-2.5">
+                    <h4 className="text-sm font-semibold text-white">{decision.decision}</h4>
+                    <p className="text-xs text-zinc-400 leading-relaxed font-light">
+                      <strong className="text-zinc-300 font-medium">Rationale:</strong> {decision.rationale}
+                    </p>
+                    <p className="text-xs text-zinc-500 leading-relaxed font-light">
+                      <strong className="text-zinc-400 font-medium">Trade-off:</strong> {decision.tradeOff}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Relevance to Forward Deployed Engineering */}
+            <div className="p-6 md:p-8 rounded-2xl border border-emerald-500/20 bg-emerald-950/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-1.5 max-w-2xl">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold block">
+                  Product & Forward Deployed Engineering Relevance
+                </span>
+                <p className="text-sm text-zinc-300 font-light leading-relaxed">
+                  {engineering.fdeRelevance}
+                </p>
+              </div>
+              <div className="shrink-0 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <span className="text-xs font-mono text-emerald-300">Production Verified</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Technologies */}
       <section className="relative py-24 md:py-32 px-4 sm:px-6 lg:px-8 border-y border-white/5 bg-white/[0.01]">
         <div className="max-w-7xl mx-auto">
@@ -476,16 +580,22 @@ export default function ProjectDetailPage({ project, relatedProjects = [] }: Pro
             <h2 className="text-4xl md:text-7xl font-bold tracking-tight mb-6 text-white/90 underline-offset-8 decoration-white/10">The <span className="italic font-light text-white/40">Impact</span> & Results</h2>
           </div>
 
-          <CaseStudyCharts metrics={project.metrics || []} />
-          
-          {/* Legacy Results (Optional fallback/text) */}
-          {(!project.metrics || project.metrics.length === 0) && project.results && project.results.length > 0 && (
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 opacity-50">
-              {project.results?.map((result, index) => (
-                <div key={index} className="text-center group">
-                  <p className="text-sm font-mono text-white/40 uppercase tracking-widest">{result}</p>
+          {project.metrics && project.metrics.length > 0 ? (
+            <CaseStudyCharts metrics={project.metrics} />
+          ) : (
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+              {project.results && project.results.length > 0 ? (
+                project.results.map((result, index) => (
+                  <div key={index} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+                    <div className="w-2 h-2 rounded-full bg-white/40 mb-4" />
+                    <p className="text-sm text-gray-300 leading-relaxed font-light">{result}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center p-8 rounded-2xl bg-white/[0.02] border border-white/5">
+                  <p className="text-white/40 font-mono text-sm">Delivered with responsive design, performance optimization, and custom component architecture.</p>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>

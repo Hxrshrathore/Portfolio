@@ -1217,7 +1217,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
     if (activeItem.link.startsWith("http")) {
       window.open(activeItem.link, "_blank")
     } else {
-      console.log("Internal route:", activeItem.link)
+      window.location.href = activeItem.link
     }
   }
 
@@ -1295,7 +1295,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
             </p>
             <button
               onClick={handleButtonClick}
-              className="mt-100 w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto"
+              className="mt-6 w-14 h-14 bg-[#00ffff] border-[4px] border-black rounded-full grid place-items-center mx-auto transition-transform active:scale-95"
+              aria-label="View project case study"
             >
               <span className="text-2xl text-[#060010]">&#x2197;</span>
             </button>

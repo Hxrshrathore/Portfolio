@@ -49,11 +49,11 @@ export default function TrustedBySection() {
             variants={itemVariants}
             className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2"
           >
-            Trusted by Visionaries
+            Selected Collaborations
           </motion.h2>
 
           <motion.p variants={itemVariants} className="text-sm md:text-lg text-gray-400 mb-12 md:mb-20 max-w-2xl mx-auto font-light tracking-wide px-4">
-            Partnering with forward-thinking companies who dare to push boundaries.
+            Delivering digital platforms for university festivals, educational institutions, and independent creative studios.
           </motion.p>
 
           <motion.div 

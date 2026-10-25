@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { uploadToR2 } from "@/lib/r2"
-
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "Harshh@055"
+import { isValidAdminToken } from "@/lib/auth"
 
 export async function POST(req: Request) {
   try {
-    // 1. Verify Authentication
+    // 1. Verify Authentication with fail-closed timing-safe check
     const cookieStore = await cookies()
     const adminToken = cookieStore.get("admin_token")?.value
 
-    if (adminToken !== ADMIN_SECRET) {
-      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 })
+    if (!isValidAdminToken(adminToken)) {
+      return NextResponse.json({ error: "Unauthorized access: admin privileges required" }, { status: 401 })
     }
 
     // 2. Parse Form Data

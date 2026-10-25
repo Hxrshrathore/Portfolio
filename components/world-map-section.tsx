@@ -5,34 +5,34 @@ import { motion } from "framer-motion"
 import { WorldMap } from "@/components/ui/world-map"
 import { MapPin } from "lucide-react"
 
-interface ClientInfo {
-  country: string
+interface HubInfo {
+  region: string
   flag: string
   lat: number
   lng: number
-  projects: number
+  timezone: string
   label: string
+  status: string
 }
 
-const CLIENTS: ClientInfo[] = [
-  { country: "United States", flag: "🇺🇸", lat: 37.0902, lng: -95.7129, projects: 12, label: "NY · LA · Chicago" },
-  { country: "Germany", flag: "🇩🇪", lat: 51.1657, lng: 10.4515, projects: 3, label: "Berlin · Munich" },
-  { country: "Italy", flag: "🇮🇹", lat: 41.8719, lng: 12.5674, projects: 2, label: "Rome · Milan" },
-  { country: "Austria", flag: "🇦🇹", lat: 48.2082, lng: 16.3738, projects: 1, label: "Vienna" },
-  { country: "Australia", flag: "🇦🇺", lat: -33.8688, lng: 151.2093, projects: 2, label: "Sydney" },
-  { country: "Vietnam", flag: "🇻🇳", lat: 14.0583, lng: 108.2772, projects: 1, label: "Ho Chi Minh City" },
+const COLLABORATION_HUBS: HubInfo[] = [
+  { region: "India (HQ)", flag: "🇮🇳", lat: 20.2961, lng: 85.8245, timezone: "UTC+5:30", label: "Bhubaneswar · Base Timezone", status: "Base" },
+  { region: "North America (East)", flag: "🇺🇸", lat: 40.7128, lng: -74.006, timezone: "UTC-5", label: "EST · Potential Morning Sync", status: "Overlap Window" },
+  { region: "North America (West)", flag: "🇺🇸", lat: 37.7749, lng: -122.4194, timezone: "UTC-8", label: "PST · Evening Collaboration", status: "Overlap Window" },
+  { region: "United Kingdom & EU", flag: "🇪🇺", lat: 51.5074, lng: -0.1278, timezone: "UTC+0/+1", label: "GMT / CET · Afternoon Overlap", status: "Overlap Window" },
+  { region: "Southeast Asia", flag: "🇸🇬", lat: 1.3521, lng: 103.8198, timezone: "UTC+8", label: "SGT · Daytime Overlap", status: "Overlap Window" },
+  { region: "Australia", flag: "🇦🇺", lat: -33.8688, lng: 151.2093, timezone: "UTC+10", label: "AEST · Early Morning Sync", status: "Overlap Window" },
 ]
 
-const INDIA = { lat: 20.5937, lng: 78.9629 }
+const BHUBANESWAR = { lat: 20.2961, lng: 85.8245 }
 
-const mapDots = CLIENTS.map((c) => ({
-  start: INDIA,
-  end: { lat: c.lat, lng: c.lng },
+const mapDots = COLLABORATION_HUBS.filter(h => h.region !== "India (HQ)").map((h) => ({
+  start: BHUBANESWAR,
+  end: { lat: h.lat, lng: h.lng },
 }))
 
 export default function WorldMapSection() {
-  const [activeClient, setActiveClient] = useState<number | null>(null)
-  const totalProjects = useMemo(() => CLIENTS.reduce((s, c) => s + c.projects, 0), [])
+  const [activeHub, setActiveHub] = useState<number | null>(null)
 
   return (
     <section className="relative w-full bg-black overflow-hidden border-t border-white/5 h-screen min-h-[680px] max-h-[1000px]">
@@ -52,8 +52,8 @@ export default function WorldMapSection() {
               transition={{ duration: 0.4 }}
               className="flex items-center gap-2 mb-3"
             >
-              <MapPin className="w-3 h-3 text-white/20" />
-              <span className="text-white/25 text-[10px] font-bold tracking-[0.3em] uppercase">Global Reach</span>
+              <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+              <span className="text-zinc-400 text-[10px] font-bold tracking-[0.3em] uppercase">Timezone Compatibility</span>
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -64,7 +64,7 @@ export default function WorldMapSection() {
             >
               <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">Based in India,</span>
               <br />
-              <span className="italic font-light text-white/40">shipping worldwide</span>
+              <span className="italic font-light text-zinc-400">open to remote collaboration</span>
             </motion.h2>
           </div>
 
@@ -77,15 +77,15 @@ export default function WorldMapSection() {
             className="flex items-center gap-6 md:gap-10"
           >
             {[
-              { value: `${CLIENTS.length}`, suffix: "+", label: "Countries" },
-              { value: `${totalProjects}`, suffix: "+", label: "Projects" },
-              { value: "24", suffix: "/7", label: "Availability" },
+              { value: "Remote", suffix: "", label: "Capability" },
+              { value: "UTC+5:30", suffix: "", label: "Base Timezone" },
+              { value: "Async", suffix: " Friendly", label: "Communication" },
             ].map((stat, i) => (
               <div key={i} className="text-left">
                 <div className="text-2xl md:text-3xl font-bold text-white tracking-tight tabular-nums leading-none">
-                  {stat.value}<span className="text-white/25 font-light">{stat.suffix}</span>
+                  {stat.value}<span className="text-zinc-400 font-light text-base md:text-lg">{stat.suffix}</span>
                 </div>
-                <div className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-white/25 mt-1 font-mono">
+                <div className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 mt-1 font-mono">
                   {stat.label}
                 </div>
               </div>
@@ -93,7 +93,7 @@ export default function WorldMapSection() {
           </motion.div>
         </div>
 
-        {/* ── Main Content: Map + Country Cards ── */}
+        {/* ── Main Content: Map + Regional Hub Cards ── */}
         <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 md:gap-5 pb-6">
 
           {/* Map */}
@@ -112,7 +112,7 @@ export default function WorldMapSection() {
             </div>
           </motion.div>
 
-          {/* Country Cards Column */}
+          {/* Regional Hub Cards Column */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -121,14 +121,14 @@ export default function WorldMapSection() {
             className="lg:w-[280px] xl:w-[320px] shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto"
             data-no-cursor="true"
           >
-            {CLIENTS.map((client, i) => {
-              const isActive = activeClient === i
+            {COLLABORATION_HUBS.map((hub, i) => {
+              const isActive = activeHub === i
               return (
                 <motion.div
-                  key={client.country}
-                  onMouseEnter={() => setActiveClient(i)}
-                  onMouseLeave={() => setActiveClient(null)}
-                  onClick={() => setActiveClient(isActive ? null : i)}
+                  key={hub.region}
+                  onMouseEnter={() => setActiveHub(i)}
+                  onMouseLeave={() => setActiveHub(null)}
+                  onClick={() => setActiveHub(isActive ? null : i)}
                   className={`
                     relative group cursor-default select-none rounded-xl
                     border transition-all duration-300 overflow-hidden
@@ -142,21 +142,21 @@ export default function WorldMapSection() {
                   <div className="relative flex items-center gap-3 px-4 py-3 lg:py-2.5">
                     {/* Flag */}
                     <span className={`text-xl md:text-2xl leading-none transition-transform duration-300 ${isActive ? "scale-110" : ""}`}>
-                      {client.flag}
+                      {hub.flag}
                     </span>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <span className={`text-[11px] md:text-xs font-semibold tracking-wide truncate transition-colors duration-300 ${isActive ? "text-white" : "text-white/60"}`}>
-                          {client.country}
+                          {hub.region}
                         </span>
-                        <span className={`text-[10px] font-mono tabular-nums shrink-0 transition-colors duration-300 ${isActive ? "text-white/50" : "text-white/20"}`}>
-                          ×{client.projects}
+                        <span className={`text-[10px] font-mono tabular-nums shrink-0 transition-colors duration-300 ${isActive ? "text-white/70" : "text-white/30"}`}>
+                          {hub.timezone}
                         </span>
                       </div>
                       <span className={`text-[8px] md:text-[9px] font-mono tracking-wider transition-colors duration-300 block truncate ${isActive ? "text-white/40" : "text-white/20"}`}>
-                        {client.label}
+                        {hub.label}
                       </span>
                     </div>
 

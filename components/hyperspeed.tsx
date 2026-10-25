@@ -602,7 +602,7 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions, className = "" }) => {
              preset: SMAAPreset.MEDIUM,
              searchImage: SMAAEffect.searchImageDataURL,
              areaImage: SMAAEffect.areaImageDataURL,
-          }),
+          } as any),
         )
         this.renderPass.renderToScreen = false
         this.bloomPass.renderToScreen = false

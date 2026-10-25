@@ -30,30 +30,25 @@ const inter = Inter({
 })
 
 export const metadata = {
-  title: "Harsh Kumar | Web Designer, UI/UX & Front-End Developer – KIIT Student Portfolio 2025",
+  title: "Harsh Kumar | Product-Minded Software Engineer & Applied AI Builder",
   description:
-    "Explore Harsh Kumar's award-winning web, UI/UX, and graphic design portfolio. KIIT 3rd-year student—Python, data, and full stack developer. Available for projects and freelance work.",
+    "Product-Minded Software Engineer & Applied AI Builder. Engineering full-stack products, AI-powered applications, and high-leverage integrations — from problem discovery to production deployment.",
   keywords: [
-    "web designer portfolio 2025",
-    "best web developer student India",
-    "KIIT web designer",
-    "top UI/UX designer portfolio",
-    "front-end developer student",
-    "Python web designer portfolio",
-    "full stack junior portfolio",
-    "data analyst web portfolio",
-    "AI-ready portfolio site",
-    "college student designer showcase",
-    "website builder for hire",
-    "modern creative web designer India",
-    "KIIT 3rd year web designer",
-    "student portfolio front-end projects",
-    "Harsh Kumar web designer",
-    "Bhubaneswar web developer",
-    "React developer portfolio",
-    "Next.js developer India",
-    "UI/UX designer for hire",
-    "freelance web designer student",
+    "Harsh Kumar",
+    "Product-Minded Software Engineer",
+    "Applied AI Builder",
+    "Forward Deployed Engineer",
+    "Full-Stack Engineer",
+    "Next.js Developer",
+    "React Developer",
+    "TypeScript",
+    "Python Data Pipelines",
+    "LLM Integrations",
+    "API Automation",
+    "WebGL Shaders",
+    "Interface Engineering",
+    "Bhubaneswar India",
+    "hxrshrathore",
   ],
   authors: [{ name: "Harsh Kumar" }],
   creator: "Harsh Kumar",
@@ -68,9 +63,9 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Harsh Kumar | Web Designer, UI/UX & Front-End Developer – KIIT Student Portfolio 2025",
+    title: "Harsh Kumar | Product-Minded Software Engineer & Applied AI Builder",
     description:
-      "Explore Harsh Kumar's award-winning web, UI/UX, and graphic design portfolio. KIIT 3rd-year student—Python, data, and full stack developer. Available for projects.",
+      "I design, engineer, and ship full-stack products, AI-powered applications, and integrations — from figuring out the problem to getting the solution running.",
     url: "https://hxrshrathore.vercel.app",
     siteName: "Harsh Kumar Portfolio",
     locale: "en_US",
@@ -80,15 +75,15 @@ export const metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Harsh Kumar - Web Designer & Developer Portfolio",
+        alt: "Harsh Kumar - Product-Minded Software Engineer & Applied AI Builder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Harsh Kumar | Web Designer, UI/UX & Front-End Developer – KIIT Student Portfolio 2025",
+    title: "Harsh Kumar | Product-Minded Software Engineer & Applied AI Builder",
     description:
-      "Explore Harsh Kumar's award-winning web, UI/UX, and graphic design portfolio. KIIT 3rd-year student—Python, data, and full stack developer.",
+      "I design, engineer, and ship full-stack products, AI-powered applications, and integrations — from figuring out the problem to getting the solution running.",
     creator: "@hxrshrathore",
     images: ["/og-image.png"],
   },
@@ -103,11 +98,6 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
-  },
-    generator: 'v0.app'
 }
 
 export default function RootLayout({

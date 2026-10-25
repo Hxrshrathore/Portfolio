@@ -4,8 +4,7 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePreloaderStore } from "@/lib/store/use-preloader-store"
-import CountUp from "@/components/ui/count-up"
-import GradientText from "@/components/ui/gradient-text"
+import Counter from "./Counter"
 
 interface PreloaderProps {
   children: React.ReactNode
@@ -45,7 +44,7 @@ export default function Preloader({ children }: PreloaderProps) {
 
     // Dynamic Interval Logic
     const startTime = Date.now()
-    const targetDuration = isReturningUser ? 800 : 2000 // Snappier for returning users
+    const targetDuration = 350 // Fast, responsive load transition
     
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime
@@ -94,7 +93,7 @@ export default function Preloader({ children }: PreloaderProps) {
               y: "-100%",
               transition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] }
             }}
-            className="fixed inset-0 z-[100] flex items-end justify-end bg-black"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black"
           >
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
@@ -103,28 +102,21 @@ export default function Preloader({ children }: PreloaderProps) {
             </div>
 
             <motion.div
-              className="relative z-10 p-6 md:p-12"
+              className="relative z-10 flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <GradientText
-                colors={["#ffffff", "#f3f4f6", "#e5e7eb", "#f3f4f6", "#ffffff"]}
-                animationSpeed={3}
-                showBorder={false}
-                className="text-6xl md:text-9xl font-bold tracking-tighter"
-              >
-                <div className="flex items-baseline gap-1">
-                  <CountUp 
-                    from={0} 
-                    to={progress} 
-                    duration={0.3} 
-                    direction="up" 
-                    className="font-mono tabular-nums leading-none" 
-                  />
-                  <span className="text-3xl md:text-5xl opacity-40 font-light">%</span>
-                </div>
-              </GradientText>
+              <Counter
+                value={progress}
+                places={[100, 10, 1]}
+                fontSize={80}
+                padding={5}
+                gap={10}
+                textColor="white"
+                fontWeight={900}
+                digitPlaceHolders={false}
+              />
             </motion.div>
           </motion.div>
         )}

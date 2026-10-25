@@ -42,33 +42,6 @@ export interface Project {
 
 // Map database row to Project interface
 function mapProject(p: any): Project {
-  // Sample metrics for Case Study demonstration during development
-  const sampleMetrics = [
-    {
-      label: "Performance Boost",
-      value: 40,
-      unit: "%",
-      type: "area",
-      data: [
-        { name: "Research", value: 10 },
-        { name: "Design", value: 25 },
-        { name: "Dev", value: 35 },
-        { name: "Post-Launch", value: 40 }
-      ]
-    },
-    {
-      label: "User Satisfaction",
-      value: 94,
-      unit: "%",
-      type: "bar",
-      data: [
-        { name: "Alpha", value: 40 },
-        { name: "Beta", value: 72 },
-        { name: "V1", value: 94 }
-      ]
-    }
-  ];
-
   return {
     ...p,
     domain: p.domain as ProjectDomain,
@@ -76,13 +49,28 @@ function mapProject(p: any): Project {
     demoUrl: p.demoUrl || undefined,
     githubUrl: p.githubUrl || undefined,
     category: p.category || "",
-    metrics: p.metrics && p.metrics.length > 0 ? p.metrics : sampleMetrics
+    metrics: p.metrics && p.metrics.length > 0 ? p.metrics : []
   }
 }
 
 export const getAllProjects = async (): Promise<Project[]> => {
   const result = await db.select().from(projectsSchema)
   return result.map(mapProject)
+}
+
+export const getPublicProjects = async (): Promise<Project[]> => {
+  const { isPublicProject } = await import("./curation")
+  const all = await getAllProjects()
+  return all.filter(isPublicProject)
+}
+
+export const getFeaturedCaseStudies = async (): Promise<Project[]> => {
+  const { FEATURED_SLUGS } = await import("./curation")
+  const all = await getAllProjects()
+  const featured = FEATURED_SLUGS
+    .map(slug => all.find(p => p.slug.toLowerCase() === slug.toLowerCase()))
+    .filter((p): p is Project => Boolean(p))
+  return featured
 }
 
 export const getFeaturedProjects = async (): Promise<Project[]> => {

@@ -3,13 +3,33 @@ const nextConfig = {
   // TypeScript + JS file extensions
   pageExtensions: ["js", "jsx", "ts", "tsx"],
 
-  // Remove deprecated configs
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.r2.dev",
+      },
+      {
+        protocol: "https",
+        hostname: "**.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.reactbits.dev",
+      },
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+    ],
   },
   experimental: {
     optimizePackageImports: [

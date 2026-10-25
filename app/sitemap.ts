@@ -1,9 +1,18 @@
 import { MetadataRoute } from 'next'
 import { getAllPosts } from '@/lib/blog'
-import { shopProducts } from '@/lib/shop-data'
+import { getPublicProjects } from '@/lib/projects-data'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://hxrshrathore.com'
+  const baseUrl = 'https://hxrshrathore.vercel.app'
+
+  // Fetch curated public projects
+  const projects = await getPublicProjects()
+  const projectEntries: MetadataRoute.Sitemap = projects.map((project) => ({
+    url: `${baseUrl}/projects/${project.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  }))
 
   // Fetch blog posts
   const posts = await getAllPosts()
@@ -14,39 +23,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Fetch shop products
-  const productEntries: MetadataRoute.Sitemap = shopProducts.map((product) => ({
-    url: `${baseUrl}/shop/${product.slug}`,
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }))
-
-  // Static pages
+  // Core static pages
   const staticEntries: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 1,
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/projects`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/bio`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/shop`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/contact`,
-      changeFrequency: 'yearly',
-      priority: 0.5,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
   ]
 
-  return [...staticEntries, ...postEntries, ...productEntries]
+  return [...staticEntries, ...projectEntries, ...postEntries]
 }

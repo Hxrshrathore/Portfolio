@@ -160,7 +160,7 @@ export default function ContactPage() {
                       minFontSize={20}
                     />
                   </div>
-                  <p className="text-white/40 text-[10px] font-bold tracking-[0.3em] uppercase">Creative Developer</p>
+                  <p className="text-white/40 text-[10px] font-bold tracking-[0.3em] uppercase">Creative Developer & Interface Engineer</p>
                 </div>
               </div>
 

@@ -2,44 +2,49 @@
 
 import FlowingMenu from "./flowing-menu"
 
-const demoItems = [
+const capabilityItems = [
   {
-    link: "/projects?category=Web%20Designs",
-    text: "Web Experiences",
-    image: "https://picsum.photos/600/400?random=1",
+    link: "/projects",
+    text: "Full-Stack Web Applications",
+    image: "/rip/frame1.png",
   },
   {
-    link: "/projects?category=UI%2FUX%20Designs",
-    text: "Interface Design",
-    image: "https://picsum.photos/600/400?random=2",
+    link: "/projects",
+    text: "Applied AI & LLM Systems",
+    image: "/rip/frame8.png",
   },
   {
-    link: "/projects?category=AI%2FML%20Projects",
-    text: "Smart Solutions",
-    image: "https://picsum.photos/600/400?random=3",
+    link: "/projects",
+    text: "API Integrations & Pipelines",
+    image: "/rip/frame6.png",
   },
-  { link: "/projects?category=Graphics", text: "Visual Identity", image: "https://picsum.photos/600/400?random=4" },
+  {
+    link: "/projects",
+    text: "Product Interfaces & Systems",
+    image: "/rip/frame4.png",
+  },
 ]
 
 export default function FlowingMenuSection() {
   return (
-    <section className="relative w-full bg-black overflow-hidden">
+    <section id="capabilities" className="relative w-full bg-black overflow-hidden border-t border-white/5">
       {/* Header */}
       <div className="text-center py-16 md:py-24 px-4">
-        <h2 className="text-3xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2">How Can I Help You?</h2>
-        <p className="text-sm md:text-lg text-gray-300 max-w-3xl mx-auto tracking-wide px-4">
-          Full-stack developer with a passion for building cool stuff.
-          <br className="hidden md:block" />
-          <span className="hidden md:inline">I don&apos;t cut corners — always looking for new challenges and opportunities to learn.</span>
+        <span className="text-white/40 text-[11px] font-mono tracking-[0.25em] uppercase block mb-3">
+          Engineering Capabilities
+        </span>
+        <h2 className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2">
+          From Problem Discovery to Production
+        </h2>
+        <p className="text-sm md:text-base text-zinc-400 max-w-2xl mx-auto tracking-wide px-4 leading-relaxed font-light">
+          Delivering robust web products, contextual AI integrations, automated workflows, and high-performance interfaces designed to solve real user friction.
         </p>
       </div>
 
       {/* Flowing Menu */}
-      <div className="h-[450px] md:h-[600px] relative">
-        <FlowingMenu items={demoItems} />
+      <div className="h-[420px] md:h-[540px] relative">
+        <FlowingMenu items={capabilityItems} />
       </div>
-
-      {/* Component Categories Grid */}
     </section>
   )
 }

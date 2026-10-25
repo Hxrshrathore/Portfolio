@@ -1,27 +1,37 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "Harshh@055"
+import { isValidAdminToken } from "@/lib/auth"
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
-  // Only target admin routes
+
+  // 1. Protect Admin API endpoints
+  if (pathname.startsWith("/api/admin")) {
+    const adminToken = request.cookies.get("admin_token")?.value
+    if (!isValidAdminToken(adminToken)) {
+      return NextResponse.json({ error: "Unauthorized access: admin privileges required" }, { status: 401 })
+    }
+    return NextResponse.next()
+  }
+
+  // 2. Protect Admin UI routes
   if (pathname.startsWith("/admin")) {
     const adminToken = request.cookies.get("admin_token")?.value
+    const isAuthenticated = isValidAdminToken(adminToken)
 
-    // If matching /admin/login
+    // Bypass check for the login page
     if (pathname === "/admin/login") {
-      if (adminToken === ADMIN_SECRET) {
-        // Already authenticated, send to dashboard
+      if (isAuthenticated) {
+        // Already authenticated, forward to admin dashboard
         return NextResponse.redirect(new URL("/admin", request.url))
       }
       return NextResponse.next()
     }
 
-    // For any other /admin path, verify credentials
-    if (adminToken !== ADMIN_SECRET) {
-      return NextResponse.redirect(new URL("/admin/login", request.url))
+    // For any other /admin route, require valid authentication
+    if (!isAuthenticated) {
+      const loginUrl = new URL("/admin/login", request.url)
+      return NextResponse.redirect(loginUrl)
     }
   }
 
@@ -29,5 +39,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 }
+

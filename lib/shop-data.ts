@@ -253,7 +253,7 @@ export default function PlasmaWave(props) {
     id: "3",
     slug: "minimal-icon-pack-black",
     name: "Minimal Architectural Icons",
-    description: "50+ high-quality vector icons designed with a focus on geometric precision and architectural clarity. Perfect for high-end portfolio websites.",
+    description: "Curated high-quality vector icons designed with a focus on geometric precision and architectural clarity. Perfect for high-end portfolio websites.",
     price: 1500, // $15.00
     category: "Assets",
     images: ["https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop"],

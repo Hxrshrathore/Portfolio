@@ -28,7 +28,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
   const textPathRef = useRef<SVGTextPathElement | null>(null)
   const pathRef = useRef<SVGPathElement | null>(null)
   const [spacing, setSpacing] = useState(0)
-  const [offset, setOffset] = useState(0)
+  const offsetRef = useRef(0)
   const uid = useId()
   const pathId = `curve-${uid}`
   const pathD = `M-100,40 Q500,${40 + curveAmount} 1540,40`
@@ -56,23 +56,21 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
     const step = () => {
       if (!dragRef.current && textPathRef.current) {
         const delta = dirRef.current === "right" ? speed : -speed
-        const currentOffset = Number.parseFloat(textPathRef.current.getAttribute("startOffset") || "0")
-        let newOffset = currentOffset + delta
+        offsetRef.current += delta
 
-        // Fix the wrapping logic to ensure continuous looping
-        if (newOffset <= -spacing) {
-          newOffset = 0
+        // Continuous wrapping logic
+        if (offsetRef.current <= -spacing) {
+          offsetRef.current = 0
         }
-        if (newOffset >= spacing) {
-          newOffset = 0
+        if (offsetRef.current >= spacing) {
+          offsetRef.current = 0
         }
 
-        textPathRef.current.setAttribute("startOffset", newOffset + "px")
-        setOffset(newOffset)
+        textPathRef.current.setAttribute("startOffset", `${offsetRef.current}px`)
       }
       frame = requestAnimationFrame(step)
     }
-    step()
+    frame = requestAnimationFrame(step)
     return () => cancelAnimationFrame(frame)
   }, [spacing, speed, ready])
 
@@ -90,19 +88,17 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
     lastXRef.current = e.clientX
     velRef.current = dx
 
-    const currentOffset = Number.parseFloat(textPathRef.current.getAttribute("startOffset") || "0")
-    let newOffset = currentOffset + dx
+    offsetRef.current += dx
 
     // Fix wrapping for interactive dragging
-    if (newOffset <= -spacing) {
-      newOffset = 0
+    if (offsetRef.current <= -spacing) {
+      offsetRef.current = 0
     }
-    if (newOffset >= spacing) {
-      newOffset = 0
+    if (offsetRef.current >= spacing) {
+      offsetRef.current = 0
     }
 
-    textPathRef.current.setAttribute("startOffset", newOffset + "px")
-    setOffset(newOffset)
+    textPathRef.current.setAttribute("startOffset", `${offsetRef.current}px`)
   }
 
   const endDrag = () => {
@@ -147,7 +143,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
             <textPath 
               ref={textPathRef} 
               href={`#${pathId}`} 
-              startOffset={offset + "px"} 
+              startOffset="0px" 
               xmlSpace="preserve"
             >
               {totalText}

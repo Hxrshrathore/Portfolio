@@ -13,10 +13,14 @@ export default function MagicBentoSection() {
       <div className="relative z-10 flex flex-col h-full max-w-7xl mx-auto w-full px-4">
         {/* Header */}
         <div className="text-center pt-6 pb-2 shrink-0">
-          <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-1 tracking-tight px-2">But, why me?</h2>
-          <p className="text-xs md:text-sm text-gray-400 max-w-2xl mx-auto tracking-wide px-4">
-            Experience the magic of thoughtful interaction design.
-            <span className="hidden md:inline"> Every hover, every click, every moment is crafted to delight.</span>
+          <span className="text-white/40 text-[10px] font-mono tracking-[0.25em] uppercase block mb-1">
+            Engineering Craft
+          </span>
+          <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
+            Engineering Approach & Systems
+          </h2>
+          <p className="text-xs md:text-sm text-zinc-400 max-w-2xl mx-auto tracking-wide px-4 font-light">
+            Turning ambiguous requirements into dependable, production-ready software systems.
           </p>
         </div>
 

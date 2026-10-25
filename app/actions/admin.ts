@@ -13,16 +13,11 @@ import {
 import { eq, desc, gte, sql, and } from "drizzle-orm"
 import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
+import { verifyAdminAuth } from "@/lib/auth"
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "Harshh@055"
-
-// Helper to secure all admin server actions
+// Helper to secure all admin server actions with fail-closed timing-safe checks
 async function verifyAuth() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("admin_token")?.value
-  if (token !== ADMIN_SECRET) {
-    throw new Error("Unauthorized access")
-  }
+  await verifyAdminAuth()
 }
 
 // ----------------------------------------------------

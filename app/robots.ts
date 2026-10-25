@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/cart', '/api', '/checkout'],
+      disallow: ['/admin', '/api/admin', '/api/bridge', '/api', '/cart'],
     },
-    sitemap: 'https://hxrshrathore.com/sitemap.xml',
+    sitemap: 'https://hxrshrathore.vercel.app/sitemap.xml',
   }
 }

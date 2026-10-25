@@ -508,54 +508,24 @@ export function BentoStackLayers() {
 }
 
 /* ═══════════════════════════════════════════════════
-   4. STATS COUNTER — IntersectionObserver triggered
+   4. CORE FOCUS VISUAL — Interactive capabilities
    ═══════════════════════════════════════════════════ */
 
-const stats = [
-  { label: "Projects",  value: 25,   suffix: "+" },
-  { label: "Clients",   value: 15,   suffix: "+" },
-  { label: "Uptime",    value: 99.9, suffix: "%", decimal: true },
+const capabilities = [
+  { label: "Full-Stack & Systems", detail: "Next.js, Node, PostgreSQL, APIs" },
+  { label: "Applied AI & LLMs", detail: "Tool Calling, SSE Streaming, Zod Schemas" },
+  { label: "Interface & Performance", detail: "WebGL Shaders, Type-Safe UI, Web Vitals" },
 ]
 
 export function BentoStatsCounter() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const numberRefs = useRef<(HTMLSpanElement | null)[]>([])
   const glowRef = useRef<HTMLDivElement>(null)
   const isVisible = useIsVisible(containerRef)
   const cursor = useCursorPosition(containerRef)
   const [mounted, setMounted] = useState(false)
-  const hasAnimated = useRef(false)
   const rafId = useRef(0)
 
   useEffect(() => { setMounted(true) }, [])
-
-  // Count-up animation — fires once when first visible
-  useEffect(() => {
-    if (!mounted || !isVisible || hasAnimated.current) return
-    hasAnimated.current = true
-
-    const duration = 2000
-    const steps = 60
-    const interval = duration / steps
-    let step = 0
-
-    const timer = setInterval(() => {
-      step++
-      const progress = Math.min(step / steps, 1)
-      const eased = 1 - Math.pow(1 - progress, 3) // ease-out cubic
-
-      stats.forEach((stat, i) => {
-        const el = numberRefs.current[i]
-        if (!el) return
-        const val = stat.value * eased
-        el.textContent = (stat.decimal ? (Math.round(val * 10) / 10).toFixed(1) : Math.round(val).toString()) + stat.suffix
-      })
-
-      if (step >= steps) clearInterval(timer)
-    }, interval)
-
-    return () => clearInterval(timer)
-  }, [mounted, isVisible])
 
   // Cursor glow — lightweight RAF
   useEffect(() => {
@@ -593,7 +563,7 @@ export function BentoStatsCounter() {
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
         pointerEvents: "auto", zIndex: 5,
-        gap: 6, padding: 16,
+        gap: 6, padding: "16px 20px",
       }}
     >
       {/* Cursor glow */}
@@ -606,40 +576,41 @@ export function BentoStatsCounter() {
         }}
       />
 
-      {stats.map((stat, i) => (
+      {capabilities.map((cap, i) => (
         <div
           key={i}
           style={{
-            display: "flex", alignItems: "baseline",
-            justifyContent: "center", gap: 6,
-            width: "100%", padding: "8px 0",
-            borderBottom: i < stats.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            display: "flex", flexDirection: "column",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            width: "100%", padding: "10px 0",
+            borderBottom: i < capabilities.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
             position: "relative", zIndex: 1,
           }}
         >
           <span
-            ref={(el) => { numberRefs.current[i] = el }}
             style={{
-              fontSize: 28, fontWeight: 700,
-              color: "rgba(255,255,255,0.85)",
+              fontSize: 16, fontWeight: 600,
+              color: "rgba(255,255,255,0.9)",
               fontFamily: "'Geist', sans-serif",
-              letterSpacing: "-0.03em",
-              lineHeight: 1,
-              fontVariantNumeric: "tabular-nums", // prevents layout shift during counting
+              letterSpacing: "-0.01em",
+              lineHeight: 1.2,
             }}
           >
-            0{stat.suffix}
+            {cap.label}
           </span>
           <span
             style={{
               fontSize: 10,
-              color: "rgba(255,255,255,0.3)",
+              color: "rgba(255,255,255,0.35)",
               textTransform: "uppercase",
-              letterSpacing: "0.15em",
+              letterSpacing: "0.12em",
               fontWeight: 500,
+              fontFamily: "monospace",
+              marginTop: 3,
             }}
           >
-            {stat.label}
+            {cap.detail}
           </span>
         </div>
       ))}

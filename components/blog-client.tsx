@@ -28,7 +28,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.25, 0.1, 0.25, 1.0],
+      ease: [0.25, 0.1, 0.25, 1.0] as const,
     },
   },
 }
@@ -52,9 +52,14 @@ export function BlogClient({ posts }: BlogClientProps) {
               Thoughts on Design & Code
             </h3>
           </div>
-          <p className="text-gray-400 max-w-sm text-sm leading-relaxed">
-            Exploring the intersection of architectural discipline and creative digital craftsmanship.
-          </p>
+          <div className="max-w-md">
+            <p className="text-zinc-400 text-sm leading-relaxed mb-2">
+              Curated architectural insights on modern web development, performance, and interface design.
+            </p>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
+              Source: Smashing Magazine RSS & Selected Publications
+            </span>
+          </div>
         </div>
 
         {/* Blog Posts Grid with Framer Motion */}

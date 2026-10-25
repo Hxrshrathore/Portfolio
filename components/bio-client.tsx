@@ -95,11 +95,11 @@ export default function BioClient({ featuredProjects }: { featuredProjects: Proj
           <motion.h1 variants={itemVariants} className="text-3xl font-bold tracking-tighter mb-2 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
             Harsh Kumar
           </motion.h1>
-          <motion.p variants={itemVariants} className="text-sm font-light text-white/40 tracking-[0.2em] uppercase mb-4">
-            Creative Developer & UI/UX Designer
+          <motion.p variants={itemVariants} className="text-xs font-mono text-zinc-400 tracking-[0.2em] uppercase mb-4">
+            Product-Minded Software Engineer & Applied AI Builder
           </motion.p>
-          <motion.p variants={itemVariants} className="text-sm text-gray-400 font-light leading-relaxed max-w-[280px] mx-auto italic">
-            "Crafting high-end digital experiences at the intersection of design and code."
+          <motion.p variants={itemVariants} className="text-sm text-zinc-400 font-light leading-relaxed max-w-[320px] mx-auto">
+            Engineering full-stack products, AI integrations, and automated workflows from problem discovery to production.
           </motion.p>
         </motion.div>
 

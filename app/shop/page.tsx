@@ -43,7 +43,7 @@ export default function ShopPage() {
           >
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-md">
               <Sparkles size={12} className="text-white/60 animate-pulse" />
-              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white/50">Digital Marketplace</span>
+              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-amber-300/80">Component Lab • Demonstration Showcase</span>
             </div>
 
             <div className="flex flex-col items-center justify-center mb-16 px-4">
@@ -115,9 +115,9 @@ export default function ShopPage() {
         {/* Global Shop Stats / Info */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 max-w-5xl mx-auto">
           {[
-            { label: "CURATED ASSETS", value: "50+", icon: Package },
-            { label: "INSTANT ACCESSS", value: "FREE", icon: Sparkles },
-            { label: "PREMIUM SUPPORT", value: "24/7", icon: Sparkles },
+            { label: "CURATED ASSETS", value: "CLEAN", icon: Package },
+            { label: "INSTANT ACCESS", value: "DIRECT", icon: Sparkles },
+            { label: "ENGINEERING FOCUS", value: "MODULAR", icon: Sparkles },
           ].map((stat, i) => (
             <motion.div
               key={i}

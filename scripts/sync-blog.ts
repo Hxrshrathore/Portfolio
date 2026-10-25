@@ -52,7 +52,7 @@ async function syncBlog() {
     for (const item of feed.items) {
       const slug = getSlugFromLink(item.link || "")
       const title = item.title || "No Title"
-      const description = item.contentSnippet || item.description || ""
+      const description = item.contentSnippet || (item as any).description || ""
       const date = item.pubDate ? new Date(item.pubDate) : new Date()
       const author = (item as any).author || "Smashing Magazine"
       const image = item.enclosure?.url || ""

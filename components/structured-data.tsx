@@ -15,46 +15,30 @@ export default function StructuredData() {
       "https://twitter.com/hxrshrathore",
       "https://behance.net/hxrshrathore",
     ],
-    jobTitle: "Web Designer & Front-End Developer",
-    worksFor: {
-      "@type": "EducationalOrganization",
-      name: "KIIT University",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Bhubaneswar",
-        addressRegion: "Odisha",
-        addressCountry: "IN",
-      },
-    },
-    alumniOf: {
-      "@type": "EducationalOrganization",
-      name: "KIIT University",
-    },
+    jobTitle: "Product-Minded Software Engineer & Applied AI Builder",
     knowsAbout: [
-      "Web Design",
-      "UI/UX Design",
-      "Front-End Development",
-      "React",
+      "Software Engineering",
+      "Full-Stack Web Applications",
+      "Applied AI & LLM Integrations",
+      "API Integrations & Automation",
       "Next.js",
+      "React",
       "TypeScript",
-      "Python",
-      "Full Stack Development",
-      "Data Analysis",
-      "Graphic Design",
-      "WebGL",
-      "Three.js",
-      "Framer Motion",
+      "Python Data Pipelines",
+      "SQL & PostgreSQL",
+      "Interface Engineering",
+      "Design Systems",
     ],
     description:
-      "Award-winning web designer, UI/UX expert, and front-end developer at KIIT University. Specializing in innovative, user-centric digital experiences with expertise in React, Next.js, Python, and full stack development.",
+      "Product-Minded Software Engineer & Applied AI Builder. Engineering full-stack applications, LLM workflows, data extraction pipelines, and high-performance interfaces.",
   }
 
   const portfolioSchema = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     "@id": "https://hxrshrathore.vercel.app/#portfolio",
-    name: "Harsh Kumar Portfolio",
-    description: "Professional portfolio showcasing web design, UI/UX, and front-end development projects",
+    name: "Harsh Kumar Portfolio & Engineering Case Studies",
+    description: "Engineering case studies in full-stack applications, applied AI systems, workflow automation, and interface engineering",
     author: {
       "@type": "Person",
       name: "Harsh Kumar",
@@ -62,7 +46,7 @@ export default function StructuredData() {
     datePublished: "2024-01-01",
     dateModified: new Date().toISOString().split("T")[0],
     inLanguage: "en-US",
-    keywords: "web design, UI/UX, front-end development, React, Next.js, portfolio",
+    keywords: "software engineering, applied AI, full-stack, Next.js, TypeScript, data pipelines, portfolio",
   }
 
   const websiteSchema = {
@@ -71,24 +55,16 @@ export default function StructuredData() {
     name: "Harsh Kumar Portfolio",
     alternateName: "hxrshrathore Portfolio",
     url: "https://hxrshrathore.vercel.app",
-    description: "Professional portfolio of Harsh Kumar - Web Designer, UI/UX Expert, and Front-End Developer",
+    description: "Portfolio of Harsh Kumar — Product-Minded Software Engineer & Applied AI Builder",
     inLanguage: "en-US",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: "https://hxrshrathore.vercel.app/search?q={search_term_string}",
-      },
-      "query-input": "required name=search_term_string",
-    },
   }
 
   const professionalServiceSchema = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    name: "Harsh Kumar - Web Design & Development Services",
+    name: "Harsh Kumar - Engineering & Applied AI Solutions",
     description:
-      "Professional web design, UI/UX design, and front-end development services by KIIT student Harsh Kumar",
+      "Full-stack web application development, applied AI/LLM integrations, and workflow automation pipelines.",
     provider: {
       "@type": "Person",
       name: "Harsh Kumar",
@@ -98,14 +74,12 @@ export default function StructuredData() {
       name: "India",
     },
     availableLanguage: ["English", "Hindi"],
-    priceRange: "$$",
     serviceType: [
-      "Web Design",
-      "UI/UX Design",
-      "Front-End Development",
-      "Full Stack Development",
-      "Graphic Design",
-      "Portfolio Development",
+      "Full-Stack Web Applications",
+      "Applied AI & LLM Integrations",
+      "API Integrations & Workflow Automation",
+      "High-Performance Web Platforms",
+      "Product Interfaces & Design Systems",
     ],
   }
 
