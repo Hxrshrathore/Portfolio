@@ -8,6 +8,9 @@ interface MenuItemProps {
   text: string
   image?: string
   images?: string[]
+  index?: number
+  isActiveOnMobile?: boolean
+  onSelectMobile?: () => void
 }
 
 interface FlowingMenuProps {
@@ -15,27 +18,93 @@ interface FlowingMenuProps {
 }
 
 const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
+  const [activeIdx, setActiveIdx] = React.useState<number | null>(null)
+  const menuContainerRef = React.useRef<HTMLDivElement>(null)
+
+  // Mobile: ensure strictly ONE menu item is active at a time based on viewport center proximity
+  React.useEffect(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
+    if (!isMobile) return
+
+    const handleScroll = () => {
+      if (!menuContainerRef.current) return
+      const containerRect = menuContainerRef.current.getBoundingClientRect()
+      const vh = window.innerHeight || 800
+
+      // Out of view: deactivate all
+      if (containerRect.bottom < 0 || containerRect.top > vh) {
+        setActiveIdx(null)
+        return
+      }
+
+      const itemElements = Array.from(
+        menuContainerRef.current.querySelectorAll<HTMLElement>("[data-menu-item]")
+      )
+      if (!itemElements.length) return
+
+      const viewportCenter = vh / 2
+      let closestIdx = -1
+      let minDistance = Infinity
+
+      itemElements.forEach((el, idx) => {
+        const rect = el.getBoundingClientRect()
+        const itemCenter = rect.top + rect.height / 2
+        const dist = Math.abs(itemCenter - viewportCenter)
+        if (dist < minDistance) {
+          minDistance = dist
+          closestIdx = idx
+        }
+      })
+
+      // Only activate if the single closest item is within the focal focus band
+      if (closestIdx !== -1 && minDistance < vh * 0.25) {
+        setActiveIdx(closestIdx)
+      } else {
+        setActiveIdx(null)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [items.length])
+
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div ref={menuContainerRef} className="w-full h-full overflow-hidden">
       <nav className="flex flex-col h-full m-0 p-0">
         {items.map((item, idx) => (
-          <MenuItem key={idx} {...item} />
+          <MenuItem
+            key={idx}
+            index={idx}
+            isActiveOnMobile={activeIdx === idx}
+            onSelectMobile={() => setActiveIdx(idx)}
+            {...item}
+          />
         ))}
       </nav>
     </div>
   )
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
+const MenuItem: React.FC<MenuItemProps> = ({
+  link,
+  text,
+  image,
+  images,
+  isActiveOnMobile = false,
+  onSelectMobile,
+}) => {
   const itemRef = React.useRef<HTMLDivElement>(null)
   const marqueeRef = React.useRef<HTMLDivElement>(null)
   const marqueeInnerRef = React.useRef<HTMLDivElement>(null)
   const animationTlRef = React.useRef<gsap.core.Timeline | null>(null)
+  const isCurrentlyActiveRef = React.useRef(false)
 
-  const animationDefaults = { duration: 0.6, ease: "expo" }
+  const animationDefaults = { duration: 0.5, ease: "expo" }
 
-  const animateIn = (edge: "top" | "bottom") => {
+  const animateIn = (edge: "top" | "bottom" = "bottom") => {
     if (!marqueeRef.current || !marqueeInnerRef.current) return
+    isCurrentlyActiveRef.current = true
     animationTlRef.current?.kill()
     animationTlRef.current = gsap.timeline({ defaults: animationDefaults })
     animationTlRef.current
@@ -44,8 +113,9 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
       .to([marqueeRef.current, marqueeInnerRef.current], { y: "0%" })
   }
 
-  const animateOut = (edge: "top" | "bottom") => {
+  const animateOut = (edge: "top" | "bottom" = "top") => {
     if (!marqueeRef.current || !marqueeInnerRef.current) return
+    isCurrentlyActiveRef.current = false
     animationTlRef.current?.kill()
     animationTlRef.current = gsap.timeline({ defaults: animationDefaults })
     animationTlRef.current
@@ -75,6 +145,28 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
     animateOut(edge)
   }
 
+  // Handle single-active highlight on mobile
+  React.useEffect(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
+    if (!isMobile) return
+
+    if (isActiveOnMobile) {
+      if (!isCurrentlyActiveRef.current) {
+        animateIn("bottom")
+      }
+    } else {
+      if (isCurrentlyActiveRef.current) {
+        animateOut("top")
+      }
+    }
+  }, [isActiveOnMobile])
+
+  React.useEffect(() => {
+    return () => {
+      animationTlRef.current?.kill()
+    }
+  }, [])
+
   const imageList = React.useMemo(() => {
     if (images && images.length > 0) return images
     if (image) return [image]
@@ -86,7 +178,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
       const currentImage = imageList.length > 0 ? imageList[idx % imageList.length] : ""
       return (
         <React.Fragment key={idx}>
-          <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap self-center">
+          <span className="text-[#060010] uppercase font-normal text-xs sm:text-base md:text-xl lg:text-2xl xl:text-3xl leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap self-center tracking-tight">
             {text}
           </span>
           <div
@@ -98,47 +190,21 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
     })
   }, [text, imageList])
 
-  React.useEffect(() => {
-    const isMobile = window.innerWidth <= 768
-    let observer: IntersectionObserver | null = null
-
-    if (isMobile && itemRef.current) {
-      // Intersection Observer logic for mobile midway trigger
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              animateIn("bottom")
-            } else {
-              animateOut("top")
-            }
-          })
-        },
-        {
-          // Root margin defines the active zone in the center of the viewport
-          rootMargin: "-42% 0% -42% 0%",
-          threshold: 0,
-        }
-      )
-
-      observer.observe(itemRef.current)
-    }
-
-    return () => {
-      animationTlRef.current?.kill()
-      if (observer) observer.disconnect()
-    }
-  }, [])
-
   return (
     <div
+      data-menu-item="true"
       className="flex-1 relative overflow-hidden text-center shadow-[0_-1px_0_0_#fff]"
       ref={itemRef}
       style={{ willChange: "transform" }}
     >
       <a
-        className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-white text-[4vh] hover:text-[#060010] focus:text-white focus-visible:text-[#060010]"
+        className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-white text-xs sm:text-base md:text-xl lg:text-2xl xl:text-3xl whitespace-nowrap px-3 sm:px-4 hover:text-[#060010] focus:text-white focus-visible:text-[#060010] tracking-tight"
         href={link}
+        onClick={(e) => {
+          if (typeof window !== "undefined" && window.innerWidth <= 768) {
+            onSelectMobile?.()
+          }
+        }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         data-no-cursor="true"
