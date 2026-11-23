@@ -225,21 +225,20 @@ export default function Preloader({ children }: PreloaderProps) {
         )}
       </AnimatePresence>
 
-      {/* Content wrapper with smoother reveal */}
-      <main
+      {/* Content wrapper with clean reveal (no transform/willChange so sticky/fixed positioning on iOS never breaks) */}
+      <div
+        className="w-full flex-grow flex flex-col"
         style={
           phase === "done" 
-            ? {} // Remove transform and will-change to prevent breaking position:fixed children
+            ? undefined
             : {
                 opacity: showChildren ? 1 : 0,
-                transform: showChildren ? "none" : "translateY(20px)",
-                transition: "opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
-                willChange: "opacity, transform"
+                transition: "opacity 0.4s ease-out",
               }
         }
       >
         {children}
-      </main>
+      </div>
     </>
   )
 }

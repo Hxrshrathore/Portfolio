@@ -268,7 +268,7 @@ export default function FeaturedCaseStudies() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[140px] pointer-events-none rounded-full" />
 
       {/* Sticky Full Viewport Frame with optical padding */}
-      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden px-4 md:px-8 pt-14 sm:pt-20 md:pt-36 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-16">
+      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden bg-black px-4 md:px-8 pt-14 sm:pt-20 md:pt-36 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-16">
         <div className="max-w-6xl mx-auto w-full flex flex-col justify-between h-full">
           {/* Section Header: Title and subtext aligned to top with optical correction */}
           <div className="flex flex-col md:flex-row md:items-start justify-between mb-2 sm:mb-4 md:mb-10 gap-2 sm:gap-4 md:gap-6 shrink-0 relative z-20">

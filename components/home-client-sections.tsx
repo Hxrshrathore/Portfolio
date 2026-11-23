@@ -13,7 +13,7 @@ interface ProximityWrapperProps {
 function ProximityWrapper({
   children,
   fallback,
-  rootMargin = "800px 0px",
+  rootMargin = "1200px 0px",
   className = "w-full",
 }: ProximityWrapperProps) {
   const [shouldMount, setShouldMount] = useState(false)
@@ -31,11 +31,14 @@ function ProximityWrapper({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Build and warm the section in background on idle thread before user arrives
-          if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(() => setShouldMount(true), { timeout: 1200 })
+          // Immediately mount on touch/mobile to prevent stalling while scrolling on Safari
+          const isTouch = "ontouchstart" in window || (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0)
+          if (isTouch) {
+            setShouldMount(true)
+          } else if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(() => setShouldMount(true), { timeout: 600 })
           } else {
-            setTimeout(() => setShouldMount(true), 40)
+            setTimeout(() => setShouldMount(true), 20)
           }
           observer.disconnect()
         }

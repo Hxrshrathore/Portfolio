@@ -47,6 +47,7 @@ export default function HeroPortfolioTransition({
   const { lenis } = useScroll()
   const gateRef = useRef<HTMLDivElement>(null)
   const portfolioRef = useRef<HTMLDivElement>(null)
+  const heroStickyRef = useRef<HTMLDivElement>(null)
   const isSnappingRef = useRef(false)
   const [isSnapping, setIsSnapping] = useState(false)
   const [isHeroCovered, setIsHeroCovered] = useState(false)
@@ -276,8 +277,14 @@ export default function HeroPortfolioTransition({
         updateBrowserTheme(isBelowHero)
       }
 
-      // Hide hero when wholly covered by black portfolio to stop Safari top bar sampling white
-      const isCovered = scrollY >= targetY - 10
+      // Synchronously hide hero as soon as black portfolio begins covering it (vh * 0.92)
+      // to prevent any frozen hero background from bleeding through transparent/sticky sections on iOS Safari
+      const isCovered = scrollY >= (vh * 0.92)
+      if (heroStickyRef.current) {
+        heroStickyRef.current.style.visibility = isCovered ? "hidden" : "visible"
+        heroStickyRef.current.style.pointerEvents = isCovered ? "none" : "auto"
+        heroStickyRef.current.style.opacity = isCovered ? "0" : "1"
+      }
       setIsHeroCovered((prev) => (prev === isCovered ? prev : isCovered))
 
       // Update rubber band stretch 1:1 in real time with user's scroll
@@ -495,10 +502,13 @@ export default function HeroPortfolioTransition({
     <div className="relative w-full bg-black">
       {/* ── 1. Sticky Hero Viewport (White background) ── */}
       <div 
+        ref={heroStickyRef}
         className="sticky top-0 h-screen h-[100dvh] min-h-[100dvh] w-full z-0 overflow-hidden bg-white"
         style={{
           visibility: isHeroCovered ? "hidden" : "visible",
           pointerEvents: isHeroCovered ? "none" : "auto",
+          opacity: isHeroCovered ? 0 : 1,
+          transition: "opacity 0.2s ease-out",
         }}
       >
         {hero}

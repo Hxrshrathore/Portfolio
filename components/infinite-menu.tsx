@@ -1318,7 +1318,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full bg-black">
       <canvas
         id="infinite-grid-menu-canvas"
         ref={canvasRef}

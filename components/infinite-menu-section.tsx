@@ -722,7 +722,7 @@ export default function InfiniteMenuSection() {
           {/* ─── CENTER COLUMN: Globe + Arrows ─── */}
           <div className="flex flex-col items-center h-full justify-center">
             {/* Globe */}
-            <div className="h-[340px] sm:h-[380px] md:h-[400px] w-full relative">
+            <div className="h-[340px] sm:h-[380px] md:h-[400px] w-full relative bg-black">
               <InfiniteMenu
                 items={portfolioItems}
                 onNavigate={handleNavigate}
