@@ -74,7 +74,7 @@ export function CaseStudyCharts({ metrics }: { metrics: Metric[] }) {
           {/* Chart Rendering */}
           <div className="flex-1 w-full min-h-[200px]">
             {metric.type === 'radar' && metric.data ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={metric.data}>
                   <PolarGrid stroke="#ffffff10" />
                   <PolarAngleAxis dataKey="name" tick={{ fill: "#ffffff40", fontSize: 10 }} />
@@ -89,7 +89,7 @@ export function CaseStudyCharts({ metrics }: { metrics: Metric[] }) {
                 </RadarChart>
               </ResponsiveContainer>
             ) : metric.type === 'bar' && metric.data ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={metric.data}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
                   <XAxis 
@@ -108,7 +108,7 @@ export function CaseStudyCharts({ metrics }: { metrics: Metric[] }) {
                 </BarChart>
               </ResponsiveContainer>
             ) : metric.data ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <AreaChart data={metric.data}>
                   <defs>
                     <linearGradient id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">

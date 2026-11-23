@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import {
   AreaChart,
   Area,
@@ -56,6 +56,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function BentoPerformanceChart() {
   const [data, setData] = useState<typeof fullData>([])
   const [mounted, setMounted] = useState(false)
+  const [hasDimensions, setHasDimensions] = useState(false)
+  const chartWrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -68,6 +70,21 @@ export default function BentoPerformanceChart() {
       timers.push(timer)
     })
     return () => timers.forEach(clearTimeout)
+  }, [])
+
+  useEffect(() => {
+    const el = chartWrapperRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      if (width > 0 && height > 0) {
+        setHasDimensions(true)
+      } else {
+        setHasDimensions(false)
+      }
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   if (!mounted) return null
@@ -120,59 +137,63 @@ export default function BentoPerformanceChart() {
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width="100%" height="75%">
-        <AreaChart
-          data={data}
-          margin={{ top: 5, right: 8, left: -25, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="perfAfter" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity={0.02} />
-            </linearGradient>
-            <linearGradient id="perfBefore" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#666666" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#666666" stopOpacity={0.01} />
-            </linearGradient>
-          </defs>
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 9, fill: "rgba(255,255,255,0.25)" }}
-          />
-          <YAxis
-            domain={[40, 100]}
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 9, fill: "rgba(255,255,255,0.2)" }}
-          />
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ stroke: "rgba(255,255,255,0.1)" }}
-          />
-          <Area
-            type="monotone"
-            dataKey="before"
-            stroke="#555555"
-            strokeWidth={1.5}
-            fill="url(#perfBefore)"
-            dot={false}
-            animationDuration={1200}
-            animationEasing="ease-in-out"
-          />
-          <Area
-            type="monotone"
-            dataKey="after"
-            stroke="#ffffff"
-            strokeWidth={2}
-            fill="url(#perfAfter)"
-            dot={false}
-            animationDuration={1500}
-            animationEasing="ease-in-out"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      <div ref={chartWrapperRef} className="flex-1 w-full min-h-[90px] relative">
+        {hasDimensions && (
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+            <AreaChart
+              data={data}
+              margin={{ top: 5, right: 8, left: -25, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="perfAfter" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="perfBefore" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#666666" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#666666" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 9, fill: "rgba(255,255,255,0.25)" }}
+              />
+              <YAxis
+                domain={[40, 100]}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 9, fill: "rgba(255,255,255,0.2)" }}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: "rgba(255,255,255,0.1)" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="before"
+                stroke="#555555"
+                strokeWidth={1.5}
+                fill="url(#perfBefore)"
+                dot={false}
+                animationDuration={1200}
+                animationEasing="ease-in-out"
+              />
+              <Area
+                type="monotone"
+                dataKey="after"
+                stroke="#ffffff"
+                strokeWidth={2}
+                fill="url(#perfAfter)"
+                dot={false}
+                animationDuration={1500}
+                animationEasing="ease-in-out"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
 
       {/* Legend */}
       <div

@@ -311,6 +311,23 @@ function TiltGlassCard({
 // Project Architecture & Engineering Telemetry Graph (Animated Recharts Area Chart)
 function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
   const telemetry = getProjectTelemetry(item)
+  const [hasDimensions, setHasDimensions] = useState(false)
+  const chartWrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = chartWrapperRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      if (width > 0 && height > 0) {
+        setHasDimensions(true)
+      } else {
+        setHasDimensions(false)
+      }
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   return (
     <TiltGlassCard className="w-full">
@@ -325,40 +342,42 @@ function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
       >
         <div className="w-full p-2.5 sm:p-3 text-left">
           {/* Animated Recharts Area Chart with Key Trigger on Project Change */}
-          <div className="w-full h-[120px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={telemetry} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
-                <defs>
-                  <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
-                    <stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="subject"
-                  stroke="rgba(255,255,255,0.4)"
-                  fontSize={9}
-                  tickLine={false}
-                  axisLine={false}
-                  interval={0}
-                />
-                <YAxis domain={[85, 100]} hide={true} />
-                <Tooltip content={<TelemetryTooltip />} cursor={{ stroke: "rgba(255,255,255,0.2)", strokeDasharray: "2 2" }} />
-                <Area
-                  key={item.title}
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#34d399"
-                  strokeWidth={1.8}
-                  fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
-                  isAnimationActive={true}
-                  animationDuration={450}
-                  animationEasing="ease-out"
-                  activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div ref={chartWrapperRef} className="w-full h-[120px] relative">
+            {hasDimensions && (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <AreaChart data={telemetry} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
+                      <stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="subject"
+                    stroke="rgba(255,255,255,0.4)"
+                    fontSize={9}
+                    tickLine={false}
+                    axisLine={false}
+                    interval={0}
+                  />
+                  <YAxis domain={[85, 100]} hide={true} />
+                  <Tooltip content={<TelemetryTooltip />} cursor={{ stroke: "rgba(255,255,255,0.2)", strokeDasharray: "2 2" }} />
+                  <Area
+                    key={item.title}
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#34d399"
+                    strokeWidth={1.8}
+                    fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
+                    isAnimationActive={true}
+                    animationDuration={450}
+                    animationEasing="ease-out"
+                    activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </GlassSurface>
