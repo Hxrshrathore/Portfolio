@@ -353,7 +353,7 @@ function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
                   strokeWidth={1.8}
                   fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
                   isAnimationActive={true}
-                  animationDuration={850}
+                  animationDuration={450}
                   animationEasing="ease-out"
                   activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
                 />
@@ -402,111 +402,103 @@ function ProjectScopeCard({ item }: { item: PortfolioItem }) {
   )
 }
 
-// ─── Dial Curvature Animation Variants (matching the OptionWheel edge-curve kinematics) ───
-// Left Column: Sweeps along the cylindrical arc from/to the outer left edge
-const leftDialVariants = {
+// ─── 3D Constellation Optical Sync Variants ───
+// Perfectly synchronized to the 3D sphere's 30-frame (500ms) camera zoom & slerp kinematics
+const leftCardSyncVariants = {
   enter: (dir: number) => ({
     opacity: 0,
-    x: -65,
-    y: dir >= 0 ? 45 : -45,
-    rotateZ: dir >= 0 ? -5 : 5,
-    rotateY: 14,
-    scale: 0.94,
+    scale: 0.92,
+    y: dir >= 0 ? 24 : -24,
+    x: -16,
+    rotateY: 8,
     filter: "blur(8px)",
   }),
   center: {
     opacity: 1,
-    x: 0,
-    y: 0,
-    rotateZ: 0,
-    rotateY: 0,
     scale: 1,
+    y: 0,
+    x: 0,
+    rotateY: 0,
     filter: "blur(0px)",
     transition: {
-      duration: 0.42,
+      duration: 0.30,
       ease: [0.16, 1, 0.3, 1] as const,
     },
   },
   exit: (dir: number) => ({
     opacity: 0,
-    x: -65,
-    y: dir >= 0 ? -45 : 45,
-    rotateZ: dir >= 0 ? 5 : -5,
-    rotateY: -14,
-    scale: 0.94,
+    scale: 0.92,
+    y: dir >= 0 ? -24 : 24,
+    x: -16,
+    rotateY: -8,
     filter: "blur(8px)",
     transition: {
-      duration: 0.26,
-      ease: [0.25, 0.1, 0.25, 1.0] as const,
+      duration: 0.20,
+      ease: [0.32, 0, 0.67, 0] as const,
     },
   }),
 }
 
-// Right Column: Sweeps along the cylindrical arc from/to the outer right edge
-const rightDialVariants = {
+const rightCardSyncVariants = {
   enter: (dir: number) => ({
     opacity: 0,
-    x: 65,
-    y: dir >= 0 ? 45 : -45,
-    rotateZ: dir >= 0 ? 5 : -5,
-    rotateY: -14,
-    scale: 0.94,
+    scale: 0.92,
+    y: dir >= 0 ? 24 : -24,
+    x: 16,
+    rotateY: -8,
     filter: "blur(8px)",
   }),
   center: {
     opacity: 1,
-    x: 0,
-    y: 0,
-    rotateZ: 0,
-    rotateY: 0,
     scale: 1,
+    y: 0,
+    x: 0,
+    rotateY: 0,
     filter: "blur(0px)",
     transition: {
-      duration: 0.42,
+      duration: 0.30,
       ease: [0.16, 1, 0.3, 1] as const,
     },
   },
   exit: (dir: number) => ({
     opacity: 0,
-    x: 65,
-    y: dir >= 0 ? -45 : 45,
-    rotateZ: dir >= 0 ? -5 : 5,
-    rotateY: 14,
-    scale: 0.94,
+    scale: 0.92,
+    y: dir >= 0 ? -24 : 24,
+    x: 16,
+    rotateY: 8,
     filter: "blur(8px)",
     transition: {
-      duration: 0.26,
-      ease: [0.25, 0.1, 0.25, 1.0] as const,
+      duration: 0.20,
+      ease: [0.32, 0, 0.67, 0] as const,
     },
   }),
 }
 
-// Mobile Column: Dial vertical curve
-const mobileDialVariants = {
+const mobileCardSyncVariants = {
   enter: (dir: number) => ({
     opacity: 0,
-    y: dir >= 0 ? 35 : -35,
-    scale: 0.95,
+    scale: 0.94,
+    y: dir >= 0 ? 20 : -20,
     filter: "blur(6px)",
   }),
   center: {
     opacity: 1,
-    y: 0,
     scale: 1,
+    y: 0,
     filter: "blur(0px)",
     transition: {
-      duration: 0.38,
+      duration: 0.28,
       ease: [0.16, 1, 0.3, 1] as const,
     },
   },
   exit: (dir: number) => ({
     opacity: 0,
-    y: dir >= 0 ? -35 : 35,
-    scale: 0.95,
+    scale: 0.94,
+    y: dir >= 0 ? -20 : 20,
     filter: "blur(6px)",
     transition: {
-      duration: 0.22,
-      ease: [0.25, 0.1, 0.25, 1.0] as const,
+      duration: 0.18,
+      ease: [0.32, 0, 0.67, 0] as const,
     },
   }),
 }
@@ -536,6 +528,7 @@ export default function InfiniteMenuSection() {
       return diff > count / 2 ? -1 : 1
     })
     setActiveIndex(index)
+    setDisplayIndex(index)
   }, [])
 
   const handleMovementChange = useCallback((moving: boolean) => {
@@ -544,27 +537,31 @@ export default function InfiniteMenuSection() {
 
   const handleNavigate = useCallback(
     (dir: "prev" | "next") => {
-      setDirection(dir === "next" ? 1 : -1)
       if (!canNavigate) return
       setCanNavigate(false)
+      const nextDir = dir === "next" ? 1 : -1
+      setDirection(nextDir)
 
       const win = window as any
+      let targetIdx = -1
       if (typeof win.__infiniteMenuNavigate === "function") {
-        win.__infiniteMenuNavigate(dir)
+        targetIdx = win.__infiniteMenuNavigate(dir)
       } else if (navigateRef.current) {
         navigateRef.current(dir)
       }
 
-      setTimeout(() => setCanNavigate(true), 350)
-    },
-    [canNavigate]
-  )
+      const nextIndex =
+        typeof targetIdx === "number" && targetIdx >= 0
+          ? targetIdx
+          : (displayIndex + nextDir + portfolioItems.length) % portfolioItems.length
 
-  useEffect(() => {
-    if (!isGlobeMoving) {
-      setDisplayIndex(activeIndexRef.current)
-    }
-  }, [isGlobeMoving, activeIndex])
+      setActiveIndex(nextIndex)
+      setDisplayIndex(nextIndex)
+
+      setTimeout(() => setCanNavigate(true), 450)
+    },
+    [canNavigate, displayIndex]
+  )
 
   // Intersection Observer to detect when section is visible in viewport
   useEffect(() => {
@@ -625,7 +622,7 @@ export default function InfiniteMenuSection() {
               <motion.div
                 key={`left-${displayIndex}`}
                 custom={direction}
-                variants={leftDialVariants}
+                variants={leftCardSyncVariants}
                 initial="enter"
                 animate="center"
                 exit="exit"
@@ -802,7 +799,7 @@ export default function InfiniteMenuSection() {
               <motion.div
                 key={`right-${displayIndex}`}
                 custom={direction}
-                variants={rightDialVariants}
+                variants={rightCardSyncVariants}
                 initial="enter"
                 animate="center"
                 exit="exit"
@@ -856,7 +853,7 @@ export default function InfiniteMenuSection() {
             <motion.div
               key={`mobile-${displayIndex}`}
               custom={direction}
-              variants={mobileDialVariants}
+              variants={mobileCardSyncVariants}
               initial="enter"
               animate="center"
               exit="exit"

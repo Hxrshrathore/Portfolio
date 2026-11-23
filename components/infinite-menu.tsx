@@ -1061,8 +1061,8 @@ class InfiniteGridMenu {
   private navTargetOrientation = quat.create()
   public navCameraZoom = 0  // 0 = resting, 1 = fully zoomed out
 
-  public navigate(direction: "prev" | "next"): void {
-    if (this.navigating) return
+  public navigate(direction: "prev" | "next"): number {
+    if (this.navigating) return -1
 
     const currentIndex = this.findNearestVertexIndex()
     const step = direction === "next" ? 1 : -1
@@ -1086,7 +1086,7 @@ class InfiniteGridMenu {
     if (vec3.length(axis) < 0.0001) {
       if (dot > 0) {
         // Already aligned, nothing to do
-        return
+        return targetIndex % Math.max(1, this.items.length)
       }
       // Opposite direction — pick arbitrary perpendicular axis
       axis = vec3.fromValues(0, 1, 0)
@@ -1106,6 +1106,8 @@ class InfiniteGridMenu {
     this.navigating = true
     this.navProgress = 0
     this.navTotalFrames = 30
+
+    return targetIndex % Math.max(1, this.items.length)
   }
 
   private updateNavigation(): void {
@@ -1139,6 +1141,9 @@ class InfiniteGridMenu {
 
       // Reset pointer rotation so snapping can take over cleanly
       quat.identity(this.control.pointerRotation)
+
+      const finalIndex = this.findNearestVertexIndex() % Math.max(1, this.items.length)
+      this.onActiveItemChange(finalIndex)
     }
   }
 }
