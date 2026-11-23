@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, CheckCircle2, Code2, Activity, Zap, Layers }
 import GlassSurface from "@/components/GlassSurface"
 import TransitionLink from "@/components/transition-link"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts"
+import { gsap } from "gsap"
 
 interface PortfolioItem {
   image: string
@@ -226,93 +227,178 @@ function TelemetryTooltip({ active, payload }: any) {
   return null
 }
 
+// 3D Axis Tilt & Bending Wrapper (matching the Engineering Approach / Magic Bento physics)
+function TiltGlassCard({
+  children,
+  className = "",
+  maxTilt = 10,
+}: {
+  children: React.ReactNode
+  className?: string
+  maxTilt?: number
+}) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const quickToRotateX = useRef<gsap.QuickToFunc | null>(null)
+  const quickToRotateY = useRef<gsap.QuickToFunc | null>(null)
+
+  useEffect(() => {
+    const element = cardRef.current
+    if (!element) return
+
+    gsap.set(element, {
+      transformPerspective: 1000,
+      transformStyle: "preserve-3d",
+    })
+
+    const handleMouseEnter = () => {
+      quickToRotateX.current ??= gsap.quickTo(element, "rotationX", {
+        duration: 0.15,
+        ease: "power2.out",
+      })
+      quickToRotateY.current ??= gsap.quickTo(element, "rotationY", {
+        duration: 0.15,
+        ease: "power2.out",
+      })
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = element.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      const centerX = rect.width / 2
+      const centerY = rect.height / 2
+
+      const rotateX = ((y - centerY) / centerY) * -maxTilt
+      const rotateY = ((x - centerX) / centerX) * maxTilt
+
+      quickToRotateX.current?.(rotateX)
+      quickToRotateY.current?.(rotateY)
+    }
+
+    const handleMouseLeave = () => {
+      gsap.to(element, {
+        rotationX: 0,
+        rotationY: 0,
+        duration: 0.35,
+        ease: "power2.out",
+      })
+    }
+
+    element.addEventListener("mouseenter", handleMouseEnter)
+    element.addEventListener("mousemove", handleMouseMove)
+    element.addEventListener("mouseleave", handleMouseLeave)
+
+    return () => {
+      element.removeEventListener("mouseenter", handleMouseEnter)
+      element.removeEventListener("mousemove", handleMouseMove)
+      element.removeEventListener("mouseleave", handleMouseLeave)
+      quickToRotateX.current = null
+      quickToRotateY.current = null
+    }
+  }, [maxTilt])
+
+  return (
+    <div
+      ref={cardRef}
+      className={`will-change-transform ${className}`}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </div>
+  )
+}
+
 // Project Architecture & Engineering Telemetry Graph (Animated Recharts Area Chart)
 function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
   const telemetry = getProjectTelemetry(item)
 
   return (
-    <GlassSurface
-      width="100%"
-      height="auto"
-      borderRadius={16}
-      distortionScale={-180}
-      displace={0.5}
-      backgroundOpacity={0.08}
-      className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
-    >
-      <div className="w-full p-2.5 sm:p-3 text-left">
-        {/* Animated Recharts Area Chart with Key Trigger on Project Change */}
-        <div className="w-full h-[120px] relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={telemetry} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
-              <defs>
-                <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
-                  <stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="subject"
-                stroke="rgba(255,255,255,0.4)"
-                fontSize={9}
-                tickLine={false}
-                axisLine={false}
-                interval={0}
-              />
-              <YAxis domain={[85, 100]} hide={true} />
-              <Tooltip content={<TelemetryTooltip />} cursor={{ stroke: "rgba(255,255,255,0.2)", strokeDasharray: "2 2" }} />
-              <Area
-                key={item.title}
-                type="monotone"
-                dataKey="score"
-                stroke="#34d399"
-                strokeWidth={1.8}
-                fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
-                isAnimationActive={true}
-                animationDuration={850}
-                animationEasing="ease-out"
-                activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+    <TiltGlassCard className="w-full">
+      <GlassSurface
+        width="100%"
+        height="auto"
+        borderRadius={16}
+        distortionScale={-180}
+        displace={0.5}
+        backgroundOpacity={0.08}
+        className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+      >
+        <div className="w-full p-2.5 sm:p-3 text-left">
+          {/* Animated Recharts Area Chart with Key Trigger on Project Change */}
+          <div className="w-full h-[120px] relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={telemetry} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
+                <defs>
+                  <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
+                    <stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="subject"
+                  stroke="rgba(255,255,255,0.4)"
+                  fontSize={9}
+                  tickLine={false}
+                  axisLine={false}
+                  interval={0}
+                />
+                <YAxis domain={[85, 100]} hide={true} />
+                <Tooltip content={<TelemetryTooltip />} cursor={{ stroke: "rgba(255,255,255,0.2)", strokeDasharray: "2 2" }} />
+                <Area
+                  key={item.title}
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#34d399"
+                  strokeWidth={1.8}
+                  fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
+                  isAnimationActive={true}
+                  animationDuration={850}
+                  animationEasing="ease-out"
+                  activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
-    </GlassSurface>
+      </GlassSurface>
+    </TiltGlassCard>
   )
 }
 
 // Tech Stack & Software Scope Card (Right Column)
 function ProjectScopeCard({ item }: { item: PortfolioItem }) {
   return (
-    <GlassSurface
-      width="100%"
-      height="auto"
-      borderRadius={14}
-      distortionScale={-180}
-      displace={0.5}
-      backgroundOpacity={0.08}
-      className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
-    >
-      <div className="w-full p-3 text-left">
-        {/* Primary Tech Stack Software Tags */}
-        <div className="space-y-2">
-          <span className="text-gray-400 text-xs leading-relaxed block font-light">
-            Software & Tech Stack
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {item.stack.map((tech, idx) => (
-              <span
-                key={idx}
-                className="text-xs text-gray-300 leading-relaxed px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/10 hover:border-emerald-400/40 hover:text-white transition-colors"
-              >
-                {tech}
-              </span>
-            ))}
+    <TiltGlassCard className="w-full">
+      <GlassSurface
+        width="100%"
+        height="auto"
+        borderRadius={14}
+        distortionScale={-180}
+        displace={0.5}
+        backgroundOpacity={0.08}
+        className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+      >
+        <div className="w-full p-3 text-left">
+          {/* Primary Tech Stack Software Tags */}
+          <div className="space-y-2">
+            <span className="text-gray-400 text-xs leading-relaxed block font-light">
+              Software & Tech Stack
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {item.stack.map((tech, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs text-gray-300 leading-relaxed px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/10 hover:border-emerald-400/40 hover:text-white transition-colors"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </GlassSurface>
+      </GlassSurface>
+    </TiltGlassCard>
   )
 }
 
@@ -474,19 +560,21 @@ export default function InfiniteMenuSection() {
 
                 {activeItem.link.startsWith("/") ? (
                   <TransitionLink href={activeItem.link} className="w-full block group">
-                    <GlassSurface
-                      width="100%"
-                      height={40}
-                      borderRadius={10}
-                      distortionScale={-180}
-                      displace={0.4}
-                      backgroundOpacity={0.12}
-                      className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
-                    >
-                      <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
-                        View Case Study →
-                      </span>
-                    </GlassSurface>
+                    <TiltGlassCard className="w-full" maxTilt={8}>
+                      <GlassSurface
+                        width="100%"
+                        height={40}
+                        borderRadius={10}
+                        distortionScale={-180}
+                        displace={0.4}
+                        backgroundOpacity={0.12}
+                        className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
+                      >
+                        <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                          View Case Study →
+                        </span>
+                      </GlassSurface>
+                    </TiltGlassCard>
                   </TransitionLink>
                 ) : (
                   <a
@@ -495,19 +583,21 @@ export default function InfiniteMenuSection() {
                     rel="noopener noreferrer"
                     className="w-full block group"
                   >
-                    <GlassSurface
-                      width="100%"
-                      height={40}
-                      borderRadius={10}
-                      distortionScale={-180}
-                      displace={0.4}
-                      backgroundOpacity={0.12}
-                      className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
-                    >
-                      <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
-                        View Project →
-                      </span>
-                    </GlassSurface>
+                    <TiltGlassCard className="w-full" maxTilt={8}>
+                      <GlassSurface
+                        width="100%"
+                        height={40}
+                        borderRadius={10}
+                        distortionScale={-180}
+                        displace={0.4}
+                        backgroundOpacity={0.12}
+                        className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
+                      >
+                        <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                          View Project →
+                        </span>
+                      </GlassSurface>
+                    </TiltGlassCard>
                   </a>
                 )}
               </motion.div>
@@ -615,36 +705,38 @@ export default function InfiniteMenuSection() {
                 className="flex flex-col gap-3 w-full"
               >
                 {/* Project Context Card */}
-                <GlassSurface
-                  width="100%"
-                  height="auto"
-                  borderRadius={14}
-                  distortionScale={-180}
-                  displace={0.5}
-                  backgroundOpacity={0.08}
-                  className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
-                >
-                  <div className="w-full p-2.5 sm:p-3 text-left">
-                    <p className="text-gray-300 text-xs leading-relaxed mb-3">
-                      {activeItem.overview}
-                    </p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-                      <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center shrink-0">
-                        <img
-                          src={activeItem.logo}
-                          alt={activeItem.title}
-                          className="w-5 h-5 object-contain"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-white text-xs font-semibold">
-                          {activeItem.organization}
-                        </p>
-                        <p className="text-white/30 text-[10px]">Client / Organization</p>
+                <TiltGlassCard className="w-full">
+                  <GlassSurface
+                    width="100%"
+                    height="auto"
+                    borderRadius={14}
+                    distortionScale={-180}
+                    displace={0.5}
+                    backgroundOpacity={0.08}
+                    className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+                  >
+                    <div className="w-full p-2.5 sm:p-3 text-left">
+                      <p className="text-gray-300 text-xs leading-relaxed mb-3">
+                        {activeItem.overview}
+                      </p>
+                      <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+                        <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center shrink-0">
+                          <img
+                            src={activeItem.logo}
+                            alt={activeItem.title}
+                            className="w-5 h-5 object-contain"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-white text-xs font-semibold">
+                            {activeItem.organization}
+                          </p>
+                          <p className="text-white/30 text-[10px]">Client / Organization</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </GlassSurface>
+                  </GlassSurface>
+                </TiltGlassCard>
 
                 {/* Tech Stack & Software Scope Card */}
                 <ProjectScopeCard item={activeItem} />
@@ -694,42 +786,46 @@ export default function InfiniteMenuSection() {
               <ProjectScopeCard item={activeItem} />
 
               {/* Context (Mobile) */}
-              <GlassSurface
-                width="100%"
-                height="auto"
-                borderRadius={14}
-                distortionScale={-180}
-                displace={0.5}
-                backgroundOpacity={0.08}
-                className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
-              >
-                <div className="w-full p-4 text-left">
-                  <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                    {activeItem.overview}
-                  </p>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-white/60 text-xs font-light">{activeItem.organization}</span>
+              <TiltGlassCard className="w-full">
+                <GlassSurface
+                  width="100%"
+                  height="auto"
+                  borderRadius={14}
+                  distortionScale={-180}
+                  displace={0.5}
+                  backgroundOpacity={0.08}
+                  className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+                >
+                  <div className="w-full p-4 text-left">
+                    <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                      {activeItem.overview}
+                    </p>
+                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="text-white/60 text-xs font-light">{activeItem.organization}</span>
+                    </div>
                   </div>
-                </div>
-              </GlassSurface>
+                </GlassSurface>
+              </TiltGlassCard>
 
               {/* CTA */}
               {activeItem.link.startsWith("/") ? (
                 <TransitionLink href={activeItem.link} className="block w-full group">
-                  <GlassSurface
-                    width="100%"
-                    height={46}
-                    borderRadius={12}
-                    distortionScale={-180}
-                    displace={0.4}
-                    backgroundOpacity={0.12}
-                    className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                  >
-                    <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
-                      View Case Study →
-                    </span>
-                  </GlassSurface>
+                  <TiltGlassCard className="w-full" maxTilt={8}>
+                    <GlassSurface
+                      width="100%"
+                      height={46}
+                      borderRadius={12}
+                      distortionScale={-180}
+                      displace={0.4}
+                      backgroundOpacity={0.12}
+                      className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                    >
+                      <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                        View Case Study →
+                      </span>
+                    </GlassSurface>
+                  </TiltGlassCard>
                 </TransitionLink>
               ) : (
                 <a
@@ -738,19 +834,21 @@ export default function InfiniteMenuSection() {
                   rel="noopener noreferrer"
                   className="block w-full group"
                 >
-                  <GlassSurface
-                    width="100%"
-                    height={46}
-                    borderRadius={12}
-                    distortionScale={-180}
-                    displace={0.4}
-                    backgroundOpacity={0.12}
-                    className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                  >
-                    <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
-                      View Project →
-                    </span>
-                  </GlassSurface>
+                  <TiltGlassCard className="w-full" maxTilt={8}>
+                    <GlassSurface
+                      width="100%"
+                      height={46}
+                      borderRadius={12}
+                      distortionScale={-180}
+                      displace={0.4}
+                      backgroundOpacity={0.12}
+                      className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                    >
+                      <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                        View Project →
+                      </span>
+                    </GlassSurface>
+                  </TiltGlassCard>
                 </a>
               )}
             </motion.div>
