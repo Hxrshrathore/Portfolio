@@ -53,8 +53,6 @@ export default function HeroPortfolioTransition({
   const [isHeroCovered, setIsHeroCovered] = useState(false)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isTouchingRef = useRef(false)
-  const touchStartYRef = useRef(0)
-  const touchStartTimeRef = useRef(0)
   const lastScrollYRef = useRef(0)
   const lastIsBelowHeroRef = useRef<boolean | null>(null)
   const directionTowardHeroRef = useRef(false)
@@ -331,11 +329,20 @@ export default function HeroPortfolioTransition({
       }
 
       // ── SNAP-ON-RELEASE / PAUSE DETECTION (Direction-Aware Thresholds) ──
+      // On mobile devices, disable all automatic scroll snapping / scroll hijacking for natural touch scroll
+      if (isMobileDevice()) {
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+          scrollTimeoutRef.current = null
+        }
+        return
+      }
+
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current)
       }
 
-      const timeoutDuration = isMobileDevice() ? 260 : 140
+      const timeoutDuration = 140
       scrollTimeoutRef.current = setTimeout(() => {
         if (isSnappingRef.current || isTouchingRef.current) return
         const curY = window.scrollY || window.pageYOffset || 0
@@ -359,11 +366,9 @@ export default function HeroPortfolioTransition({
       }, timeoutDuration)
     }
 
-    // Touch event handlers for fluid mobile gestures
-    const handleTouchStart = (e: TouchEvent) => {
+    // Touch event handlers for fluid mobile gestures (auto-scroll disabled on mobile)
+    const handleTouchStart = () => {
       isTouchingRef.current = true
-      touchStartYRef.current = e.touches[0].clientY
-      touchStartTimeRef.current = Date.now()
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current)
         scrollTimeoutRef.current = null
@@ -378,47 +383,13 @@ export default function HeroPortfolioTransition({
       }
     }
 
-    const handleTouchEnd = (e: TouchEvent) => {
+    const handleTouchEnd = () => {
       isTouchingRef.current = false
-      const endY = e.changedTouches[0]?.clientY ?? touchStartYRef.current
-      const deltaY = touchStartYRef.current - endY // positive when swiping UP (scrolling DOWN into portfolio)
-      const deltaTime = Math.max(1, Date.now() - touchStartTimeRef.current)
-      const velocityY = deltaY / deltaTime
-
-      const scrollY = window.scrollY || window.pageYOffset || 0
-      const vh = window.innerHeight || 800
-      const targetY = targetYRef.current || (vh + vh * 0.3)
-
-      if (isSnappingRef.current) return
-
-      // If user is inside or near the hero transition zone
-      if (scrollY >= 0 && scrollY < targetY - 10) {
-        // Fast or decisive swipe gesture:
-        // Swiping UP (scrolling DOWN into portfolio)
-        if (deltaY > 35 || velocityY > 0.25) {
-          triggerSnapToPortfolio()
-          return
-        }
-        // Swiping DOWN (scrolling UP back to hero)
-        if (deltaY < -35 || velocityY < -0.25) {
-          triggerSpringBackToHero()
-          return
-        }
-
-        // For gentle slow drags, wait for momentum to settle before evaluating dead zone
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = setTimeout(() => {
-          if (isSnappingRef.current || isTouchingRef.current) return
-          const curY = window.scrollY || window.pageYOffset || 0
-          if (curY > 5 && curY < targetY - 10) {
-            if (curY > vh * 0.20) {
-              triggerSnapToPortfolio()
-            } else {
-              triggerSpringBackToHero()
-            }
-          }
-        }, 220)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = null
       }
+      // Automatic swipe snapping disabled on mobile to allow 100% natural touch scrolling
     }
 
     // Desktop pointerup handler
