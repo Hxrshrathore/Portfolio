@@ -229,7 +229,6 @@ function TelemetryTooltip({ active, payload }: any) {
 // Project Architecture & Engineering Telemetry Graph (Animated Recharts Area Chart)
 function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
   const telemetry = getProjectTelemetry(item)
-  const avgScore = (telemetry.reduce((acc, t) => acc + t.score, 0) / telemetry.length).toFixed(1)
 
   return (
     <GlassSurface
@@ -241,27 +240,11 @@ function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
       backgroundOpacity={0.08}
       className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
     >
-      <div className="w-full p-2 sm:p-2.5 text-left space-y-2">
-        {/* Telemetry Header */}
-        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/50">
-              Architecture Telemetry
-            </span>
-          </div>
-          <span className="text-[9px] font-mono text-emerald-400 font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-            {avgScore} INDEX
-          </span>
-        </div>
-
+      <div className="w-full p-2.5 sm:p-3 text-left">
         {/* Animated Recharts Area Chart with Key Trigger on Project Change */}
-        <div className="w-full h-[105px] relative pt-1">
+        <div className="w-full h-[120px] relative">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={telemetry} margin={{ top: 5, right: 6, left: 6, bottom: 0 }}>
+            <AreaChart data={telemetry} margin={{ top: 6, right: 6, left: 6, bottom: 0 }}>
               <defs>
                 <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
@@ -272,7 +255,7 @@ function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
               <XAxis
                 dataKey="subject"
                 stroke="rgba(255,255,255,0.4)"
-                fontSize={8}
+                fontSize={9}
                 tickLine={false}
                 axisLine={false}
                 interval={0}
@@ -294,22 +277,6 @@ function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Micro Specs Footer */}
-        <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/5 text-center">
-          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
-            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Core</span>
-            <span className="text-[8px] font-mono font-medium text-white/80 truncate block">{item.stack[0]}</span>
-          </div>
-          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
-            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Motion</span>
-            <span className="text-[8px] font-mono font-medium text-emerald-400 block">60 FPS</span>
-          </div>
-          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
-            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Status</span>
-            <span className="text-[8px] font-mono font-medium text-white/80 block">Verified</span>
-          </div>
-        </div>
       </div>
     </GlassSurface>
   )
@@ -327,49 +294,19 @@ function ProjectScopeCard({ item }: { item: PortfolioItem }) {
       backgroundOpacity={0.08}
       className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
     >
-      <div className="w-full p-2 sm:p-2.5 text-left space-y-2">
-        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-          <div className="flex items-center gap-1.5">
-            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/50">
-              Tech Stack & Scope
-            </span>
-          </div>
-          <span className="text-[9px] font-mono text-emerald-400/90 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-            {item.role}
-          </span>
-        </div>
-
+      <div className="w-full p-3 text-left">
         {/* Primary Tech Stack Software Tags */}
-        <div className="space-y-1">
-          <span className="text-[8px] font-mono uppercase tracking-widest text-white/30 block">
+        <div className="space-y-2">
+          <span className="text-gray-400 text-xs leading-relaxed block font-light">
             Software & Tech Stack
           </span>
           <div className="flex flex-wrap gap-1.5">
             {item.stack.map((tech, idx) => (
               <span
                 key={idx}
-                className="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] border border-white/10 text-white/90 hover:border-emerald-400/40 hover:text-emerald-300 transition-colors"
+                className="text-xs text-gray-300 leading-relaxed px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/10 hover:border-emerald-400/40 hover:text-white transition-colors"
               >
                 {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Scope Deliverables Tags */}
-        <div className="space-y-1 pt-1.5 border-t border-white/5">
-          <span className="text-[8px] font-mono uppercase tracking-widest text-white/30 block">
-            Deliverable Tags
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {item.deliverables.map((deliv, idx) => (
-              <span
-                key={idx}
-                className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/5 border border-emerald-500/15 text-emerald-300/80 flex items-center gap-1"
-              >
-                <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                {deliv}
               </span>
             ))}
           </div>
@@ -640,10 +577,6 @@ export default function InfiniteMenuSection() {
                   className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
                 >
                   <div className="w-full p-2.5 sm:p-3 text-left">
-                    <div className="flex items-center justify-between mb-2.5 border-b border-white/5 pb-2">
-                      <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Project Context</span>
-                      <span className="text-[9px] font-mono text-emerald-400">Verified Case</span>
-                    </div>
                     <p className="text-gray-300 text-xs leading-relaxed mb-3">
                       {activeItem.overview}
                     </p>

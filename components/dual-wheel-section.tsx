@@ -12,7 +12,7 @@ const CHANNELS = [
   },
   {
     label: "Email",
-    value: "Hxrshrathore@gmail.com",
+    value: "hxrshrathore@gmail.com",
     url: "mailto:hxrshrathore@gmail.com",
     copy: "hxrshrathore@gmail.com",
   },
@@ -55,21 +55,21 @@ export default function DualWheelSection() {
   }, [])
 
   // Calculate dynamic font sizes and insets based on actual viewport width
-  // Ensures long strings like "Hxrshrathore@gmail.com" (23 chars) always fit completely
+  // Ensures long strings like "hxrshrathore@gmail.com" (22 chars) always fit completely without any cropping
   const { leftFontSize, rightFontSize, leftInset, rightInset } = useMemo(() => {
     if (windowWidth < 480) {
-      return { leftFontSize: 1.5, rightFontSize: 1.25, leftInset: 16, rightInset: 16 }
+      return { leftFontSize: 1.4, rightFontSize: 1.1, leftInset: 16, rightInset: 16 }
     }
     if (windowWidth < 768) {
-      return { leftFontSize: 1.8, rightFontSize: 1.5, leftInset: 24, rightInset: 24 }
+      return { leftFontSize: 1.7, rightFontSize: 1.35, leftInset: 24, rightInset: 24 }
     }
     if (windowWidth < 1024) {
-      return { leftFontSize: 2.3, rightFontSize: 1.9, leftInset: 40, rightInset: 40 }
+      return { leftFontSize: 2.1, rightFontSize: 1.65, leftInset: 32, rightInset: 32 }
     }
     if (windowWidth < 1366) {
-      return { leftFontSize: 2.8, rightFontSize: 2.3, leftInset: 64, rightInset: 64 }
+      return { leftFontSize: 2.5, rightFontSize: 2.0, leftInset: 48, rightInset: 48 }
     }
-    return { leftFontSize: 3.3, rightFontSize: 2.8, leftInset: 88, rightInset: 88 }
+    return { leftFontSize: 2.9, rightFontSize: 2.35, leftInset: 64, rightInset: 64 }
   }, [windowWidth])
 
   // ── Scroll Hijacking Logic ──
