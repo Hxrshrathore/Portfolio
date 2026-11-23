@@ -402,26 +402,119 @@ function ProjectScopeCard({ item }: { item: PortfolioItem }) {
   )
 }
 
-// Animation variants for side content
-const sideContentVariants = {
-  hidden: { opacity: 0, y: 15, scale: 0.98 },
-  visible: {
+// ─── Dial Curvature Animation Variants (matching the OptionWheel edge-curve kinematics) ───
+// Left Column: Sweeps along the cylindrical arc from/to the outer left edge
+const leftDialVariants = {
+  enter: (dir: number) => ({
+    opacity: 0,
+    x: -65,
+    y: dir >= 0 ? 45 : -45,
+    rotateZ: dir >= 0 ? -5 : 5,
+    rotateY: 14,
+    scale: 0.94,
+    filter: "blur(8px)",
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    rotateZ: 0,
+    rotateY: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.42,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  },
+  exit: (dir: number) => ({
+    opacity: 0,
+    x: -65,
+    y: dir >= 0 ? -45 : 45,
+    rotateZ: dir >= 0 ? 5 : -5,
+    rotateY: -14,
+    scale: 0.94,
+    filter: "blur(8px)",
+    transition: {
+      duration: 0.26,
+      ease: [0.25, 0.1, 0.25, 1.0] as const,
+    },
+  }),
+}
+
+// Right Column: Sweeps along the cylindrical arc from/to the outer right edge
+const rightDialVariants = {
+  enter: (dir: number) => ({
+    opacity: 0,
+    x: 65,
+    y: dir >= 0 ? 45 : -45,
+    rotateZ: dir >= 0 ? 5 : -5,
+    rotateY: -14,
+    scale: 0.94,
+    filter: "blur(8px)",
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    rotateZ: 0,
+    rotateY: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.42,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  },
+  exit: (dir: number) => ({
+    opacity: 0,
+    x: 65,
+    y: dir >= 0 ? -45 : 45,
+    rotateZ: dir >= 0 ? -5 : 5,
+    rotateY: 14,
+    scale: 0.94,
+    filter: "blur(8px)",
+    transition: {
+      duration: 0.26,
+      ease: [0.25, 0.1, 0.25, 1.0] as const,
+    },
+  }),
+}
+
+// Mobile Column: Dial vertical curve
+const mobileDialVariants = {
+  enter: (dir: number) => ({
+    opacity: 0,
+    y: dir >= 0 ? 35 : -35,
+    scale: 0.95,
+    filter: "blur(6px)",
+  }),
+  center: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] as const },
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.38,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
   },
-  exit: {
+  exit: (dir: number) => ({
     opacity: 0,
-    y: -15,
-    scale: 0.98,
-    transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1.0] as const },
-  },
+    y: dir >= 0 ? -35 : 35,
+    scale: 0.95,
+    filter: "blur(6px)",
+    transition: {
+      duration: 0.22,
+      ease: [0.25, 0.1, 0.25, 1.0] as const,
+    },
+  }),
 }
 
 export default function InfiniteMenuSection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [displayIndex, setDisplayIndex] = useState(0)
+  const [direction, setDirection] = useState(1)
   const [isGlobeMoving, setIsGlobeMoving] = useState(false)
   const [canNavigate, setCanNavigate] = useState(true)
   const [isCardHovered, setIsCardHovered] = useState(false)
@@ -435,6 +528,13 @@ export default function InfiniteMenuSection() {
   const activeItem = portfolioItems[displayIndex] ?? portfolioItems[0]
 
   const handleActiveItemChange = useCallback((index: number) => {
+    setDirection((prev) => {
+      const prevIdx = activeIndexRef.current
+      if (prevIdx === index) return prev
+      const count = portfolioItems.length
+      const diff = (index - prevIdx + count) % count
+      return diff > count / 2 ? -1 : 1
+    })
     setActiveIndex(index)
   }, [])
 
@@ -443,15 +543,16 @@ export default function InfiniteMenuSection() {
   }, [])
 
   const handleNavigate = useCallback(
-    (direction: "prev" | "next") => {
+    (dir: "prev" | "next") => {
+      setDirection(dir === "next" ? 1 : -1)
       if (!canNavigate) return
       setCanNavigate(false)
 
       const win = window as any
       if (typeof win.__infiniteMenuNavigate === "function") {
-        win.__infiniteMenuNavigate(direction)
+        win.__infiniteMenuNavigate(dir)
       } else if (navigateRef.current) {
-        navigateRef.current(direction)
+        navigateRef.current(dir)
       }
 
       setTimeout(() => setCanNavigate(true), 350)
@@ -516,18 +617,20 @@ export default function InfiniteMenuSection() {
 
           {/* ─── LEFT COLUMN: Engineering & Architecture Focus ─── */}
           <div
-            className="hidden md:flex flex-col items-center gap-3 h-full justify-center"
+            className="hidden md:flex flex-col items-center gap-3 h-full justify-center [perspective:1200px]"
             onMouseEnter={() => setIsCardHovered(true)}
             onMouseLeave={() => setIsCardHovered(false)}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={`left-${displayIndex}`}
-                variants={sideContentVariants}
-                initial="hidden"
-                animate="visible"
+                custom={direction}
+                variants={leftDialVariants}
+                initial="enter"
+                animate="center"
                 exit="exit"
                 className="flex flex-col items-center gap-3 w-full"
+                style={{ transformStyle: "preserve-3d" }}
               >
                 <div className="relative">
                   <GlassSurface
@@ -691,18 +794,20 @@ export default function InfiniteMenuSection() {
 
           {/* ─── RIGHT COLUMN: Project Context & Scope ─── */}
           <div
-            className="hidden md:flex flex-col items-center gap-3 h-full justify-center"
+            className="hidden md:flex flex-col items-center gap-3 h-full justify-center [perspective:1200px]"
             onMouseEnter={() => setIsCardHovered(true)}
             onMouseLeave={() => setIsCardHovered(false)}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={`right-${displayIndex}`}
-                variants={sideContentVariants}
-                initial="hidden"
-                animate="visible"
+                custom={direction}
+                variants={rightDialVariants}
+                initial="enter"
+                animate="center"
                 exit="exit"
                 className="flex flex-col gap-3 w-full"
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {/* Project Context Card */}
                 <TiltGlassCard className="w-full">
@@ -746,13 +851,14 @@ export default function InfiniteMenuSection() {
         </div>
 
         {/* ─── MOBILE: Info below globe ─── */}
-        <div className="md:hidden mt-8 space-y-6">
-          <AnimatePresence mode="wait">
+        <div className="md:hidden mt-8 space-y-6 [perspective:1000px]">
+          <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={`mobile-${displayIndex}`}
-              variants={sideContentVariants}
-              initial="hidden"
-              animate="visible"
+              custom={direction}
+              variants={mobileDialVariants}
+              initial="enter"
+              animate="center"
               exit="exit"
               className="space-y-6"
             >
