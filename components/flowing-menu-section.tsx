@@ -2,26 +2,52 @@
 
 import FlowingMenu from "./flowing-menu"
 
+const CDN = "https://pub-546a6f9534fa4f7abd35b1c5c23bb394.r2.dev/projects"
+
 const capabilityItems = [
   {
     link: "/projects",
     text: "Full-Stack Web Applications",
-    image: "/rip/frame1.png",
+    image: `${CDN}/Nutgram.png`,
+    images: [
+      `${CDN}/Nutgram.png`,
+      `${CDN}/KIITFEST.png`,
+      `${CDN}/Kritarth.png`,
+      `${CDN}/Blunt%20E-commerce.png`,
+    ],
   },
   {
     link: "/projects",
     text: "Applied AI & LLM Systems",
-    image: "/rip/frame8.png",
+    image: `${CDN}/Nexus%20AI.png`,
+    images: [
+      `${CDN}/Nexus%20AI.png`,
+      `${CDN}/Verinews.png`,
+      `${CDN}/Viral%20ARC.png`,
+      `${CDN}/Nutgram.png`,
+    ],
   },
   {
     link: "/projects",
     text: "API Integrations & Pipelines",
-    image: "/rip/frame6.png",
+    image: `${CDN}/Verinews.png`,
+    images: [
+      `${CDN}/Verinews.png`,
+      `${CDN}/Nutgram.png`,
+      `${CDN}/KIITFEST.png`,
+      `${CDN}/Hermes%20Racing.png`,
+    ],
   },
   {
     link: "/projects",
     text: "Product Interfaces & Systems",
-    image: "/rip/frame4.png",
+    image: `${CDN}/Chimera.png`,
+    images: [
+      `${CDN}/Chimera.png`,
+      `${CDN}/Estate.png`,
+      `${CDN}/TEDxKIIT%20University.png`,
+      `${CDN}/Pandav%20Studio.png`,
+    ],
   },
 ]
 

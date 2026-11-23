@@ -6,7 +6,8 @@ import { gsap } from "gsap"
 interface MenuItemProps {
   link: string
   text: string
-  image: string
+  image?: string
+  images?: string[]
 }
 
 interface FlowingMenuProps {
@@ -25,7 +26,7 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
   )
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
   const itemRef = React.useRef<HTMLDivElement>(null)
   const marqueeRef = React.useRef<HTMLDivElement>(null)
   const marqueeInnerRef = React.useRef<HTMLDivElement>(null)
@@ -74,17 +75,28 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
     animateOut(edge)
   }
 
+  const imageList = React.useMemo(() => {
+    if (images && images.length > 0) return images
+    if (image) return [image]
+    return []
+  }, [image, images])
+
   const repeatedMarqueeContent = React.useMemo(() => {
-    return Array.from({ length: 32 }).map((_, idx) => (
-      <React.Fragment key={idx}>
-        <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap">{text}</span>
-        <div
-          className="w-[200px] h-[7vh] my-[2em] mx-[2vw] p-[1em_0] rounded-[50px] bg-cover bg-center shrink-0"
-          style={{ backgroundImage: `url(${image})` }}
-        />
-      </React.Fragment>
-    ))
-  }, [text, image])
+    return Array.from({ length: 32 }).map((_, idx) => {
+      const currentImage = imageList.length > 0 ? imageList[idx % imageList.length] : ""
+      return (
+        <React.Fragment key={idx}>
+          <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap">
+            {text}
+          </span>
+          <div
+            className="w-[180px] md:w-[220px] h-[6.5vh] md:h-[7.5vh] my-[1.5em] mx-[1.5vw] rounded-lg bg-cover bg-center shrink-0 border border-black/10 shadow-md overflow-hidden"
+            style={{ backgroundImage: currentImage ? `url(${currentImage})` : undefined }}
+          />
+        </React.Fragment>
+      )
+    })
+  }, [text, imageList])
 
   React.useEffect(() => {
     const isMobile = window.innerWidth <= 768
