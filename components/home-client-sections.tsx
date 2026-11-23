@@ -129,14 +129,14 @@ export const TestimonialGlobeClient = () => (
 
 const DynamicDualWheel = dynamic(() => import("@/components/dual-wheel-section"), {
   ssr: false,
-  loading: () => <div className="h-[260vh] w-full bg-black" />
+  loading: () => <div className="min-h-[180vh] md:min-h-[260vh] w-full bg-black" />
 })
 
 export const DualWheelSectionClient = () => (
   <ProximityWrapper
     rootMargin="1000px 0px"
-    className="w-full h-[260vh]"
-    fallback={<div className="h-[260vh] w-full bg-black" />}
+    className="w-full min-h-[180vh] md:min-h-[260vh]"
+    fallback={<div className="min-h-[180vh] md:min-h-[260vh] w-full bg-black" />}
   >
     <DynamicDualWheel />
   </ProximityWrapper>

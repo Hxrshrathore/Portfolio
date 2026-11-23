@@ -342,7 +342,7 @@ const OptionWheel = ({
       tabIndex={0}
       data-no-cursor="true"
       aria-label="Option wheel"
-      className={`relative h-full w-full select-none outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${className ? className : 'overflow-hidden'}`}
+      className={`relative h-full w-full select-none outline-none ${draggable ? '[touch-action:none]' : '[touch-action:pan-y]'} ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${className ? className : 'overflow-hidden'}`}
       style={
         {
           '--ow-text-color': textColor,

@@ -13,7 +13,8 @@ import TransitionLink from "@/components/transition-link"
 const CASE_STUDY_METAS: Record<string, {
   label: string
   tags: { text: string; color: string }[]
-  bgImage: string
+  bgImage?: string
+  art?: "aurora" | "ember" | "dusk" | "glacier" | "verdant"
   logo: React.ReactNode
 }> = {
   "nutgram": {
@@ -67,7 +68,7 @@ const CASE_STUDY_METAS: Record<string, {
       { text: "Python", color: "text-zinc-400" },
       { text: "SQL", color: "text-zinc-400" },
     ],
-    bgImage: "/placeholder.jpg",
+    art: "ember",
     logo: (
       <div className="w-8 h-8 rounded-xl bg-amber-500/25 border border-amber-400/40 flex items-center justify-center shadow-lg">
         <svg className="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -136,45 +137,49 @@ export default function FeaturedCaseStudies() {
   const pair2Opacity = useTransform(smoothProgress, [0.15, 0.25, 1], [0, 1, 1])
   const pair2PointerEvents = useTransform(smoothProgress, (v) => (v >= 0.35 ? "auto" : "none"))
 
-  // ── Mobile 1-by-1 Transforms (Sequential 4-card staging so all 4 are 100% visible) ──
-  // Card 0 (Nutgram)
-  const mCard0Y = useTransform(smoothProgress, [0, 0.16, 0.25], ["0vh", "0vh", "-60vh"])
+  // ── Mobile 1-by-1 Transforms (Sequential 4-card staging: clean deck elevation, zero collisions) ──
+  // Card 0 (Nutgram): dwell 0.00-0.16, dissolve 0.16-0.24
+  const mCard0Y = useTransform(smoothProgress, [0, 0.16, 0.24], ["0vh", "0vh", "-16vh"])
   const mCard0Opacity = useTransform(smoothProgress, [0, 0.16, 0.23], [1, 1, 0])
-  const mCard0Pointer = useTransform(smoothProgress, (v) => (v < 0.21 ? "auto" : "none"))
+  const mCard0Scale = useTransform(smoothProgress, [0, 0.16, 0.24], [1, 1, 0.92])
+  const mCard0Pointer = useTransform(smoothProgress, (v) => (v < 0.20 ? "auto" : "none"))
 
-  // Card 1 (KIITFEST)
-  const mCard1Y = useTransform(smoothProgress, [0.16, 0.25, 0.44, 0.53], ["60vh", "0vh", "0vh", "-60vh"])
-  const mCard1Opacity = useTransform(smoothProgress, [0.16, 0.23, 0.44, 0.51], [0, 1, 1, 0])
-  const mCard1Pointer = useTransform(smoothProgress, (v) => (v >= 0.21 && v < 0.49 ? "auto" : "none"))
+  // Card 1 (KIITFEST): enter 0.18-0.25, dwell 0.25-0.41, dissolve 0.41-0.49
+  const mCard1Y = useTransform(smoothProgress, [0.18, 0.25, 0.41, 0.49], ["16vh", "0vh", "0vh", "-16vh"])
+  const mCard1Opacity = useTransform(smoothProgress, [0.18, 0.24, 0.41, 0.48], [0, 1, 1, 0])
+  const mCard1Scale = useTransform(smoothProgress, [0.18, 0.25, 0.41, 0.49], [0.92, 1, 1, 0.92])
+  const mCard1Pointer = useTransform(smoothProgress, (v) => (v >= 0.21 && v < 0.45 ? "auto" : "none"))
 
-  // Card 2 (Nexus AI)
-  const mCard2Y = useTransform(smoothProgress, [0.44, 0.53, 0.72, 0.81], ["60vh", "0vh", "0vh", "-60vh"])
-  const mCard2Opacity = useTransform(smoothProgress, [0.44, 0.51, 0.72, 0.79], [0, 1, 1, 0])
-  const mCard2Pointer = useTransform(smoothProgress, (v) => (v >= 0.49 && v < 0.77 ? "auto" : "none"))
+  // Card 2 (Nexus AI): enter 0.43-0.50, dwell 0.50-0.66, dissolve 0.66-0.74
+  const mCard2Y = useTransform(smoothProgress, [0.43, 0.50, 0.66, 0.74], ["16vh", "0vh", "0vh", "-16vh"])
+  const mCard2Opacity = useTransform(smoothProgress, [0.43, 0.49, 0.66, 0.73], [0, 1, 1, 0])
+  const mCard2Scale = useTransform(smoothProgress, [0.43, 0.50, 0.66, 0.74], [0.92, 1, 1, 0.92])
+  const mCard2Pointer = useTransform(smoothProgress, (v) => (v >= 0.46 && v < 0.70 ? "auto" : "none"))
 
-  // Card 3 (RCOE Rajasthan)
-  const mCard3Y = useTransform(smoothProgress, [0.72, 0.81, 1], ["60vh", "0vh", "0vh"])
-  const mCard3Opacity = useTransform(smoothProgress, [0.72, 0.79, 1], [0, 1, 1])
-  const mCard3Pointer = useTransform(smoothProgress, (v) => (v >= 0.77 ? "auto" : "none"))
+  // Card 3 (RCOE Rajasthan): enter 0.68-0.75, long dwell 0.75-0.94, unpin into next section
+  const mCard3Y = useTransform(smoothProgress, [0.68, 0.75, 1], ["16vh", "0vh", "0vh"])
+  const mCard3Opacity = useTransform(smoothProgress, [0.68, 0.74, 1], [0, 1, 1])
+  const mCard3Scale = useTransform(smoothProgress, [0.68, 0.75, 1], [0.92, 1, 1])
+  const mCard3Pointer = useTransform(smoothProgress, (v) => (v >= 0.71 ? "auto" : "none"))
 
   // Mobile dot indicators
-  const dot0Width = useTransform(smoothProgress, [0, 0.20, 0.25], ["22px", "22px", "6px"])
-  const dot0Color = useTransform(smoothProgress, [0, 0.20, 0.25], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot0Width = useTransform(smoothProgress, [0, 0.17, 0.23], ["22px", "22px", "6px"])
+  const dot0Color = useTransform(smoothProgress, [0, 0.17, 0.23], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot1Width = useTransform(smoothProgress, [0.16, 0.25, 0.48, 0.53], ["6px", "22px", "22px", "6px"])
-  const dot1Color = useTransform(smoothProgress, [0.16, 0.25, 0.48, 0.53], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot1Width = useTransform(smoothProgress, [0.18, 0.25, 0.42, 0.48], ["6px", "22px", "22px", "6px"])
+  const dot1Color = useTransform(smoothProgress, [0.18, 0.25, 0.42, 0.48], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot2Width = useTransform(smoothProgress, [0.44, 0.53, 0.76, 0.81], ["6px", "22px", "22px", "6px"])
-  const dot2Color = useTransform(smoothProgress, [0.44, 0.53, 0.76, 0.81], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot2Width = useTransform(smoothProgress, [0.43, 0.50, 0.67, 0.73], ["6px", "22px", "22px", "6px"])
+  const dot2Color = useTransform(smoothProgress, [0.43, 0.50, 0.67, 0.73], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot3Width = useTransform(smoothProgress, [0.72, 0.81, 1.0], ["6px", "22px", "22px"])
-  const dot3Color = useTransform(smoothProgress, [0.72, 0.81, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
+  const dot3Width = useTransform(smoothProgress, [0.68, 0.75, 1.0], ["6px", "22px", "22px"])
+  const dot3Color = useTransform(smoothProgress, [0.68, 0.75, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
 
   const renderCard = (study: typeof caseStudies[0], idx: number) => {
     const metaConfig = CASE_STUDY_METAS[study.slug] || {
       label: study.clientOrOrg || study.headline,
       tags: [{ text: study.category, color: "text-zinc-300" }],
-      bgImage: "/placeholder.jpg",
+      art: "aurora" as const,
       logo: (
         <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
           <span className="font-bold text-xs text-white">#</span>
@@ -185,11 +190,11 @@ export default function FeaturedCaseStudies() {
     return (
       <div
         key={study.slug}
-        className="flex flex-col items-center group w-full max-w-[360px] scale-[0.88] sm:scale-100 origin-center"
+        className="flex flex-col items-center group w-full max-w-[340px] sm:max-w-[360px] scale-[0.84] sm:scale-100 origin-center"
         data-no-cursor="true"
       >
         {/* Interactive Glass Folder Component */}
-        <div className="relative w-full flex justify-center py-2 overflow-visible" data-no-cursor="true">
+        <div className="relative w-full flex justify-center py-1 sm:py-2 overflow-visible" data-no-cursor="true">
           <GlassFolder
             label={metaConfig.label}
             meta={
@@ -202,7 +207,8 @@ export default function FeaturedCaseStudies() {
                 ))}
               </div>
             }
-            image={metaConfig.bgImage}
+            image={metaConfig.bgImage || undefined}
+            art={metaConfig.art || "aurora"}
             logo={metaConfig.logo}
             tone="dark"
             action="more"
@@ -231,12 +237,12 @@ export default function FeaturedCaseStudies() {
         {/* Case Study GlassSurface Button (Same Button as Hero Portfolio / Resume) */}
         <TransitionLink
           href={`/projects/${study.slug}`}
-          className="inline-block group mt-3"
+          className="inline-block group mt-2.5 sm:mt-3"
         >
           <GlassSurface
-            width={164}
-            height={44}
-            borderRadius={22}
+            width={160}
+            height={42}
+            borderRadius={21}
             distortionScale={-180}
             displace={0.5}
             backgroundOpacity={0.12}
@@ -256,13 +262,13 @@ export default function FeaturedCaseStudies() {
     <section
       id="case-studies"
       ref={containerRef}
-      className="relative w-full bg-black min-h-[350vh] md:min-h-[190vh] border-t border-white/5 pt-8 md:pt-16"
+      className="relative w-full bg-black min-h-[380vh] md:min-h-[190vh] border-t border-white/5"
     >
       {/* Background radial glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[140px] pointer-events-none rounded-full" />
 
-      {/* Sticky Full Viewport Frame with generous top padding to clear floating navbar */}
-      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden px-4 md:px-8 pt-20 sm:pt-24 md:pt-36 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-16">
+      {/* Sticky Full Viewport Frame with optical padding */}
+      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden px-4 md:px-8 pt-14 sm:pt-20 md:pt-36 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] md:pb-16">
         <div className="max-w-6xl mx-auto w-full flex flex-col justify-between h-full">
           {/* Section Header: Title and subtext aligned to top with optical correction */}
           <div className="flex flex-col md:flex-row md:items-start justify-between mb-2 sm:mb-4 md:mb-10 gap-2 sm:gap-4 md:gap-6 shrink-0 relative z-20">
@@ -311,6 +317,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: mCard0Opacity,
                 y: mCard0Y,
+                scale: mCard0Scale,
                 pointerEvents: mCard0Pointer,
               }}
               className="w-full flex items-center justify-center absolute inset-0 my-auto"
@@ -323,6 +330,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: mCard1Opacity,
                 y: mCard1Y,
+                scale: mCard1Scale,
                 pointerEvents: mCard1Pointer,
               }}
               className="w-full flex items-center justify-center absolute inset-0 my-auto"
@@ -335,6 +343,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: mCard2Opacity,
                 y: mCard2Y,
+                scale: mCard2Scale,
                 pointerEvents: mCard2Pointer,
               }}
               className="w-full flex items-center justify-center absolute inset-0 my-auto"
@@ -347,6 +356,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: mCard3Opacity,
                 y: mCard3Y,
+                scale: mCard3Scale,
                 pointerEvents: mCard3Pointer,
               }}
               className="w-full flex items-center justify-center absolute inset-0 my-auto"

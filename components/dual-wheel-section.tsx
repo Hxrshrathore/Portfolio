@@ -144,12 +144,14 @@ export default function DualWheelSection() {
     }
   }, [])
 
+  const isMobile = windowWidth < 768
+
   return (
     <section
       ref={containerRef}
       data-no-cursor="true"
-      className="relative w-full bg-black text-white select-none"
-      style={{ height: "260vh" }}
+      className="relative w-full bg-black text-white select-none min-h-[180vh] md:min-h-[260vh]"
+      style={{ height: isMobile ? "180vh" : "260vh" }}
     >
       {/* ── Sticky Fullscreen Viewport Pinning ── */}
       <div 
@@ -179,13 +181,12 @@ export default function DualWheelSection() {
               fade={0.25}
               smoothing={380}
               inset={leftInset}
-              loop
-              draggable
+              loop={false}
+              draggable={!isMobile}
               disableWheel={true}
               soundUrl=""
               soundVolume={0.5}
               className="overflow-visible"
-              onChange={(index) => setActiveIndex(index)}
               onItemClick={handleItemClick}
             />
           </div>
@@ -207,16 +208,29 @@ export default function DualWheelSection() {
               fade={0.25}
               smoothing={380}
               inset={rightInset}
-              loop
-              draggable
+              loop={false}
+              draggable={!isMobile}
               disableWheel={true}
               soundUrl=""
               soundVolume={0.5}
               className="overflow-visible"
-              onChange={(index) => setActiveIndex(index)}
               onItemClick={handleItemClick}
             />
           </div>
+        </div>
+
+        {/* Mobile 6-channel progress dots indicator */}
+        <div className="absolute bottom-6 inset-x-0 flex md:hidden items-center justify-center gap-1.5 z-30 pointer-events-none">
+          {CHANNELS.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                activeIndex === idx
+                  ? "w-4 bg-white/90"
+                  : "w-1 bg-white/20"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>
