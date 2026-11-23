@@ -178,7 +178,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       const currentImage = imageList.length > 0 ? imageList[idx % imageList.length] : ""
       return (
         <React.Fragment key={idx}>
-          <span className="text-[#060010] uppercase font-normal text-xs sm:text-base md:text-xl lg:text-2xl xl:text-3xl leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap self-center tracking-tight">
+          <span className="text-[#060010] uppercase font-normal text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap self-center tracking-tight">
             {text}
           </span>
           <div
@@ -198,7 +198,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       style={{ willChange: "transform" }}
     >
       <a
-        className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-white text-xs sm:text-base md:text-xl lg:text-2xl xl:text-3xl whitespace-nowrap px-3 sm:px-4 hover:text-[#060010] focus:text-white focus-visible:text-[#060010] tracking-tight"
+        className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-white text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl whitespace-nowrap px-3 sm:px-4 hover:text-[#060010] focus:text-white focus-visible:text-[#060010] tracking-tight"
         href={link}
         onClick={(e) => {
           if (typeof window !== "undefined" && window.innerWidth <= 768) {
