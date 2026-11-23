@@ -22,6 +22,9 @@ export default function HeroPortfolioTransition({
   const isSnappingRef = useRef(false)
   const [isSnapping, setIsSnapping] = useState(false)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isTouchingRef = useRef(false)
+  const touchStartYRef = useRef(0)
+  const touchStartTimeRef = useRef(0)
   const lastScrollYRef = useRef(0)
   const directionTowardHeroRef = useRef(false)
   const targetYRef = useRef(0)
@@ -84,11 +87,12 @@ export default function HeroPortfolioTransition({
 
     updateTargetY()
     const targetY = targetYRef.current
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
 
     if (lenis) {
       lenis.scrollTo(targetY, {
-        lock: true, // Prevents wheel interference during auto-scroll
-        duration: 0.6,
+        lock: !isMobile, // Do not lock touch input on mobile
+        duration: isMobile ? 0.45 : 0.6,
         easing: springEase,
         onComplete: () => {
           isSnappingRef.current = false
@@ -100,7 +104,7 @@ export default function HeroPortfolioTransition({
       setTimeout(() => {
         isSnappingRef.current = false
         setIsSnapping(false)
-      }, 600)
+      }, isMobile ? 450 : 600)
     }
   }, [lenis, springEase, updateTargetY])
 
@@ -193,10 +197,12 @@ export default function HeroPortfolioTransition({
     isSnappingRef.current = true
     setIsSnapping(true)
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
+
     if (lenis) {
       lenis.scrollTo(0, {
-        lock: true,
-        duration: 0.55,
+        lock: !isMobile,
+        duration: isMobile ? 0.45 : 0.55,
         easing: springEase,
         onComplete: () => {
           isSnappingRef.current = false
@@ -208,12 +214,16 @@ export default function HeroPortfolioTransition({
       setTimeout(() => {
         isSnappingRef.current = false
         setIsSnapping(false)
-      }, 550)
+      }, isMobile ? 450 : 550)
     }
   }, [lenis, springEase])
 
   // Proportional 1:1 Scroll Tracking + Direction-Aware Thresholds
   useEffect(() => {
+    const isMobileDevice = () =>
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 768)
+
     const handleScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset || 0
       const vh = window.innerHeight || 800
@@ -221,18 +231,10 @@ export default function HeroPortfolioTransition({
       const blackSectionHeight = gateRef.current?.offsetHeight || (vh * 0.30)
 
       // ── EXACT THRESHOLD FORMULAS ──
-      // 1. Top-to-Bottom direction (Hero -> Portfolio): 30% of viewport height (0.30 * vh)
       const topToBottomThreshold = vh * 0.30
-
-      // 2. Bottom-to-Top direction (Bottom section -> Homepage):
-      // The bottom section is at targetY.
-      // As user scrolls up into the black section, remaining black section = scrollY - (targetY - blackSectionHeight).
-      // "whenever this black section is less than 70% of the black section" ->
-      // remaining < 0.70 * blackSectionHeight <=> scrollY < targetY - (0.30 * blackSectionHeight).
       const bottomToTopThreshold = targetY - (0.30 * blackSectionHeight)
 
       // Track scroll direction:
-      // When moving upward toward Hero (from bottom section towards the top): isMovingTowardHero = true
       const isMovingTowardHero = scrollY < lastScrollYRef.current
       directionTowardHeroRef.current = isMovingTowardHero
       lastScrollYRef.current = scrollY
@@ -248,6 +250,15 @@ export default function HeroPortfolioTransition({
 
       // If already animating a snap, do not run release checks
       if (isSnappingRef.current) return
+
+      // While user is actively touching on a mobile device, never auto-snap
+      if (isTouchingRef.current) {
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current)
+          scrollTimeoutRef.current = null
+        }
+        return
+      }
 
       // If user is already past the transition gate inside the portfolio, allow free scroll
       if (scrollY >= targetY - 10) {
@@ -272,23 +283,20 @@ export default function HeroPortfolioTransition({
         clearTimeout(scrollTimeoutRef.current)
       }
 
+      const timeoutDuration = isMobileDevice() ? 260 : 140
       scrollTimeoutRef.current = setTimeout(() => {
-        if (isSnappingRef.current) return
+        if (isSnappingRef.current || isTouchingRef.current) return
         const curY = window.scrollY || window.pageYOffset || 0
 
         // Only snap if user stopped inside the transition zone
         if (curY > 5 && curY < targetY - 10) {
           if (directionTowardHeroRef.current) {
-            // Direction: Bottom to Top (from bottom section towards the top)
-            // Move to homepage whenever this black section is less than 70% of the black section!
             if (curY < bottomToTopThreshold) {
               triggerSpringBackToHero()
             } else {
               triggerSnapToPortfolio()
             }
           } else {
-            // Direction: Top to Bottom (Hero towards Portfolio)
-            // Keep the current 30% viewport height threshold
             if (curY <= topToBottomThreshold) {
               triggerSpringBackToHero()
             } else {
@@ -296,12 +304,74 @@ export default function HeroPortfolioTransition({
             }
           }
         }
-      }, 140)
+      }, timeoutDuration)
     }
 
-    // Direction-aware snap on immediate pointer or touch release
-    const handleRelease = () => {
+    // Touch event handlers for fluid mobile gestures
+    const handleTouchStart = (e: TouchEvent) => {
+      isTouchingRef.current = true
+      touchStartYRef.current = e.touches[0].clientY
+      touchStartTimeRef.current = Date.now()
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = null
+      }
+    }
+
+    const handleTouchMove = () => {
+      isTouchingRef.current = true
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = null
+      }
+    }
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      isTouchingRef.current = false
+      const endY = e.changedTouches[0]?.clientY ?? touchStartYRef.current
+      const deltaY = touchStartYRef.current - endY // positive when swiping UP (scrolling DOWN into portfolio)
+      const deltaTime = Math.max(1, Date.now() - touchStartTimeRef.current)
+      const velocityY = deltaY / deltaTime
+
+      const scrollY = window.scrollY || window.pageYOffset || 0
+      const vh = window.innerHeight || 800
+      const targetY = targetYRef.current || (vh + vh * 0.3)
+
       if (isSnappingRef.current) return
+
+      // If user is inside or near the hero transition zone
+      if (scrollY >= 0 && scrollY < targetY - 10) {
+        // Fast or decisive swipe gesture:
+        // Swiping UP (scrolling DOWN into portfolio)
+        if (deltaY > 35 || velocityY > 0.25) {
+          triggerSnapToPortfolio()
+          return
+        }
+        // Swiping DOWN (scrolling UP back to hero)
+        if (deltaY < -35 || velocityY < -0.25) {
+          triggerSpringBackToHero()
+          return
+        }
+
+        // For gentle slow drags, wait for momentum to settle before evaluating dead zone
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (isSnappingRef.current || isTouchingRef.current) return
+          const curY = window.scrollY || window.pageYOffset || 0
+          if (curY > 5 && curY < targetY - 10) {
+            if (curY > vh * 0.20) {
+              triggerSnapToPortfolio()
+            } else {
+              triggerSpringBackToHero()
+            }
+          }
+        }, 220)
+      }
+    }
+
+    // Desktop pointerup handler
+    const handlePointerUp = () => {
+      if (isSnappingRef.current || isMobileDevice()) return
       const scrollY = window.scrollY || window.pageYOffset || 0
       const vh = window.innerHeight || 800
       const targetY = targetYRef.current || (vh + vh * 0.3)
@@ -313,14 +383,12 @@ export default function HeroPortfolioTransition({
         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
 
         if (directionTowardHeroRef.current) {
-          // Bottom to top: less than 70% of the black section moves to homepage!
           if (scrollY < bottomToTopThreshold) {
             triggerSpringBackToHero()
           } else {
             triggerSnapToPortfolio()
           }
         } else {
-          // Top to bottom: 30% viewport threshold
           if (scrollY <= topToBottomThreshold) {
             triggerSpringBackToHero()
           } else {
@@ -331,8 +399,10 @@ export default function HeroPortfolioTransition({
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
-    window.addEventListener("pointerup", handleRelease, { passive: true })
-    window.addEventListener("touchend", handleRelease, { passive: true })
+    window.addEventListener("touchstart", handleTouchStart, { passive: true })
+    window.addEventListener("touchmove", handleTouchMove, { passive: true })
+    window.addEventListener("touchend", handleTouchEnd, { passive: true })
+    window.addEventListener("pointerup", handlePointerUp, { passive: true })
 
     if (lenis) {
       lenis.on("scroll", handleScroll)
@@ -342,8 +412,10 @@ export default function HeroPortfolioTransition({
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("pointerup", handleRelease)
-      window.removeEventListener("touchend", handleRelease)
+      window.removeEventListener("touchstart", handleTouchStart)
+      window.removeEventListener("touchmove", handleTouchMove)
+      window.removeEventListener("touchend", handleTouchEnd)
+      window.removeEventListener("pointerup", handlePointerUp)
       if (lenis) {
         lenis.off("scroll", handleScroll)
       }
@@ -376,7 +448,7 @@ export default function HeroPortfolioTransition({
   return (
     <div className="relative w-full bg-black">
       {/* ── 1. Sticky Hero Viewport (White background) ── */}
-      <div className="sticky top-0 h-screen w-full z-0 overflow-hidden bg-white">
+      <div className="sticky top-0 h-screen h-[100dvh] min-h-[100dvh] w-full z-0 overflow-hidden bg-white">
         {hero}
         {/* Right Half-Oval Pull Notch (Opens Résumé Page with right-to-left wipe) */}
         <RightResumeNotch />

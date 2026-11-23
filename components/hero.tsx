@@ -81,7 +81,7 @@ export default function Hero() {
     <TiltedGridHero
       images={IMAGES}
       fade={0}
-      className="h-screen min-h-[640px] w-full bg-white text-zinc-950"
+      className="h-screen h-[100dvh] min-h-[560px] md:min-h-[640px] w-full bg-white text-zinc-950"
     >
       <div className="relative z-10 flex h-full flex-col items-center justify-between pt-20 md:pt-24 pb-12 md:pb-16 text-center">
         <div className="px-6 pt-6 md:pt-10">
