@@ -55,6 +55,7 @@ export default function HeroPortfolioTransition({
   const touchStartYRef = useRef(0)
   const touchStartTimeRef = useRef(0)
   const lastScrollYRef = useRef(0)
+  const lastIsBelowHeroRef = useRef<boolean | null>(null)
   const directionTowardHeroRef = useRef(false)
   const targetYRef = useRef(0)
   const rafIdRef = useRef<number | null>(null)
@@ -268,9 +269,12 @@ export default function HeroPortfolioTransition({
       directionTowardHeroRef.current = isMovingTowardHero
       lastScrollYRef.current = scrollY
 
-      // Update browser theme color & document background dynamically for Safari/Chrome
+      // Update browser theme color & document background dynamically only on state transition
       const isBelowHero = scrollY >= topToBottomThreshold
-      updateBrowserTheme(isBelowHero)
+      if (lastIsBelowHeroRef.current !== isBelowHero) {
+        lastIsBelowHeroRef.current = isBelowHero
+        updateBrowserTheme(isBelowHero)
+      }
 
       // Hide hero when wholly covered by black portfolio to stop Safari top bar sampling white
       const isCovered = scrollY >= targetY - 10

@@ -40,13 +40,12 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const parent = canvas.parentElement
-    if (!parent) return
-
     let resizeTimeout: NodeJS.Timeout
 
     const resizeCanvas = () => {
-      const { width, height } = parent.getBoundingClientRect()
+      if (typeof window === "undefined") return
+      const width = window.innerWidth
+      const height = window.innerHeight
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width
         canvas.height = height
@@ -58,13 +57,11 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
       resizeTimeout = setTimeout(resizeCanvas, 100)
     }
 
-    const ro = new ResizeObserver(handleResize)
-    ro.observe(parent)
-
+    window.addEventListener("resize", handleResize, { passive: true })
     resizeCanvas()
 
     return () => {
-      ro.disconnect()
+      window.removeEventListener("resize", handleResize)
       clearTimeout(resizeTimeout)
     }
   }, [])
@@ -151,9 +148,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
   const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const x = e.clientX
+    const y = e.clientY
 
     const now = performance.now()
     const newSparks: Spark[] = Array.from({ length: sparkCount }, (_, i) => ({
@@ -170,7 +166,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 
   return (
     <div className="relative w-full h-full" onClick={handleClick}>
-      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-50" />
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-50" />
       {children}
     </div>
   )

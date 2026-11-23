@@ -184,7 +184,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
   }, [image, images])
 
   const repeatedMarqueeContent = React.useMemo(() => {
-    return Array.from({ length: 32 }).map((_, idx) => {
+    // 12 repetitions provides 4800px of continuous track width, ample for any screen while cutting DOM bloat by 62%
+    return Array.from({ length: 12 }).map((_, idx) => {
       const currentImage = imageList.length > 0 ? imageList[idx % imageList.length] : ""
       return (
         <React.Fragment key={idx}>

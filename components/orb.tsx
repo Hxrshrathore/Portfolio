@@ -205,7 +205,10 @@ export default function Orb({
 
     function resize() {
       if (!container) return
-      const dpr = window.devicePixelRatio || 1
+      const rawDpr = window.devicePixelRatio || 1
+      // Cap DPR: 1.5 on mobile/touch screens, 2.0 on desktop to prevent 3x DPR overdraw thermal throttling
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+      const dpr = Math.min(rawDpr, isMobile ? 1.5 : 2.0)
       const width = container.clientWidth
       const height = container.clientHeight
       renderer.setSize(width * dpr, height * dpr)

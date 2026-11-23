@@ -31,14 +31,16 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null)
 
   useEffect(() => {
+    const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+    
     // Initialize Lenis natively. 
     // Higher duration = heavier/floaty feel. Lower = snappier/faster.
     const lenis = new Lenis({
-      duration: 1.2, 
+      duration: isTouch ? 1.0 : 1.2, 
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 1.0, // Match natural finger swipe velocity on mobile/touch
     })
 
     setLenisInstance(lenis)
@@ -54,8 +56,8 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     // Add Lenis's requestAnimationFrame directly into GSAP's global ticker master loop
     gsap.ticker.add(update)
 
-    // Disable lag smoothing in GSAP to prevent any jitter between ScrollTrigger & Lenis
-    gsap.ticker.lagSmoothing(0)
+    // Smooth out lag spikes rather than hard-jumping (500ms threshold, 33ms max step)
+    gsap.ticker.lagSmoothing(500, 33)
 
     return () => {
       // Must pass the exact same function reference to remove it!
