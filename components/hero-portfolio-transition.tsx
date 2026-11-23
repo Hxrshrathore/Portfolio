@@ -12,6 +12,34 @@ interface HeroPortfolioTransitionProps {
   children: React.ReactNode
 }
 
+const updateBrowserTheme = (isDark: boolean) => {
+  if (typeof document === "undefined") return
+  const color = isDark ? "#000000" : "#ffffff"
+
+  let metaTheme = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement
+  if (!metaTheme) {
+    metaTheme = document.createElement("meta")
+    metaTheme.name = "theme-color"
+    document.head.appendChild(metaTheme)
+  }
+  if (metaTheme.content !== color) {
+    metaTheme.content = color
+  }
+
+  let metaApple = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]') as HTMLMetaElement
+  if (!metaApple) {
+    metaApple = document.createElement("meta")
+    metaApple.name = "apple-mobile-web-app-status-bar-style"
+    document.head.appendChild(metaApple)
+  }
+  metaApple.content = isDark ? "black-translucent" : "default"
+
+  document.documentElement.style.backgroundColor = color
+  if (document.body) {
+    document.body.style.backgroundColor = color
+  }
+}
+
 export default function HeroPortfolioTransition({
   hero,
   children,
@@ -21,6 +49,7 @@ export default function HeroPortfolioTransition({
   const portfolioRef = useRef<HTMLDivElement>(null)
   const isSnappingRef = useRef(false)
   const [isSnapping, setIsSnapping] = useState(false)
+  const [isHeroCovered, setIsHeroCovered] = useState(false)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isTouchingRef = useRef(false)
   const touchStartYRef = useRef(0)
@@ -239,13 +268,25 @@ export default function HeroPortfolioTransition({
       directionTowardHeroRef.current = isMovingTowardHero
       lastScrollYRef.current = scrollY
 
+      // Update browser theme color & document background dynamically for Safari/Chrome
+      const isBelowHero = scrollY >= topToBottomThreshold
+      updateBrowserTheme(isBelowHero)
+
+      // Hide hero when wholly covered by black portfolio to stop Safari top bar sampling white
+      const isCovered = scrollY >= targetY - 10
+      setIsHeroCovered((prev) => (prev === isCovered ? prev : isCovered))
+
       // Update rubber band stretch 1:1 in real time with user's scroll
-      if (rafIdRef.current === null) {
-        rafIdRef.current = requestAnimationFrame(() => {
-          rafIdRef.current = null
-          const p = Math.min(1, Math.max(0, scrollY / (vh * 0.30)))
-          setScrollProgress(p)
-        })
+      if (scrollY <= targetY) {
+        if (rafIdRef.current === null) {
+          rafIdRef.current = requestAnimationFrame(() => {
+            rafIdRef.current = null
+            const p = Math.min(1, Math.max(0, scrollY / (vh * 0.30)))
+            setScrollProgress((prev) => (Math.abs(prev - p) < 0.005 ? prev : p))
+          })
+        }
+      } else {
+        setScrollProgress((prev) => (prev === 1 ? prev : 1))
       }
 
       // If already animating a snap, do not run release checks
@@ -425,6 +466,7 @@ export default function HeroPortfolioTransition({
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current)
       }
+      updateBrowserTheme(true)
     }
   }, [lenis, triggerSnapToPortfolio, triggerSpringBackToHero])
 
@@ -448,7 +490,13 @@ export default function HeroPortfolioTransition({
   return (
     <div className="relative w-full bg-black">
       {/* ── 1. Sticky Hero Viewport (White background) ── */}
-      <div className="sticky top-0 h-screen h-[100dvh] min-h-[100dvh] w-full z-0 overflow-hidden bg-white">
+      <div 
+        className="sticky top-0 h-screen h-[100dvh] min-h-[100dvh] w-full z-0 overflow-hidden bg-white"
+        style={{
+          visibility: isHeroCovered ? "hidden" : "visible",
+          pointerEvents: isHeroCovered ? "none" : "auto",
+        }}
+      >
         {hero}
         {/* Right Half-Oval Pull Notch (Opens Résumé Page with right-to-left wipe) */}
         <RightResumeNotch />

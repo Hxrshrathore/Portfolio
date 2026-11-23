@@ -248,8 +248,27 @@ export default function Orb({
     container.addEventListener("mousemove", handleMouseMove)
     container.addEventListener("mouseleave", handleMouseLeave)
 
-    let rafId: number
+    let rafId: number | null = null
+    let isVisible = false
+    let isRunning = false
+
+    const startLoop = () => {
+      if (isRunning || !isVisible || document.hidden) return
+      isRunning = true
+      lastTime = performance.now()
+      rafId = requestAnimationFrame(update)
+    }
+
+    const stopLoop = () => {
+      isRunning = false
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId)
+        rafId = null
+      }
+    }
+
     const update = (t: number) => {
+      if (!isRunning) return
       rafId = requestAnimationFrame(update)
       const dt = (t - lastTime) * 0.001
       lastTime = t
@@ -269,10 +288,32 @@ export default function Orb({
       renderer.render({ scene: mesh })
     }
 
-    rafId = requestAnimationFrame(update)
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible) {
+          startLoop()
+        } else {
+          stopLoop()
+        }
+      },
+      { threshold: 0.02, rootMargin: "150px" }
+    )
+    observer.observe(container)
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopLoop()
+      } else if (isVisible) {
+        startLoop()
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      stopLoop()
+      observer.disconnect()
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
       window.removeEventListener("resize", resize)
       container.removeEventListener("mousemove", handleMouseMove)
       container.removeEventListener("mouseleave", handleMouseLeave)

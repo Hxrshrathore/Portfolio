@@ -77,10 +77,25 @@ export default function DualWheelSection() {
   // While inside this track, the section stays pinned full-screen (sticky top-0 h-screen).
   // Window scroll progress translates directly into the active index of both wheels.
   useEffect(() => {
-    const handleScroll = () => {
+    let rafId: number | null = null
+
+    const updateScroll = () => {
+      rafId = null
       if (!containerRef.current) return
       const rect = containerRef.current.getBoundingClientRect()
       const windowHeight = window.innerHeight || 800
+
+      // Early boundaries when out of view
+      if (rect.top > windowHeight) {
+        setActiveIndex((prev) => (prev === 0 ? prev : 0))
+        return
+      }
+      if (rect.bottom < 0) {
+        const last = CHANNELS.length - 1
+        setActiveIndex((prev) => (prev === last ? prev : last))
+        return
+      }
+
       const totalScrollable = rect.height - windowHeight
       if (totalScrollable <= 0) return
 
@@ -89,16 +104,23 @@ export default function DualWheelSection() {
       const progress = Math.min(1, Math.max(0, scrolled / totalScrollable))
       const count = CHANNELS.length
       const index = Math.min(count - 1, Math.floor(progress * count))
-      setActiveIndex(index)
+      setActiveIndex((prev) => (prev === index ? prev : index))
+    }
+
+    const handleScroll = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(updateScroll)
+      }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     if (lenis) {
       lenis.on("scroll", handleScroll)
     }
-    handleScroll()
+    updateScroll()
 
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener("scroll", handleScroll)
       if (lenis) {
         lenis.off("scroll", handleScroll)
@@ -132,7 +154,7 @@ export default function DualWheelSection() {
       {/* ── Sticky Fullscreen Viewport Pinning ── */}
       <div 
         data-no-cursor="true"
-        className="sticky top-0 h-screen w-full flex items-center justify-between overflow-hidden bg-black"
+        className="sticky top-0 h-screen h-[100dvh] pb-[env(safe-area-inset-bottom,0px)] w-full flex items-center justify-between overflow-hidden bg-black"
       >
         {/* Subtle Top & Bottom Gradient Dissolves */}
         <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black via-black/85 to-transparent pointer-events-none z-20" />

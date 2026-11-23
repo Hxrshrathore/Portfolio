@@ -35,12 +35,12 @@ export default function WorldMapSection() {
   const [activeHub, setActiveHub] = useState<number | null>(null)
 
   return (
-    <section className="relative w-full bg-black overflow-hidden border-t border-white/5 h-screen min-h-[680px] max-h-[1000px]">
+    <section className="relative w-full bg-black overflow-x-hidden md:overflow-hidden border-t border-white/5 min-h-screen md:h-screen md:min-h-[680px] md:max-h-[1000px] h-auto pb-12 md:pb-0">
       {/* Background effects */}
       <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-purple-500/[0.015] rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-blue-500/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 h-full flex flex-col" style={{ paddingTop: "clamp(100px, 14vh, 140px)" }}>
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 h-auto md:h-full flex flex-col" style={{ paddingTop: "clamp(60px, 10vh, 140px)" }}>
 
         {/* ── Top: Title Row ── */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 md:mb-8 shrink-0">

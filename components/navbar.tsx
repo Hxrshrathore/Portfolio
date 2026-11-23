@@ -19,7 +19,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-4 left-0 right-0 z-50 pt-1 md:pt-2 px-4 md:px-8">
+      <div className="fixed top-[max(1rem,env(safe-area-inset-top,1rem))] left-0 right-0 z-50 pt-1 md:pt-2 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
           <GlassSurface
             width="100%"

@@ -174,6 +174,21 @@ export function TiltedGridHero({
     return () => ro.disconnect();
   }, [tileHeight, aspectRatio, gap, bend]);
 
+  const [isInView, setIsInView] = React.useState(true);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.01, rootMargin: "100px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   // Fetch every image up front. A tile picks up its next one just before
   // it comes back into view, too late to start loading it then.
   React.useEffect(() => {
@@ -261,6 +276,7 @@ export function TiltedGridHero({
                 transformStyle: "preserve-3d",
                 // Tile t starts t tiles along the loop.
                 animation: `${orbit} ${duration}s linear ${-t * speed}s infinite`,
+                animationPlayState: isInView ? "running" : "paused",
               }}
               onAnimationIteration={(e) => {
                 // elapsedTime counts whole loops, missed events included.

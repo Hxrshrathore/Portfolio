@@ -592,7 +592,7 @@ export default function InfiniteMenuSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen min-h-0 bg-black overflow-hidden border-t border-white/5 flex flex-col"
+      className="relative w-full min-h-screen md:h-screen md:min-h-0 bg-black overflow-x-hidden md:overflow-hidden border-t border-white/5 flex flex-col pb-12 md:pb-4"
     >
       {/* Header */}
       <div className="text-center pt-6 pb-2 px-4 shrink-0">
@@ -606,7 +606,7 @@ export default function InfiniteMenuSection() {
 
       {/* 3-Column Grid Layout */}
       <div className="flex-1 min-h-0 max-w-[1400px] w-full mx-auto px-4 md:px-8 pb-4">
-        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr_260px] lg:grid-cols-[300px_1fr_300px] gap-4 items-center h-full">
+        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr_260px] lg:grid-cols-[300px_1fr_300px] gap-4 items-center h-auto md:h-full">
 
           {/* ─── LEFT COLUMN: Engineering & Architecture Focus ─── */}
           <div

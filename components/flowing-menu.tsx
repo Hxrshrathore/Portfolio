@@ -26,14 +26,17 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
     if (!isMobile) return
 
-    const handleScroll = () => {
+    let rafId: number | null = null
+
+    const updateActiveItem = () => {
+      rafId = null
       if (!menuContainerRef.current) return
       const containerRect = menuContainerRef.current.getBoundingClientRect()
       const vh = window.innerHeight || 800
 
       // Out of view: deactivate all
       if (containerRect.bottom < 0 || containerRect.top > vh) {
-        setActiveIdx(null)
+        setActiveIdx((prev) => (prev === null ? prev : null))
         return
       }
 
@@ -46,7 +49,8 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
       let closestIdx = -1
       let minDistance = Infinity
 
-      itemElements.forEach((el, idx) => {
+      for (let idx = 0; idx < itemElements.length; idx++) {
+        const el = itemElements[idx]
         const rect = el.getBoundingClientRect()
         const itemCenter = rect.top + rect.height / 2
         const dist = Math.abs(itemCenter - viewportCenter)
@@ -54,19 +58,25 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
           minDistance = dist
           closestIdx = idx
         }
-      })
+      }
 
       // Only activate if the single closest item is within the focal focus band
-      if (closestIdx !== -1 && minDistance < vh * 0.25) {
-        setActiveIdx(closestIdx)
-      } else {
-        setActiveIdx(null)
+      const targetIdx = (closestIdx !== -1 && minDistance < vh * 0.25) ? closestIdx : null
+      setActiveIdx((prev) => (prev === targetIdx ? prev : targetIdx))
+    }
+
+    const handleScroll = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(updateActiveItem)
       }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener("scroll", handleScroll)
+    updateActiveItem()
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [items.length])
 
   return (

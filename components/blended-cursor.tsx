@@ -248,8 +248,20 @@ export default function BlendedCursor() {
 
     raf = requestAnimationFrame(tick);
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else if (!raf) {
+        prev = performance.now();
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mousedown", onDown);

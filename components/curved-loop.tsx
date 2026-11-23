@@ -24,6 +24,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
     return (hasTrailing ? marqueeText.replace(/\s+$/, "") : marqueeText) + "\u00A0"
   }, [marqueeText])
 
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const measureRef = useRef<SVGTextElement | null>(null)
   const textPathRef = useRef<SVGTextPathElement | null>(null)
   const pathRef = useRef<SVGPathElement | null>(null)
@@ -53,7 +54,11 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
   useEffect(() => {
     if (!spacing || !ready) return
     let frame = 0
+    let isVisible = false
+    let isRunning = false
+
     const step = () => {
+      if (!isRunning) return
       if (!dragRef.current && textPathRef.current) {
         const delta = dirRef.current === "right" ? speed : -speed
         offsetRef.current += delta
@@ -70,8 +75,51 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
       }
       frame = requestAnimationFrame(step)
     }
-    frame = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(frame)
+
+    const start = () => {
+      if (isRunning || !isVisible || document.hidden) return
+      isRunning = true
+      frame = requestAnimationFrame(step)
+    }
+
+    const stop = () => {
+      isRunning = false
+      if (frame) {
+        cancelAnimationFrame(frame)
+        frame = 0
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible) {
+          start()
+        } else {
+          stop()
+        }
+      },
+      { threshold: 0.02, rootMargin: "150px" }
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stop()
+      } else if (isVisible) {
+        start()
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      stop()
+      observer.disconnect()
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
   }, [spacing, speed, ready])
 
   const onPointerDown = (e: PointerEvent) => {
@@ -111,6 +159,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
 
   return (
     <div
+      ref={containerRef}
       className="py-2 sm:py-4 flex items-center justify-center w-full overflow-visible"
       style={{ visibility: ready ? "visible" : "hidden", cursor: cursorStyle }}
       onPointerDown={onPointerDown}

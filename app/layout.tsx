@@ -1,4 +1,5 @@
 import type React from "react"
+import type { Metadata, Viewport } from "next"
 import { Suspense } from "react"
 import "./globals.css"
 import { Geist, Inter } from "next/font/google"
@@ -16,6 +17,14 @@ import { Analytics } from "@vercel/analytics/next"
 import BugReportWidget from "@/components/bug-report-widget"
 import NavigationWrapper from "@/components/navigation-wrapper"
 import AnalyticsTracker from "@/components/analytics-tracker"
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#000000",
+}
 
 const geistSans = Geist({ 
   subsets: ["latin"],
@@ -97,6 +106,11 @@ export const metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Harsh Kumar",
   },
 }
 

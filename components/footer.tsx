@@ -22,7 +22,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="relative bg-black pt-32 pb-12 overflow-hidden border-t border-white/5">
+    <footer className="relative bg-black pt-32 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
       {/* ── Background Elements ── */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Subtle top glow */}

@@ -83,7 +83,7 @@ export default function Hero() {
       fade={0}
       className="h-screen h-[100dvh] min-h-[560px] md:min-h-[640px] w-full bg-white text-zinc-950"
     >
-      <div className="relative z-10 flex h-full flex-col items-center justify-between pt-20 md:pt-24 pb-12 md:pb-16 text-center">
+      <div className="relative z-10 flex h-full flex-col items-center justify-between pt-20 md:pt-24 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] md:pb-16 text-center">
         <div className="px-6 pt-6 md:pt-10">
           <h1 className="text-balance text-4xl font-medium tracking-tight text-zinc-950 sm:text-5xl">
             Harsh Kumar

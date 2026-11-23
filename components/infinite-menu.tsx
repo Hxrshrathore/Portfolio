@@ -741,7 +741,26 @@ class InfiniteGridMenu {
     this.updateProjectionMatrix()
   }
 
+  private _isRunning: boolean = false
+  private _rafId: number = 0
+
+  public start(): void {
+    if (this._isRunning) return
+    this._isRunning = true
+    this._time = performance.now()
+    this._rafId = requestAnimationFrame((t) => this.run(t))
+  }
+
+  public stop(): void {
+    this._isRunning = false
+    if (this._rafId) {
+      cancelAnimationFrame(this._rafId)
+      this._rafId = 0
+    }
+  }
+
   public run(time = 0): void {
+    if (!this._isRunning) return
     this._deltaTime = Math.min(32, time - this._time)
     this._time = time
     this._deltaFrames = this._deltaTime / this.TARGET_FRAME_DURATION
@@ -750,7 +769,7 @@ class InfiniteGridMenu {
     this.animate(this._deltaTime)
     this.render()
 
-    requestAnimationFrame((t) => this.run(t))
+    this._rafId = requestAnimationFrame((t) => this.run(t))
   }
 
   private init(onInit?: InitCallback): void {
@@ -1227,6 +1246,33 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
       onMovementChangeProp?.(moving)
     }
 
+    let isVisible = false
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        sketch?.stop()
+      } else if (isVisible) {
+        sketch?.start()
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible) {
+          if (!document.hidden) sketch?.start()
+        } else {
+          sketch?.stop()
+        }
+      },
+      { threshold: 0.02, rootMargin: "150px" }
+    )
+
+    if (canvas) {
+      observer.observe(canvas)
+    }
+
     if (canvas) {
       sketch = new InfiniteGridMenu(
         canvas,
@@ -1237,7 +1283,9 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
           sketchRef.current = sk
           ;(window as any).__infiniteMenuNavigate = (direction: "prev" | "next", explicitTargetItem?: number) =>
             sk.navigate(direction, explicitTargetItem)
-          sk.run()
+          if (isVisible && !document.hidden) {
+            sk.start()
+          }
         },
       )
     }
@@ -1252,6 +1300,9 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
     handleResize()
 
     return () => {
+      observer.disconnect()
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      sketch?.stop()
       window.removeEventListener("resize", handleResize)
       delete (window as any).__infiniteMenuNavigate
     }

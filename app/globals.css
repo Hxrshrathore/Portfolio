@@ -13,6 +13,7 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
     scroll-behavior: auto !important; /* Extremely important: stops native scroll from fighting GSAP */
+    background-color: #000000;
   }
 
   :root {

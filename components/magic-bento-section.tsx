@@ -4,13 +4,13 @@ import MagicBento from "./magic-bento"
 
 export default function MagicBentoSection() {
   return (
-    <section className="relative w-full h-screen bg-black overflow-hidden border-t border-white/5 flex flex-col">
+    <section className="relative w-full min-h-screen md:h-screen bg-black overflow-x-hidden md:overflow-hidden border-t border-white/5 flex flex-col py-8 md:py-0">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full max-w-7xl mx-auto w-full px-4">
+      <div className="relative z-10 flex flex-col h-auto md:h-full max-w-7xl mx-auto w-full px-4">
         {/* Header */}
         <div className="text-center pt-6 pb-2 shrink-0">
           <span className="text-white/40 text-[10px] font-mono tracking-[0.25em] uppercase block mb-1">
