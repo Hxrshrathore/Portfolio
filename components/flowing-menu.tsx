@@ -90,7 +90,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
             {text}
           </span>
           <div
-            className="w-[180px] md:w-[240px] h-full self-stretch my-0 mx-[1.5vw] rounded-lg bg-cover bg-center shrink-0 border border-black/10 shadow-md overflow-hidden"
+            className="w-[180px] md:w-[240px] h-[calc(100%-12px)] md:h-[calc(100%-16px)] my-auto mx-[1.5vw] rounded-lg bg-cover bg-center shrink-0 border border-black/10 shadow-sm overflow-hidden"
             style={{ backgroundImage: currentImage ? `url(${currentImage})` : undefined }}
           />
         </React.Fragment>
