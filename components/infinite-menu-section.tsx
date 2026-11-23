@@ -425,7 +425,7 @@ export default function InfiniteMenuSection() {
                   <h3 className="text-base font-bold text-white tracking-tight">
                     {activeItem.title}
                   </h3>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-white/40 block mt-0.5">
+                  <span className="text-xs text-gray-400 font-light leading-relaxed block mt-0.5">
                     {activeItem.category}
                   </span>
                 </div>
@@ -661,7 +661,7 @@ export default function InfiniteMenuSection() {
                   </p>
                   <div className="flex items-center gap-2 pt-2 border-t border-white/5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-white/60 text-xs font-mono">{activeItem.organization}</span>
+                    <span className="text-white/60 text-xs font-light">{activeItem.organization}</span>
                   </div>
                 </div>
               </GlassSurface>
