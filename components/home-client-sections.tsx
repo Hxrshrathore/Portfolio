@@ -27,7 +27,17 @@ export const WorldMapClient = dynamic(() => import("@/components/world-map-secti
   loading: () => <div className="min-h-[600px] w-full bg-black" />
 })
 
+export const TestimonialGlobeClient = dynamic(() => import("@/components/testimonial-globe-section"), {
+  ssr: false,
+  loading: () => <div className="min-h-[500px] w-full bg-black" />
+})
+
 export const OrbClient = dynamic(() => import("@/components/orb-section"), {
   ssr: false,
   loading: () => <div className="min-h-[500px] w-full bg-black" />
+})
+
+export const DualWheelSectionClient = dynamic(() => import("@/components/dual-wheel-section"), {
+  ssr: false,
+  loading: () => <div className="h-[260vh] w-full bg-black" />
 })

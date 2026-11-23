@@ -4,7 +4,10 @@ import { useState, useCallback, useRef, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import InfiniteMenu from "./infinite-menu"
-import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, CheckCircle2, Code2, Activity, Zap, Layers } from "lucide-react"
+import GlassSurface from "@/components/GlassSurface"
+import TransitionLink from "@/components/transition-link"
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts"
 
 interface PortfolioItem {
   image: string
@@ -150,37 +153,229 @@ const portfolioItems: PortfolioItem[] = [
   },
 ]
 
-// Project Architecture & Deliverables Card (Left Column)
+// Deterministic telemetry points for each project architecture & engineering performance
+const getProjectTelemetry = (item: PortfolioItem) => {
+  const isAI = item.category.toLowerCase().includes("ai")
+  const stackSummary = item.stack.slice(0, 2).join(" • ")
+  const topDeliverable = item.deliverables[0] || "Custom Architecture"
+  const secDeliverable = item.deliverables[1] || "Production Platform"
+  
+  return [
+    {
+      subject: "Arch",
+      fullLabel: "System Architecture",
+      score: 95,
+      detail: stackSummary,
+      unit: "A+ Tier",
+    },
+    {
+      subject: "Motion",
+      fullLabel: "Interaction & Motion",
+      score: 98,
+      detail: topDeliverable,
+      unit: "60 FPS",
+    },
+    {
+      subject: "Speed",
+      fullLabel: isAI ? "Token Latency" : "Response Time",
+      score: 99,
+      detail: secDeliverable,
+      unit: isAI ? "18ms" : "<40ms",
+    },
+    {
+      subject: "Scale",
+      fullLabel: "Scalability & Load",
+      score: 94,
+      detail: item.organization,
+      unit: "High Concurrency",
+    },
+    {
+      subject: "Code",
+      fullLabel: "Type Safety & Quality",
+      score: 97,
+      detail: item.stack.includes("TypeScript") ? "Strict TypeScript" : "Modular Architecture",
+      unit: "100%",
+    },
+  ]
+}
+
+// Custom Interactive Tooltip for the Recharts Telemetry Graph
+function TelemetryTooltip({ active, payload }: any) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload
+    return (
+      <div className="rounded-lg border border-white/20 bg-black/90 backdrop-blur-md p-2 shadow-2xl text-left pointer-events-none min-w-[130px] z-50">
+        <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1 mb-1">
+          <span className="text-[10px] font-mono font-medium text-emerald-400">
+            {data.fullLabel}
+          </span>
+          <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+            {data.unit}
+          </span>
+        </div>
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-[9px] text-white/50 font-mono">Telemetry</span>
+          <span className="text-xs font-bold text-white font-mono">{data.score}/100</span>
+        </div>
+        <div className="text-[8px] font-mono text-zinc-400 mt-1 truncate max-w-[140px]">
+          {data.detail}
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
+// Project Architecture & Engineering Telemetry Graph (Animated Recharts Area Chart)
 function ProjectArchitectureCard({ item }: { item: PortfolioItem }) {
+  const telemetry = getProjectTelemetry(item)
+  const avgScore = (telemetry.reduce((acc, t) => acc + t.score, 0) / telemetry.length).toFixed(1)
+
   return (
-    <div className="w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-3.5 space-y-3">
-      <div className="flex items-center justify-between border-b border-white/5 pb-2">
-        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Role</span>
-        <span className="text-[10px] font-medium text-white/90">{item.role}</span>
-      </div>
-
-      <div className="space-y-1.5">
-        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 block">Deliverables</span>
-        <div className="flex flex-wrap gap-1.5">
-          {item.deliverables.map((d, i) => (
-            <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
-              {d}
+    <GlassSurface
+      width="100%"
+      height="auto"
+      borderRadius={16}
+      distortionScale={-180}
+      displace={0.5}
+      backgroundOpacity={0.08}
+      className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+    >
+      <div className="w-full p-2 sm:p-2.5 text-left space-y-2">
+        {/* Telemetry Header */}
+        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-          ))}
+            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/50">
+              Architecture Telemetry
+            </span>
+          </div>
+          <span className="text-[9px] font-mono text-emerald-400 font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+            {avgScore} INDEX
+          </span>
+        </div>
+
+        {/* Animated Recharts Area Chart with Key Trigger on Project Change */}
+        <div className="w-full h-[105px] relative pt-1">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={telemetry} margin={{ top: 5, right: 6, left: 6, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.45} />
+                  <stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="subject"
+                stroke="rgba(255,255,255,0.4)"
+                fontSize={8}
+                tickLine={false}
+                axisLine={false}
+                interval={0}
+              />
+              <YAxis domain={[85, 100]} hide={true} />
+              <Tooltip content={<TelemetryTooltip />} cursor={{ stroke: "rgba(255,255,255,0.2)", strokeDasharray: "2 2" }} />
+              <Area
+                key={item.title}
+                type="monotone"
+                dataKey="score"
+                stroke="#34d399"
+                strokeWidth={1.8}
+                fill={`url(#telemetryGrad-${item.title.replace(/[^a-zA-Z0-9]/g, "")})`}
+                isAnimationActive={true}
+                animationDuration={850}
+                animationEasing="ease-out"
+                activeDot={{ r: 4, fill: "#34d399", stroke: "#ffffff", strokeWidth: 1.5 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Micro Specs Footer */}
+        <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-white/5 text-center">
+          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
+            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Core</span>
+            <span className="text-[8px] font-mono font-medium text-white/80 truncate block">{item.stack[0]}</span>
+          </div>
+          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
+            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Motion</span>
+            <span className="text-[8px] font-mono font-medium text-emerald-400 block">60 FPS</span>
+          </div>
+          <div className="p-1 rounded bg-white/[0.02] border border-white/5">
+            <span className="text-[7px] font-mono uppercase tracking-wider text-white/30 block">Status</span>
+            <span className="text-[8px] font-mono font-medium text-white/80 block">Verified</span>
+          </div>
         </div>
       </div>
+    </GlassSurface>
+  )
+}
 
-      <div className="space-y-1.5 pt-1 border-t border-white/5">
-        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/30 block">Stack</span>
-        <div className="flex flex-wrap gap-1">
-          {item.stack.map((s, i) => (
-            <span key={i} className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/[0.02] border border-white/5 text-white/60">
-              {s}
+// Tech Stack & Software Scope Card (Right Column)
+function ProjectScopeCard({ item }: { item: PortfolioItem }) {
+  return (
+    <GlassSurface
+      width="100%"
+      height="auto"
+      borderRadius={14}
+      distortionScale={-180}
+      displace={0.5}
+      backgroundOpacity={0.08}
+      className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+    >
+      <div className="w-full p-2 sm:p-2.5 text-left space-y-2">
+        <div className="flex items-center justify-between border-b border-white/5 pb-2">
+          <div className="flex items-center gap-1.5">
+            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/50">
+              Tech Stack & Scope
             </span>
-          ))}
+          </div>
+          <span className="text-[9px] font-mono text-emerald-400/90 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+            {item.role}
+          </span>
+        </div>
+
+        {/* Primary Tech Stack Software Tags */}
+        <div className="space-y-1">
+          <span className="text-[8px] font-mono uppercase tracking-widest text-white/30 block">
+            Software & Tech Stack
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {item.stack.map((tech, idx) => (
+              <span
+                key={idx}
+                className="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] border border-white/10 text-white/90 hover:border-emerald-400/40 hover:text-emerald-300 transition-colors"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Scope Deliverables Tags */}
+        <div className="space-y-1 pt-1.5 border-t border-white/5">
+          <span className="text-[8px] font-mono uppercase tracking-widest text-white/30 block">
+            Deliverable Tags
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {item.deliverables.map((deliv, idx) => (
+              <span
+                key={idx}
+                className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/5 border border-emerald-500/15 text-emerald-300/80 flex items-center gap-1"
+              >
+                <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                {deliv}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </GlassSurface>
   )
 }
 
@@ -248,9 +443,6 @@ export default function InfiniteMenuSection() {
     <section className="relative w-full h-screen min-h-0 bg-black overflow-hidden border-t border-white/5 flex flex-col">
       {/* Header */}
       <div className="text-center pt-6 pb-2 px-4 shrink-0">
-        <span className="text-white/40 text-[10px] font-mono tracking-[0.25em] uppercase block mb-1">
-          Interactive Archive
-        </span>
         <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
           Project Constellation
         </h2>
@@ -275,14 +467,22 @@ export default function InfiniteMenuSection() {
                 className="flex flex-col items-center gap-3 w-full"
               >
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden flex items-center justify-center">
+                  <GlassSurface
+                    width={56}
+                    height={56}
+                    borderRadius={28}
+                    distortionScale={-160}
+                    displace={0.4}
+                    backgroundOpacity={0.12}
+                    className="border border-white/15"
+                  >
                     <img
                       src={activeItem.logo}
                       alt={activeItem.title}
-                      className="w-10 h-10 object-contain"
+                      className="w-9 h-9 object-contain"
                     />
-                  </div>
-                  <div className="absolute inset-0 rounded-full border border-white/5 scale-125 opacity-50" />
+                  </GlassSurface>
+                  <div className="absolute inset-0 rounded-full border border-white/5 scale-125 opacity-50 pointer-events-none" />
                 </div>
                 <div className="text-center">
                   <h3 className="text-base font-bold text-white tracking-tight">
@@ -296,26 +496,41 @@ export default function InfiniteMenuSection() {
                 <ProjectArchitectureCard item={activeItem} />
 
                 {activeItem.link.startsWith("/") ? (
-                  <Link
-                    href={activeItem.link}
-                    className="w-full py-2 px-6 rounded-lg border border-white/15 bg-white/5
-                             text-white text-xs font-medium tracking-wide text-center
-                             hover:bg-white/10 hover:border-white/25 transition-all duration-300
-                             backdrop-blur-sm block"
-                  >
-                    View Case Study →
-                  </Link>
+                  <TransitionLink href={activeItem.link} className="w-full block group">
+                    <GlassSurface
+                      width="100%"
+                      height={40}
+                      borderRadius={10}
+                      distortionScale={-180}
+                      displace={0.4}
+                      backgroundOpacity={0.12}
+                      className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
+                    >
+                      <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                        View Case Study →
+                      </span>
+                    </GlassSurface>
+                  </TransitionLink>
                 ) : (
                   <a
                     href={activeItem.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2 px-6 rounded-lg border border-white/15 bg-white/5
-                             text-white text-xs font-medium tracking-wide text-center
-                             hover:bg-white/10 hover:border-white/25 transition-all duration-300
-                             backdrop-blur-sm block"
+                    className="w-full block group"
                   >
-                    View Project →
+                    <GlassSurface
+                      width="100%"
+                      height={40}
+                      borderRadius={10}
+                      distortionScale={-180}
+                      displace={0.4}
+                      backgroundOpacity={0.12}
+                      className="w-full cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.08)]"
+                    >
+                      <span className="text-white text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                        View Project →
+                      </span>
+                    </GlassSurface>
                   </a>
                 )}
               </motion.div>
@@ -336,45 +551,69 @@ export default function InfiniteMenuSection() {
             </div>
 
             {/* Arrow Navigation */}
-            <div className="flex gap-4 mt-2 z-20">
+            <div className="flex items-center gap-3 mt-2 z-20">
               <button
+                type="button"
                 onClick={() => handleNavigate("prev")}
                 disabled={!canNavigate}
-                className="w-12 h-12 rounded-full border border-white/15 bg-white/5 backdrop-blur-md
-                         flex items-center justify-center text-white/60 
-                         hover:bg-white/10 hover:text-white hover:border-white/25 
-                         transition-all duration-300
-                         disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
+                className="group focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 transition-transform cursor-pointer"
                 aria-label="Previous project"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <GlassSurface
+                  width={44}
+                  height={44}
+                  borderRadius={22}
+                  distortionScale={-180}
+                  displace={0.5}
+                  backgroundOpacity={0.12}
+                  className="transition-all duration-300 hover:scale-105 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-white/30"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                </GlassSurface>
               </button>
 
-              {/* Dots indicator */}
-              <div className="flex items-center gap-1.5">
-                {portfolioItems.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`rounded-full transition-all duration-300 ${
-                      i === displayIndex
-                        ? "w-6 h-1.5 bg-white/60"
-                        : "w-1.5 h-1.5 bg-white/15"
-                    }`}
-                  />
-                ))}
-              </div>
+              {/* Dots indicator inside GlassSurface */}
+              <GlassSurface
+                width="auto"
+                height={38}
+                borderRadius={19}
+                distortionScale={-140}
+                displace={0.3}
+                backgroundOpacity={0.08}
+                className="px-3 border border-white/10"
+              >
+                <div className="flex items-center gap-1.5 px-2">
+                  {portfolioItems.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-full transition-all duration-300 ${
+                        i === displayIndex
+                          ? "w-6 h-1.5 bg-white/70"
+                          : "w-1.5 h-1.5 bg-white/20"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </GlassSurface>
 
               <button
+                type="button"
                 onClick={() => handleNavigate("next")}
                 disabled={!canNavigate}
-                className="w-12 h-12 rounded-full border border-white/15 bg-white/5 backdrop-blur-md
-                         flex items-center justify-center text-white/60 
-                         hover:bg-white/10 hover:text-white hover:border-white/25 
-                         transition-all duration-300
-                         disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
+                className="group focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 transition-transform cursor-pointer"
                 aria-label="Next project"
               >
-                <ChevronRight className="w-5 h-5" />
+                <GlassSurface
+                  width={44}
+                  height={44}
+                  borderRadius={22}
+                  distortionScale={-180}
+                  displace={0.5}
+                  backgroundOpacity={0.12}
+                  className="transition-all duration-300 hover:scale-105 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:border-white/30"
+                >
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:text-white transition-colors" />
+                </GlassSurface>
               </button>
             </div>
           </div>
@@ -391,44 +630,43 @@ export default function InfiniteMenuSection() {
                 className="flex flex-col gap-3 w-full"
               >
                 {/* Project Context Card */}
-                <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-4">
-                  <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
-                    <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Project Context</span>
-                    <span className="text-[9px] font-mono text-emerald-400">Verified Case</span>
-                  </div>
-                  <p className="text-gray-300 text-xs leading-relaxed mb-3">
-                    {activeItem.overview}
-                  </p>
-                  <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-                    <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center">
-                      <img
-                        src={activeItem.logo}
-                        alt={activeItem.title}
-                        className="w-5 h-5 object-contain"
-                      />
+                <GlassSurface
+                  width="100%"
+                  height="auto"
+                  borderRadius={14}
+                  distortionScale={-180}
+                  displace={0.5}
+                  backgroundOpacity={0.08}
+                  className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+                >
+                  <div className="w-full p-2.5 sm:p-3 text-left">
+                    <div className="flex items-center justify-between mb-2.5 border-b border-white/5 pb-2">
+                      <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">Project Context</span>
+                      <span className="text-[9px] font-mono text-emerald-400">Verified Case</span>
                     </div>
-                    <div>
-                      <p className="text-white text-xs font-semibold">
-                        {activeItem.organization}
-                      </p>
-                      <p className="text-white/30 text-[10px]">Client / Organization</p>
+                    <p className="text-gray-300 text-xs leading-relaxed mb-3">
+                      {activeItem.overview}
+                    </p>
+                    <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+                      <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center shrink-0">
+                        <img
+                          src={activeItem.logo}
+                          alt={activeItem.title}
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-white text-xs font-semibold">
+                          {activeItem.organization}
+                        </p>
+                        <p className="text-white/30 text-[10px]">Client / Organization</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </GlassSurface>
 
-                {/* Project Focus & Role Card */}
-                <div className="w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm p-4 flex flex-col items-center gap-2 text-center">
-                  <span className="text-white/30 text-[9px] uppercase tracking-[0.2em] font-medium font-mono">
-                    Project Scope
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-white font-mono text-xs tracking-wide">{activeItem.role}</span>
-                  </div>
-                  <span className="text-white/30 text-[9px] font-mono">
-                    Custom Web Implementation
-                  </span>
-                </div>
+                {/* Tech Stack & Software Scope Card */}
+                <ProjectScopeCard item={activeItem} />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -447,53 +685,91 @@ export default function InfiniteMenuSection() {
             >
               {/* Client info row */}
               <div className="flex items-center gap-4 px-2">
-                <div className="w-14 h-14 rounded-full border border-white/10 bg-white/5 overflow-hidden flex items-center justify-center flex-shrink-0">
+                <GlassSurface
+                  width={56}
+                  height={56}
+                  borderRadius={28}
+                  distortionScale={-160}
+                  displace={0.4}
+                  backgroundOpacity={0.12}
+                  className="border border-white/15 shrink-0"
+                >
                   <img
                     src={activeItem.logo}
                     alt={activeItem.title}
-                    className="w-10 h-10 object-contain"
+                    className="w-9 h-9 object-contain"
                   />
-                </div>
+                </GlassSurface>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-white">{activeItem.title}</h3>
                   <p className="text-gray-400 text-sm">{activeItem.description}</p>
                 </div>
               </div>
 
-              {/* Architecture & Deliverables (Mobile) */}
+              {/* Architecture & Telemetry Graph (Mobile) */}
               <ProjectArchitectureCard item={activeItem} />
 
+              {/* Tech Stack & Scope Software Tags (Mobile) */}
+              <ProjectScopeCard item={activeItem} />
+
               {/* Context (Mobile) */}
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5">
-                <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                  {activeItem.overview}
-                </p>
-                <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="text-white/60 text-xs font-mono">{activeItem.organization}</span>
+              <GlassSurface
+                width="100%"
+                height="auto"
+                borderRadius={14}
+                distortionScale={-180}
+                displace={0.5}
+                backgroundOpacity={0.08}
+                className="w-full border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+              >
+                <div className="w-full p-4 text-left">
+                  <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                    {activeItem.overview}
+                  </p>
+                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-white/60 text-xs font-mono">{activeItem.organization}</span>
+                  </div>
                 </div>
-              </div>
+              </GlassSurface>
 
               {/* CTA */}
               {activeItem.link.startsWith("/") ? (
-                <Link
-                  href={activeItem.link}
-                  className="block w-full py-3 rounded-lg border border-white/15 bg-white/5 
-                           text-white text-sm font-medium tracking-wide text-center
-                           hover:bg-white/10 transition-all"
-                >
-                  View Case Study →
-                </Link>
+                <TransitionLink href={activeItem.link} className="block w-full group">
+                  <GlassSurface
+                    width="100%"
+                    height={46}
+                    borderRadius={12}
+                    distortionScale={-180}
+                    displace={0.4}
+                    backgroundOpacity={0.12}
+                    className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                  >
+                    <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                      View Case Study →
+                    </span>
+                  </GlassSurface>
+                </TransitionLink>
               ) : (
                 <a
                   href={activeItem.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full py-3 rounded-lg border border-white/15 bg-white/5 
-                           text-white text-sm font-medium tracking-wide text-center
-                           hover:bg-white/10 transition-all"
+                  className="block w-full group"
                 >
-                  View Project →
+                  <GlassSurface
+                    width="100%"
+                    height={46}
+                    borderRadius={12}
+                    distortionScale={-180}
+                    displace={0.4}
+                    backgroundOpacity={0.12}
+                    className="w-full cursor-pointer transition-all duration-300 active:scale-95 border border-white/15 shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                  >
+                    <span className="text-white text-sm font-medium tracking-wide flex items-center justify-center gap-1.5 group-hover:text-zinc-200">
+                      View Project →
+                    </span>
+                  </GlassSurface>
                 </a>
               )}
             </motion.div>

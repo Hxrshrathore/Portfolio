@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { ArrowUpRight } from "lucide-react"
 import Orb from "./orb"
 import CircularText from "./ui/circular-text"
-import Link from "next/link"
 import ContactModal from "./contact-modal"
 
 export default function OrbSection() {
@@ -25,9 +25,9 @@ export default function OrbSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter leading-[0.8] flex flex-col uppercase select-none cursor-default">
+            <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-none flex items-baseline gap-3 sm:gap-4 uppercase select-none cursor-default">
               <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">LET&apos;S</span>
-              <span className="font-light italic text-white/10 -mt-2 md:-mt-8 transition-all duration-700 hover:text-white/30">TALK</span>
+              <span className="font-light text-zinc-400 transition-colors duration-300 hover:text-zinc-300">TALK</span>
             </h2>
           </motion.div>
           
@@ -36,12 +36,11 @@ export default function OrbSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="flex flex-col space-y-4"
+            className="flex flex-col"
           >
-            <p className="text-gray-300 text-base md:text-lg font-bold tracking-[0.3em] uppercase">
-              HAVE A PROJECT IN MIND?
+            <p className="text-zinc-400 text-base md:text-lg font-light tracking-wide">
+              Have a project in mind?
             </p>
-            <div className="h-px w-24 bg-white/20" />
           </motion.div>
         </div>
 
@@ -55,18 +54,30 @@ export default function OrbSection() {
             className="relative w-[320px] h-[320px] sm:w-[400px] sm:h-[400px] md:w-[480px] md:h-[480px]"
           >
             {/* Unified Contact Trigger Container */}
-            <button
+            <div
               onClick={() => setIsContactModalOpen(true)}
-              className="absolute inset-0 w-full h-full flex items-center justify-center cursor-pointer focus:outline-none group p-0 m-0 border-none bg-transparent"
+              className="absolute inset-0 w-full h-full flex items-center justify-center focus:outline-none group p-0 m-0 bg-transparent select-none cursor-default"
               aria-label="Open contact form"
             >
               {/* Main Orb Trigger */}
               <div className="absolute top-1/2 left-1/2 w-[220px] h-[220px] sm:w-[280px] sm:h-[280px] md:w-[340px] md:h-[340px] -translate-x-1/2 -translate-y-1/2 transition-transform duration-700 group-hover:scale-110 z-20 flex items-center justify-center">
                 <Orb />
+                {/* Invisible surrounding circle acting as the anchor for BlendedCursor fill */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsContactModalOpen(true)
+                  }}
+                  className="absolute inset-auto w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full border border-transparent bg-transparent flex items-center justify-center z-30 cursor-pointer focus:outline-none transition-transform duration-300 group-hover:scale-110"
+                  aria-label="Contact Harsh"
+                >
+                  <ArrowUpRight className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 text-white transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 pointer-events-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]" />
+                </button>
               </div>
 
               {/* Rotating "CONTACT ME" Circular Text */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center pointer-events-none">
                 <CircularText
                   text="LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * LET'S CONNECT * "
                   spinDuration={25}
@@ -74,7 +85,7 @@ export default function OrbSection() {
                   className="w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[460px] md:h-[460px]"
                 />
               </div>
-            </button>
+            </div>
           </motion.div>
         </div>
       </div>

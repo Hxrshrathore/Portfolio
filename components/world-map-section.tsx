@@ -64,7 +64,7 @@ export default function WorldMapSection() {
             >
               <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">Based in India,</span>
               <br />
-              <span className="italic font-light text-zinc-400">open to remote collaboration</span>
+              <span className="font-light text-zinc-400">open to remote collaboration</span>
             </motion.h2>
           </div>
 

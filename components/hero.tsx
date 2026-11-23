@@ -1,143 +1,146 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import dynamic from "next/dynamic"
-import { motion, type Variants } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { usePageTransition } from "@/components/page-transition"
-import { FileText, ArrowUpRight, Sparkles } from "lucide-react"
+import * as React from "react";
+import { TiltedGridHero, type TiltedGridImage } from "@/components/ui/tilted-grid-hero";
+import GlassSurface from "@/components/GlassSurface";
+import TransitionLink from "@/components/transition-link";
+import { ArrowUpRight, FileUser } from "lucide-react";
 
-// Dynamic import of LiquidChrome canvas to preserve SSR for semantic HTML
-const LiquidChrome = dynamic(() => import("@/components/liquid-chrome"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-black" />
-})
+// Website mockup screenshots from the projects / work page hero section
+const CDN = "https://pub-546a6f9534fa4f7abd35b1c5c23bb394.r2.dev/projects";
+
+const IMAGES: TiltedGridImage[] = [
+  {
+    src: `${CDN}/Nutgram.png`,
+    alt: "Nutgram client portal website mockup",
+  },
+  {
+    src: `${CDN}/KIITFEST.png`,
+    alt: "KIITFEST university festival website mockup",
+  },
+  {
+    src: `${CDN}/Kritarth.png`,
+    alt: "Kritarth social initiative platform mockup",
+  },
+  {
+    src: `${CDN}/Hermes%20Racing.png`,
+    alt: "Hermes Racing Formula Student team mockup",
+  },
+  {
+    src: `${CDN}/Viral%20ARC.png`,
+    alt: "Viral ARC creator platform mockup",
+  },
+  {
+    src: `${CDN}/Chimera.png`,
+    alt: "Chimera tech symposium website mockup",
+  },
+  {
+    src: `${CDN}/Udghosh.png`,
+    alt: "Udghosh festival website mockup",
+  },
+  {
+    src: `${CDN}/TEDxKIIT%20University.png`,
+    alt: "TEDxKIIT University conference mockup",
+  },
+  {
+    src: `${CDN}/KIIT%20MUN.png`,
+    alt: "KIIT MUN conference platform mockup",
+  },
+  {
+    src: `${CDN}/Nexus%20AI.png`,
+    alt: "Nexus AI assistant mockup",
+  },
+  {
+    src: `${CDN}/Verinews.png`,
+    alt: "Verinews automated news aggregator mockup",
+  },
+  {
+    src: `${CDN}/Estate.png`,
+    alt: "Estate architectural digital experience mockup",
+  },
+  {
+    src: `${CDN}/Blunt%20E-commerce.png`,
+    alt: "Blunt e-commerce storefront mockup",
+  },
+  {
+    src: `${CDN}/Pandav%20Studio.png`,
+    alt: "Pandav Studio creative production mockup",
+  },
+  {
+    src: `${CDN}/Acsent%20Choacing%20Center.png`,
+    alt: "Acsent Coaching website mockup",
+  },
+  {
+    src: `${CDN}/Bikash%20Vidalya.png`,
+    alt: "Bikash Vidyalaya institution portal mockup",
+  },
+];
 
 export default function Hero() {
-  const { navigateTo } = usePageTransition()
-  const [hasResume, setHasResume] = useState(false)
-
-  // Verify whether a real resume PDF exists at /resume.pdf
-  useEffect(() => {
-    fetch("/resume.pdf", { method: "HEAD" })
-      .then((res) => {
-        if (res.ok && res.headers.get("content-type")?.includes("pdf")) {
-          setHasResume(true)
-        }
-      })
-      .catch(() => {
-        setHasResume(false)
-      })
-  }, [])
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.15,
-      },
-    },
-  }
-
-  const childVariants: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.7,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-  }
-
   return (
-    <div className="relative min-h-[92svh] md:min-h-[96vh] w-full overflow-hidden bg-black flex items-center justify-center">
-      {/* Dynamic WebGL Canvas Layer */}
-      <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
-        <LiquidChrome
-          baseColor={[0.015, 0.015, 0.015]}
-          speed={0.16}
-          amplitude={0.17}
-          frequencyX={2.5}
-          frequencyY={1.5}
-          interactive={false}
-        />
-        {/* Bottom Blend Overlay */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-[5]" />
-      </div>
-
-      {/* Main Semantic Content (Visible in SSR & crawlers) */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center px-4 pt-20 md:pt-28 pb-16 text-center"
-      >
-        {/* Positioning Badge */}
-        <motion.div variants={childVariants} className="mb-6 md:mb-8">
-          <div className="inline-flex items-center space-x-2.5 bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5 shadow-[0_0_30px_rgba(255,255,255,0.03)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-white/80 text-[11px] md:text-xs font-mono tracking-[0.15em] uppercase">
-              Harsh Kumar • Forward Deployed Engineer & Applied AI
+    <TiltedGridHero
+      images={IMAGES}
+      fade={0}
+      className="h-screen min-h-[640px] w-full bg-white text-zinc-950"
+    >
+      <div className="relative z-10 flex h-full flex-col items-center justify-between pt-20 md:pt-24 pb-12 md:pb-16 text-center">
+        <div className="px-6 pt-6 md:pt-10">
+          <h1 className="text-balance text-4xl font-medium tracking-tight text-zinc-950 sm:text-5xl">
+            Harsh Kumar
+            <br />
+            <span className="text-zinc-600 font-normal text-2xl sm:text-3xl md:text-4xl block mt-1">
+              Forward Deployed Engineer Intern
             </span>
-          </div>
-        </motion.div>
+          </h1>
+        </div>
 
-        {/* Primary Semantic H1 */}
-        <motion.h1
-          variants={childVariants}
-          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-b from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent tracking-tight max-w-4xl leading-[1.08] mb-6"
-        >
-          Product-Minded Software Engineer & Applied AI Builder
-        </motion.h1>
+        <div className="flex flex-col items-center gap-5 px-6">
+          <p className="max-w-md text-balance text-sm text-zinc-600 sm:text-base">
+            I design, engineer, and ship full-stack products, AI-powered applications, and integrations.
+          </p>
 
-        {/* Supporting Copy */}
-        <motion.p
-          variants={childVariants}
-          className="text-base sm:text-lg md:text-xl text-zinc-300/90 mb-10 md:mb-12 max-w-2xl px-4 font-light leading-relaxed tracking-wide"
-        >
-          I design, engineer, and ship full-stack products, AI-powered applications, and integrations — from figuring out the problem to getting the solution running.
-        </motion.p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <TransitionLink href="/projects" className="inline-block group">
+              <GlassSurface
+                width={154}
+                height={46}
+                borderRadius={23}
+                distortionScale={-180}
+                displace={0.5}
+                backgroundOpacity={0.12}
+                className="cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)]"
+              >
+                <span className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-zinc-900 group-hover:text-black">
+                  Portfolio
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </GlassSurface>
+            </TransitionLink>
 
-        {/* Primary Calls to Action */}
-        <motion.div variants={childVariants} className="flex flex-wrap items-center justify-center gap-4">
-          <Button
-            size="lg"
-            onClick={() => navigateTo("/projects")}
-            className="group relative overflow-hidden bg-white text-black hover:bg-white rounded-full px-8 md:px-10 py-6 text-xs font-semibold tracking-[0.2em] uppercase transition-all shadow-[0_0_40px_rgba(255,255,255,0.18)]"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Explore Case Studies
-              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-            <div className="absolute inset-0 bg-zinc-200 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-          </Button>
-
-          {hasResume ? (
             <a
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase text-white/80 border border-white/15 bg-white/[0.03] hover:bg-white/10 hover:border-white/30 transition-all backdrop-blur-sm"
+              className="inline-block group"
             >
-              <FileText className="w-3.5 h-3.5 text-zinc-400" />
-              <span>View Resume</span>
+              <GlassSurface
+                width={154}
+                height={46}
+                borderRadius={23}
+                distortionScale={-180}
+                displace={0.5}
+                backgroundOpacity={0.12}
+                className="cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)]"
+              >
+                <span className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-zinc-900 group-hover:text-black">
+                  Résumé
+                  <FileUser className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:scale-110" />
+                </span>
+              </GlassSurface>
             </a>
-          ) : (
-            <button
-              onClick={() => navigateTo("/contact")}
-              className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase text-white/60 border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:text-white/90 hover:border-white/20 transition-all backdrop-blur-sm"
-              title="Resume available upon direct request"
-            >
-              <FileText className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Resume on Request</span>
-            </button>
-          )}
-        </motion.div>
-      </motion.div>
-    </div>
-  )
+          </div>
+        </div>
+      </div>
+    </TiltedGridHero>
+  );
 }
