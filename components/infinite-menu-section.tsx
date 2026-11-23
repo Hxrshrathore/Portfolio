@@ -338,6 +338,9 @@ export default function InfiniteMenuSection() {
   const [displayIndex, setDisplayIndex] = useState(0)
   const [isGlobeMoving, setIsGlobeMoving] = useState(false)
   const [canNavigate, setCanNavigate] = useState(true)
+  const [isCardHovered, setIsCardHovered] = useState(false)
+  const [isInView, setIsInView] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
   const navigateRef = useRef<((direction: "prev" | "next") => void) | null>(null)
 
   const activeIndexRef = useRef(0)
@@ -376,8 +379,41 @@ export default function InfiniteMenuSection() {
     }
   }, [isGlobeMoving, activeIndex])
 
+  // Intersection Observer to detect when section is visible in viewport
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    if (typeof IntersectionObserver !== "undefined") {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setIsInView(entry.isIntersecting)
+        },
+        { threshold: 0.2 }
+      )
+      observer.observe(el)
+      return () => observer.disconnect()
+    } else {
+      setIsInView(true)
+    }
+  }, [])
+
+  // Auto-switch project every 3.5 seconds
+  useEffect(() => {
+    if (!isInView || isCardHovered || isGlobeMoving) return
+
+    const interval = setInterval(() => {
+      handleNavigate("next")
+    }, 3500)
+
+    return () => clearInterval(interval)
+  }, [isInView, isCardHovered, isGlobeMoving, handleNavigate])
+
   return (
-    <section className="relative w-full h-screen min-h-0 bg-black overflow-hidden border-t border-white/5 flex flex-col">
+    <section
+      ref={sectionRef}
+      className="relative w-full h-screen min-h-0 bg-black overflow-hidden border-t border-white/5 flex flex-col"
+    >
       {/* Header */}
       <div className="text-center pt-6 pb-2 px-4 shrink-0">
         <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
@@ -393,7 +429,11 @@ export default function InfiniteMenuSection() {
         <div className="grid grid-cols-1 md:grid-cols-[260px_1fr_260px] lg:grid-cols-[300px_1fr_300px] gap-4 items-center h-full">
 
           {/* ─── LEFT COLUMN: Engineering & Architecture Focus ─── */}
-          <div className="hidden md:flex flex-col items-center gap-3 h-full justify-center">
+          <div
+            className="hidden md:flex flex-col items-center gap-3 h-full justify-center"
+            onMouseEnter={() => setIsCardHovered(true)}
+            onMouseLeave={() => setIsCardHovered(false)}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={`left-${displayIndex}`}
@@ -488,7 +528,11 @@ export default function InfiniteMenuSection() {
             </div>
 
             {/* Arrow Navigation */}
-            <div className="flex items-center gap-3 mt-2 z-20">
+            <div
+              className="flex items-center gap-3 mt-2 z-20"
+              onMouseEnter={() => setIsCardHovered(true)}
+              onMouseLeave={() => setIsCardHovered(false)}
+            >
               <button
                 type="button"
                 onClick={() => handleNavigate("prev")}
@@ -556,7 +600,11 @@ export default function InfiniteMenuSection() {
           </div>
 
           {/* ─── RIGHT COLUMN: Project Context & Scope ─── */}
-          <div className="hidden md:flex flex-col items-center gap-3 h-full justify-center">
+          <div
+            className="hidden md:flex flex-col items-center gap-3 h-full justify-center"
+            onMouseEnter={() => setIsCardHovered(true)}
+            onMouseLeave={() => setIsCardHovered(false)}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={`right-${displayIndex}`}
