@@ -55,20 +55,20 @@ export default function Navbar() {
 
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden flex flex-col items-center justify-center w-10 h-10 space-y-1.5 z-50"
+                className="md:hidden flex flex-col items-center justify-center w-10 h-10 space-y-1.5 z-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
                 aria-label="Toggle menu"
               >
                 <motion.span
                   animate={isMobileMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-                  className="w-6 h-0.5 bg-white block transition-all"
+                  className="w-6 h-0.5 bg-white block transition-all shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
                 />
                 <motion.span
                   animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-                  className="w-6 h-0.5 bg-white block transition-all"
+                  className="w-6 h-0.5 bg-white block transition-all shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
                 />
                 <motion.span
                   animate={isMobileMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-                  className="w-6 h-0.5 bg-white block transition-all"
+                  className="w-6 h-0.5 bg-white block transition-all shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
                 />
               </button>
             </div>
