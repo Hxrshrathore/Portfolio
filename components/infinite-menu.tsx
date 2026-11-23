@@ -807,6 +807,8 @@ class InfiniteGridMenu {
     this.initDiscInstances(this.DISC_INSTANCE_COUNT)
     this.initTexture()
     this.control = new ArcballControl(this.canvas, (deltaTime) => this.onControlUpdate(deltaTime))
+    this.orientToVertex(0)
+    this.lastActiveItemIndex = 0
 
     this.updateCameraMatrix()
     this.updateProjectionMatrix()
@@ -1013,7 +1015,10 @@ class InfiniteGridMenu {
     } else if (!this.control.isPointerDown) {
       const nearestVertexIndex = this.findNearestVertexIndex()
       const itemIndex = nearestVertexIndex % Math.max(1, this.items.length)
-      this.onActiveItemChange(itemIndex)
+      if (itemIndex !== this.lastActiveItemIndex) {
+        this.lastActiveItemIndex = itemIndex
+        this.onActiveItemChange(itemIndex)
+      }
       const snapDirection = vec3.normalize(vec3.create(), this.getVertexWorldPosition(nearestVertexIndex))
       this.control.snapTargetDirection = snapDirection
 
@@ -1053,42 +1058,71 @@ class InfiniteGridMenu {
     return vec3.transformQuat(vec3.create(), nearestVertexPos, this.control.orientation)
   }
 
+  private orientToVertex(vertexIndex: number): void {
+    if (!this.instancePositions[vertexIndex]) return
+    const from = vec3.normalize(vec3.create(), this.instancePositions[vertexIndex])
+    const to = vec3.normalize(vec3.create(), this.control.snapDirection)
+    let axis = vec3.cross(vec3.create(), from, to)
+    const dot = vec3.dot(from, to)
+    if (vec3.length(axis) < 0.0001) {
+      if (dot > 0) return
+      axis = vec3.fromValues(0, 1, 0)
+    }
+    vec3.normalize(axis, axis)
+    const angle = Math.acos(Math.max(-1, Math.min(1, dot)))
+    const q = quat.setAxisAngle(quat.create(), axis, angle)
+    quat.copy(this.control.orientation, q)
+    quat.normalize(this.control.orientation, this.control.orientation)
+  }
+
   // ─── Programmatic Navigation ───
   private navigating = false
   private navProgress = 0
   private navTotalFrames = 0
   private navStartOrientation = quat.create()
   private navTargetOrientation = quat.create()
-  public navCameraZoom = 0  // 0 = resting, 1 = fully zoomed out
+  private lastActiveItemIndex = 0
+  public navCameraZoom = 0 // 0 = resting, 1 = fully zoomed out
 
-  public navigate(direction: "prev" | "next"): number {
+  public navigate(direction: "prev" | "next", explicitTargetItem?: number): number {
     if (this.navigating) return -1
 
-    const currentIndex = this.findNearestVertexIndex()
-    const step = direction === "next" ? 1 : -1
-    const targetIndex = (currentIndex + step + this.DISC_INSTANCE_COUNT) % this.DISC_INSTANCE_COUNT
+    const itemCount = Math.max(1, this.items.length)
+    const currentItem = this.findNearestVertexIndex() % itemCount
+    const targetItem =
+      typeof explicitTargetItem === "number" && explicitTargetItem >= 0
+        ? ((explicitTargetItem % itemCount) + itemCount) % itemCount
+        : (currentItem + (direction === "next" ? 1 : -1) + itemCount) % itemCount
 
-    // Snapshot current orientation as the start
-    quat.copy(this.navStartOrientation, this.control.orientation)
+    // Find candidate vertices that match targetItem, picking the one closest to camera view
+    let bestCandidate = -1
+    let maxDot = -999
+    for (let v = 0; v < this.instancePositions.length; v++) {
+      if (v % itemCount === targetItem) {
+        const worldPos = vec3.transformQuat(vec3.create(), this.instancePositions[v], this.control.orientation)
+        const d = vec3.dot(worldPos, this.control.snapDirection)
+        if (d > maxDot) {
+          maxDot = d
+          bestCandidate = v
+        }
+      }
+    }
 
-    // Compute the rotation needed to bring targetIndex to the front
-    const targetLocalPos = this.instancePositions[targetIndex]
-    const snapDir = this.control.snapDirection // typically (0, 0, -1)
+    if (bestCandidate === -1) return targetItem
 
-    // We need: R * targetLocalPos = snapDir (pointing at camera)
-    // So R = rotation from targetLocalPos to snapDir
-    const from = vec3.normalize(vec3.create(), targetLocalPos)
-    const to = vec3.normalize(vec3.create(), snapDir)
+    // Compute rotation needed to bring bestCandidate to front
+    const pWorld = vec3.transformQuat(vec3.create(), this.instancePositions[bestCandidate], this.control.orientation)
+    const from = vec3.normalize(vec3.create(), pWorld)
+    const to = vec3.normalize(vec3.create(), this.control.snapDirection)
 
     let axis = vec3.cross(vec3.create(), from, to)
     const dot = vec3.dot(from, to)
 
     if (vec3.length(axis) < 0.0001) {
       if (dot > 0) {
-        // Already aligned, nothing to do
-        return targetIndex % Math.max(1, this.items.length)
+        this.lastActiveItemIndex = targetItem
+        return targetItem
       }
-      // Opposite direction — pick arbitrary perpendicular axis
       axis = vec3.fromValues(0, 1, 0)
     }
     vec3.normalize(axis, axis)
@@ -1096,18 +1130,20 @@ class InfiniteGridMenu {
     const angle = Math.acos(Math.max(-1, Math.min(1, dot)))
     const deltaQuat = quat.setAxisAngle(quat.create(), axis, angle)
 
-    // Target orientation = deltaQuat (gets target to front)
-    quat.copy(this.navTargetOrientation, deltaQuat)
+    quat.copy(this.navStartOrientation, this.control.orientation)
+    quat.multiply(this.navTargetOrientation, deltaQuat, this.control.orientation)
+    quat.normalize(this.navTargetOrientation, this.navTargetOrientation)
 
-    // Reset pointer rotation to identity to prevent leftover momentum
     quat.identity(this.control.pointerRotation)
     this.control._rotationVelocity = 0
+    this.control.snapTargetDirection = null
 
     this.navigating = true
     this.navProgress = 0
     this.navTotalFrames = 30
+    this.lastActiveItemIndex = targetItem
 
-    return targetIndex % Math.max(1, this.items.length)
+    return targetItem
   }
 
   private updateNavigation(): void {
@@ -1143,7 +1179,10 @@ class InfiniteGridMenu {
       quat.identity(this.control.pointerRotation)
 
       const finalIndex = this.findNearestVertexIndex() % Math.max(1, this.items.length)
-      this.onActiveItemChange(finalIndex)
+      if (finalIndex !== this.lastActiveItemIndex) {
+        this.lastActiveItemIndex = finalIndex
+        this.onActiveItemChange(finalIndex)
+      }
     }
   }
 }
@@ -1196,7 +1235,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], onNavigate, hideOverl
         handleMovementChange,
         (sk) => {
           sketchRef.current = sk
-          ;(window as any).__infiniteMenuNavigate = (direction: "prev" | "next") => sk.navigate(direction)
+          ;(window as any).__infiniteMenuNavigate = (direction: "prev" | "next", explicitTargetItem?: number) =>
+            sk.navigate(direction, explicitTargetItem)
           sk.run()
         },
       )

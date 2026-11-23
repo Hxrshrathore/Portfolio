@@ -520,15 +520,14 @@ export default function InfiniteMenuSection() {
   const activeItem = portfolioItems[displayIndex] ?? portfolioItems[0]
 
   const handleActiveItemChange = useCallback((index: number) => {
-    setDirection((prev) => {
-      const prevIdx = activeIndexRef.current
-      if (prevIdx === index) return prev
+    setActiveIndex((prev) => {
+      if (prev === index) return prev
       const count = portfolioItems.length
-      const diff = (index - prevIdx + count) % count
-      return diff > count / 2 ? -1 : 1
+      const diff = (index - prev + count) % count
+      setDirection(diff > count / 2 ? -1 : 1)
+      setDisplayIndex(index)
+      return index
     })
-    setActiveIndex(index)
-    setDisplayIndex(index)
   }, [])
 
   const handleMovementChange = useCallback((moving: boolean) => {
@@ -542,23 +541,20 @@ export default function InfiniteMenuSection() {
       const nextDir = dir === "next" ? 1 : -1
       setDirection(nextDir)
 
+      const count = portfolioItems.length
+      const nextIndex = (displayIndex + nextDir + count) % count
+
       const win = window as any
-      let targetIdx = -1
       if (typeof win.__infiniteMenuNavigate === "function") {
-        targetIdx = win.__infiniteMenuNavigate(dir)
+        win.__infiniteMenuNavigate(dir, nextIndex)
       } else if (navigateRef.current) {
         navigateRef.current(dir)
       }
 
-      const nextIndex =
-        typeof targetIdx === "number" && targetIdx >= 0
-          ? targetIdx
-          : (displayIndex + nextDir + portfolioItems.length) % portfolioItems.length
-
       setActiveIndex(nextIndex)
       setDisplayIndex(nextIndex)
 
-      setTimeout(() => setCanNavigate(true), 450)
+      setTimeout(() => setCanNavigate(true), 500)
     },
     [canNavigate, displayIndex]
   )

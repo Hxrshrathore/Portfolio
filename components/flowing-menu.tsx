@@ -86,11 +86,11 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, images }) => {
       const currentImage = imageList.length > 0 ? imageList[idx % imageList.length] : ""
       return (
         <React.Fragment key={idx}>
-          <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap">
+          <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0] whitespace-nowrap self-center">
             {text}
           </span>
           <div
-            className="w-[180px] md:w-[220px] h-[6.5vh] md:h-[7.5vh] my-[1.5em] mx-[1.5vw] rounded-lg bg-cover bg-center shrink-0 border border-black/10 shadow-md overflow-hidden"
+            className="w-[180px] md:w-[240px] h-full self-stretch my-0 mx-[1.5vw] rounded-lg bg-cover bg-center shrink-0 border border-black/10 shadow-md overflow-hidden"
             style={{ backgroundImage: currentImage ? `url(${currentImage})` : undefined }}
           />
         </React.Fragment>
