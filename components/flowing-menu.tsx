@@ -203,6 +203,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   return (
     <div
       data-menu-item="true"
+      data-no-cursor="true"
       className="flex-1 relative overflow-hidden text-center shadow-[0_-1px_0_0_#fff]"
       ref={itemRef}
       style={{ willChange: "transform" }}

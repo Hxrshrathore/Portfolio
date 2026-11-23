@@ -1,7 +1,8 @@
 "use client"
 
-import React, { useRef } from "react"
+import React, { useRef, useEffect } from "react"
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
+import { useScroll as useSmoothScroll } from "@/components/smooth-scroll"
 import { ArrowUpRight } from "lucide-react"
 import { FEATURED_CASE_STUDIES, FEATURED_SLUGS } from "@/lib/curation"
 import GlassFolder from "@/components/ui/glass-folder"
@@ -81,10 +82,36 @@ const CASE_STUDY_METAS: Record<string, {
 
 export default function FeaturedCaseStudies() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const { setWeight } = useSmoothScroll()
   const caseStudies = FEATURED_SLUGS.map(slug => FEATURED_CASE_STUDIES[slug]).filter(Boolean)
 
   const pair1 = caseStudies.slice(0, 2)
   const pair2 = caseStudies.slice(2, 4)
+
+  // Dynamic Lenis scroll weight on mobile: gives case studies a velvety, controlled touch feel
+  useEffect(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+    if (!isMobile) return
+    const el = containerRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setWeight(1.5) // Weighted, stable deceleration on mobile
+        } else {
+          setWeight(1.2)
+        }
+      },
+      { threshold: 0.05 }
+    )
+
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      setWeight(1.2)
+    }
+  }, [setWeight])
 
   // Track raw scroll progress across the container
   const { scrollYProgress } = useScroll({
@@ -100,15 +127,48 @@ export default function FeaturedCaseStudies() {
     restDelta: 0.0005,
   })
 
-  // Pair 1 transitions: scrolls naturally up and out of the viewport (-110vh)
+  // ── Desktop 2x2 Transitions: pair 1 slides up out, pair 2 slides up in ──
   const pair1Y = useTransform(smoothProgress, [0, 0.15, 0.50], ["0vh", "0vh", "-110vh"])
   const pair1Opacity = useTransform(smoothProgress, [0, 0.40, 0.50], [1, 1, 0])
   const pair1PointerEvents = useTransform(smoothProgress, (v) => (v < 0.35 ? "auto" : "none"))
 
-  // Pair 2 transitions: scrolls in naturally from below (110vh -> 0vh)
   const pair2Y = useTransform(smoothProgress, [0.15, 0.50, 1], ["110vh", "0vh", "0vh"])
   const pair2Opacity = useTransform(smoothProgress, [0.15, 0.25, 1], [0, 1, 1])
   const pair2PointerEvents = useTransform(smoothProgress, (v) => (v >= 0.35 ? "auto" : "none"))
+
+  // ── Mobile 1-by-1 Transforms (Sequential 4-card staging so all 4 are 100% visible) ──
+  // Card 0 (Nutgram)
+  const mCard0Y = useTransform(smoothProgress, [0, 0.18, 0.28], ["0vh", "0vh", "-60vh"])
+  const mCard0Opacity = useTransform(smoothProgress, [0, 0.18, 0.26], [1, 1, 0])
+  const mCard0Pointer = useTransform(smoothProgress, (v) => (v < 0.23 ? "auto" : "none"))
+
+  // Card 1 (KIITFEST)
+  const mCard1Y = useTransform(smoothProgress, [0.18, 0.28, 0.46, 0.56], ["60vh", "0vh", "0vh", "-60vh"])
+  const mCard1Opacity = useTransform(smoothProgress, [0.18, 0.26, 0.46, 0.54], [0, 1, 1, 0])
+  const mCard1Pointer = useTransform(smoothProgress, (v) => (v >= 0.23 && v < 0.51 ? "auto" : "none"))
+
+  // Card 2 (Nexus AI)
+  const mCard2Y = useTransform(smoothProgress, [0.46, 0.56, 0.74, 0.84], ["60vh", "0vh", "0vh", "-60vh"])
+  const mCard2Opacity = useTransform(smoothProgress, [0.46, 0.54, 0.74, 0.82], [0, 1, 1, 0])
+  const mCard2Pointer = useTransform(smoothProgress, (v) => (v >= 0.51 && v < 0.79 ? "auto" : "none"))
+
+  // Card 3 (RCOE Rajasthan)
+  const mCard3Y = useTransform(smoothProgress, [0.74, 0.84, 1], ["60vh", "0vh", "0vh"])
+  const mCard3Opacity = useTransform(smoothProgress, [0.74, 0.82, 1], [0, 1, 1])
+  const mCard3Pointer = useTransform(smoothProgress, (v) => (v >= 0.79 ? "auto" : "none"))
+
+  // Mobile dot indicators
+  const dot0Width = useTransform(smoothProgress, [0, 0.22, 0.28], ["22px", "22px", "6px"])
+  const dot0Color = useTransform(smoothProgress, [0, 0.22, 0.28], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+
+  const dot1Width = useTransform(smoothProgress, [0.18, 0.28, 0.50, 0.56], ["6px", "22px", "22px", "6px"])
+  const dot1Color = useTransform(smoothProgress, [0.18, 0.28, 0.50, 0.56], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+
+  const dot2Width = useTransform(smoothProgress, [0.46, 0.56, 0.78, 0.84], ["6px", "22px", "22px", "6px"])
+  const dot2Color = useTransform(smoothProgress, [0.46, 0.56, 0.78, 0.84], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+
+  const dot3Width = useTransform(smoothProgress, [0.74, 0.84, 1.0], ["6px", "22px", "22px"])
+  const dot3Color = useTransform(smoothProgress, [0.74, 0.84, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
 
   const renderCard = (study: typeof caseStudies[0], idx: number) => {
     const metaConfig = CASE_STUDY_METAS[study.slug] || {
@@ -196,29 +256,29 @@ export default function FeaturedCaseStudies() {
     <section
       id="case-studies"
       ref={containerRef}
-      className="relative w-full bg-black min-h-[190vh] border-t border-white/5 pt-12 md:pt-16"
+      className="relative w-full bg-black min-h-[300vh] md:min-h-[190vh] border-t border-white/5 pt-12 md:pt-16"
     >
       {/* Background radial glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[140px] pointer-events-none rounded-full" />
 
       {/* Sticky Full Viewport Frame with generous top padding to clear floating navbar */}
-      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden px-4 md:px-8 pt-24 md:pt-36 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] md:pb-16">
+      <div className="sticky top-0 h-screen h-[100dvh] w-full flex flex-col justify-between overflow-hidden px-4 md:px-8 pt-24 md:pt-36 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] md:pb-16">
         <div className="max-w-6xl mx-auto w-full flex flex-col justify-between h-full">
           {/* Section Header: Title and subtext aligned to top with optical correction */}
-          <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 md:mb-10 gap-6 shrink-0 relative z-20">
+          <div className="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-10 gap-4 md:gap-6 shrink-0 relative z-20">
             <div className="absolute -inset-x-8 -top-36 bottom-[-20px] bg-gradient-to-b from-black via-black/95 to-transparent pointer-events-none -z-10" />
             <div>
               <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent tracking-tight -mt-1 sm:-mt-1.5 md:-mt-2.5 leading-[1.08]">
                 Featured Case Studies
               </h2>
             </div>
-            <p className="text-zinc-400 text-sm md:text-base max-w-md font-light leading-relaxed md:text-right pt-0.5 sm:pt-1">
+            <p className="text-zinc-400 text-xs sm:text-sm md:text-base max-w-md font-light leading-relaxed md:text-right pt-0.5 sm:pt-1">
               Real software systems engineered under real constraints — exploring architecture, trade-offs, debugging, and production delivery.
             </p>
           </div>
 
-          {/* 2x2 Staged Sticky Scroll Folders Area (Centered in Viewport) */}
-          <div className="relative w-full flex-1 flex items-center justify-center min-h-[380px] my-auto">
+          {/* Desktop 2x2 Staged Sticky Scroll Folders Area (hidden md:flex) */}
+          <div className="hidden md:flex relative w-full flex-1 items-center justify-center min-h-[380px] my-auto">
             {/* Pair 1: First 2 Folders (Nutgram & KIITFEST) */}
             <motion.div
               style={{
@@ -226,7 +286,7 @@ export default function FeaturedCaseStudies() {
                 y: pair1Y,
                 pointerEvents: pair1PointerEvents,
               }}
-              className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"
+              className="w-full grid grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"
             >
               {pair1.map((study, idx) => renderCard(study, idx))}
             </motion.div>
@@ -238,10 +298,81 @@ export default function FeaturedCaseStudies() {
                 y: pair2Y,
                 pointerEvents: pair2PointerEvents,
               }}
-              className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"
+              className="w-full grid grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"
             >
               {pair2.map((study, idx) => renderCard(study, idx + 2))}
             </motion.div>
+          </div>
+
+          {/* Mobile 1-by-1 Sequential Staged Folders Area (md:hidden) */}
+          <div className="md:hidden relative w-full flex-1 flex flex-col items-center justify-center min-h-[340px] my-auto">
+            {/* Card 0: Nutgram */}
+            <motion.div
+              style={{
+                opacity: mCard0Opacity,
+                y: mCard0Y,
+                pointerEvents: mCard0Pointer,
+              }}
+              className="w-full flex items-center justify-center absolute inset-0 my-auto"
+            >
+              {caseStudies[0] && renderCard(caseStudies[0], 0)}
+            </motion.div>
+
+            {/* Card 1: KIITFEST */}
+            <motion.div
+              style={{
+                opacity: mCard1Opacity,
+                y: mCard1Y,
+                pointerEvents: mCard1Pointer,
+              }}
+              className="w-full flex items-center justify-center absolute inset-0 my-auto"
+            >
+              {caseStudies[1] && renderCard(caseStudies[1], 1)}
+            </motion.div>
+
+            {/* Card 2: Nexus AI */}
+            <motion.div
+              style={{
+                opacity: mCard2Opacity,
+                y: mCard2Y,
+                pointerEvents: mCard2Pointer,
+              }}
+              className="w-full flex items-center justify-center absolute inset-0 my-auto"
+            >
+              {caseStudies[2] && renderCard(caseStudies[2], 2)}
+            </motion.div>
+
+            {/* Card 3: RCOE Rajasthan */}
+            <motion.div
+              style={{
+                opacity: mCard3Opacity,
+                y: mCard3Y,
+                pointerEvents: mCard3Pointer,
+              }}
+              className="w-full flex items-center justify-center absolute inset-0 my-auto"
+            >
+              {caseStudies[3] && renderCard(caseStudies[3], 3)}
+            </motion.div>
+          </div>
+
+          {/* Mobile 4-step progress dots indicator */}
+          <div className="flex md:hidden items-center justify-center gap-2 pb-2 shrink-0 z-20">
+            <motion.div
+              style={{ width: dot0Width, backgroundColor: dot0Color }}
+              className="h-1.5 rounded-full"
+            />
+            <motion.div
+              style={{ width: dot1Width, backgroundColor: dot1Color }}
+              className="h-1.5 rounded-full"
+            />
+            <motion.div
+              style={{ width: dot2Width, backgroundColor: dot2Color }}
+              className="h-1.5 rounded-full"
+            />
+            <motion.div
+              style={{ width: dot3Width, backgroundColor: dot3Color }}
+              className="h-1.5 rounded-full"
+            />
           </div>
         </div>
       </div>

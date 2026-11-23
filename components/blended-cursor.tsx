@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 
-const STATE = { DEFAULT: 0, HOVER: 1, TEXT: 2 } as const;
+const STATE = { DEFAULT: 0, HOVER: 1, TEXT: 2, HIDDEN: 3 } as const;
 
 // ── Semi-implicit Euler spring with sub-stepping for stability ──
 function createSpring(stiffness: number, damping: number, mass: number) {
@@ -69,7 +69,7 @@ export default function BlendedCursor() {
     const s = state.current;
 
     if (target.closest('[data-no-cursor]')) {
-      s.mode = STATE.DEFAULT;
+      s.mode = STATE.HIDDEN;
       s.hoverEl = null;
       return;
     }
@@ -183,6 +183,12 @@ export default function BlendedCursor() {
         tBR = 2;
         trailSize = 0; trailOpacity = 0;
         hl = HL_DEFAULT;
+      } else if (s.mode === STATE.HIDDEN) {
+        tW = 0; tH = 0;
+        tScale = 0;
+        tBR = 50;
+        trailSize = 0; trailOpacity = 0;
+        hl = HL_ENTER;
       } else {
         tW = 24; tH = 24;
         tScale = s.clicked ? 0.5 : 1;
