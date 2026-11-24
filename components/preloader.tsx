@@ -36,6 +36,8 @@ const CRITICAL_ASSETS = [
   "/logo/ascent.png",
   "/logo/chimera.png",
   "/logo/pandav.png",
+  "/logo/aerolux.png",
+  "/projects/aerolux.jpg",
   "/placeholder.jpg",
 ]
 

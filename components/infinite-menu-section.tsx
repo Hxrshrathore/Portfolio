@@ -28,7 +28,7 @@ interface PortfolioItem {
 const portfolioItems: PortfolioItem[] = [
   {
     image: "/projects/aerolux.jpg",
-    logo: "/logo/aerolux.svg",
+    logo: "/logo/aerolux.png",
     link: "/projects/aerolux",
     title: "AeroLux",
     description: "Luxury private aviation platform & flight dispatch prototype",
