@@ -138,42 +138,43 @@ export default function FeaturedCaseStudies() {
   const pair2PointerEvents = useTransform(smoothProgress, (v) => (v >= 0.35 ? "auto" : "none"))
 
   // ── Mobile 1-by-1 Transforms (Sequential 4-card staging: clean deck elevation, zero collisions) ──
-  // Card 0 (Nutgram): dwell 0.00-0.16, dissolve 0.16-0.24
-  const mCard0Y = useTransform(smoothProgress, [0, 0.16, 0.24], ["0vh", "0vh", "-16vh"])
-  const mCard0Opacity = useTransform(smoothProgress, [0, 0.16, 0.23], [1, 1, 0])
-  const mCard0Scale = useTransform(smoothProgress, [0, 0.16, 0.24], [1, 1, 0.92])
-  const mCard0Pointer = useTransform(smoothProgress, (v) => (v < 0.20 ? "auto" : "none"))
+  // Using direct scrollYProgress on mobile ensures 1:1 tactile touch response without spring inertia lag
+  // Card 0 (Nutgram): dwell 0.00-0.20, dissolve 0.20-0.26
+  const mCard0Y = useTransform(scrollYProgress, [0, 0.20, 0.26], ["0vh", "0vh", "-16vh"])
+  const mCard0Opacity = useTransform(scrollYProgress, [0, 0.20, 0.25], [1, 1, 0])
+  const mCard0Scale = useTransform(scrollYProgress, [0, 0.20, 0.26], [1, 1, 0.92])
+  const mCard0Pointer = useTransform(scrollYProgress, (v) => (v < 0.22 ? "auto" : "none"))
 
-  // Card 1 (KIITFEST): enter 0.18-0.25, dwell 0.25-0.41, dissolve 0.41-0.49
-  const mCard1Y = useTransform(smoothProgress, [0.18, 0.25, 0.41, 0.49], ["16vh", "0vh", "0vh", "-16vh"])
-  const mCard1Opacity = useTransform(smoothProgress, [0.18, 0.24, 0.41, 0.48], [0, 1, 1, 0])
-  const mCard1Scale = useTransform(smoothProgress, [0.18, 0.25, 0.41, 0.49], [0.92, 1, 1, 0.92])
-  const mCard1Pointer = useTransform(smoothProgress, (v) => (v >= 0.21 && v < 0.45 ? "auto" : "none"))
+  // Card 1 (KIITFEST): enter 0.21-0.27, dwell 0.27-0.45, dissolve 0.45-0.51
+  const mCard1Y = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["16vh", "0vh", "0vh", "-16vh"])
+  const mCard1Opacity = useTransform(scrollYProgress, [0.21, 0.26, 0.45, 0.50], [0, 1, 1, 0])
+  const mCard1Scale = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], [0.92, 1, 1, 0.92])
+  const mCard1Pointer = useTransform(scrollYProgress, (v) => (v >= 0.23 && v < 0.48 ? "auto" : "none"))
 
-  // Card 2 (Nexus AI): enter 0.43-0.50, dwell 0.50-0.66, dissolve 0.66-0.74
-  const mCard2Y = useTransform(smoothProgress, [0.43, 0.50, 0.66, 0.74], ["16vh", "0vh", "0vh", "-16vh"])
-  const mCard2Opacity = useTransform(smoothProgress, [0.43, 0.49, 0.66, 0.73], [0, 1, 1, 0])
-  const mCard2Scale = useTransform(smoothProgress, [0.43, 0.50, 0.66, 0.74], [0.92, 1, 1, 0.92])
-  const mCard2Pointer = useTransform(smoothProgress, (v) => (v >= 0.46 && v < 0.70 ? "auto" : "none"))
+  // Card 2 (Nexus AI): enter 0.46-0.52, dwell 0.52-0.70, dissolve 0.70-0.76
+  const mCard2Y = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["16vh", "0vh", "0vh", "-16vh"])
+  const mCard2Opacity = useTransform(scrollYProgress, [0.46, 0.51, 0.70, 0.75], [0, 1, 1, 0])
+  const mCard2Scale = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], [0.92, 1, 1, 0.92])
+  const mCard2Pointer = useTransform(scrollYProgress, (v) => (v >= 0.48 && v < 0.73 ? "auto" : "none"))
 
-  // Card 3 (RCOE Rajasthan): enter 0.68-0.75, long dwell 0.75-0.94, unpin into next section
-  const mCard3Y = useTransform(smoothProgress, [0.68, 0.75, 1], ["16vh", "0vh", "0vh"])
-  const mCard3Opacity = useTransform(smoothProgress, [0.68, 0.74, 1], [0, 1, 1])
-  const mCard3Scale = useTransform(smoothProgress, [0.68, 0.75, 1], [0.92, 1, 1])
-  const mCard3Pointer = useTransform(smoothProgress, (v) => (v >= 0.71 ? "auto" : "none"))
+  // Card 3 (RCOE Rajasthan): enter 0.71-0.77, full dwell 0.77-0.96, dissolve/unpin 0.96-1.0
+  const mCard3Y = useTransform(scrollYProgress, [0.71, 0.77, 0.96, 1], ["16vh", "0vh", "0vh", "-6vh"])
+  const mCard3Opacity = useTransform(scrollYProgress, [0.71, 0.76, 0.96, 1], [0, 1, 1, 0.2])
+  const mCard3Scale = useTransform(scrollYProgress, [0.71, 0.77, 0.96, 1], [0.92, 1, 1, 0.96])
+  const mCard3Pointer = useTransform(scrollYProgress, (v) => (v >= 0.73 ? "auto" : "none"))
 
   // Mobile dot indicators
-  const dot0Width = useTransform(smoothProgress, [0, 0.17, 0.23], ["22px", "22px", "6px"])
-  const dot0Color = useTransform(smoothProgress, [0, 0.17, 0.23], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot0Width = useTransform(scrollYProgress, [0, 0.20, 0.25], ["22px", "22px", "6px"])
+  const dot0Color = useTransform(scrollYProgress, [0, 0.20, 0.25], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot1Width = useTransform(smoothProgress, [0.18, 0.25, 0.42, 0.48], ["6px", "22px", "22px", "6px"])
-  const dot1Color = useTransform(smoothProgress, [0.18, 0.25, 0.42, 0.48], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot1Width = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["6px", "22px", "22px", "6px"])
+  const dot1Color = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot2Width = useTransform(smoothProgress, [0.43, 0.50, 0.67, 0.73], ["6px", "22px", "22px", "6px"])
-  const dot2Color = useTransform(smoothProgress, [0.43, 0.50, 0.67, 0.73], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot2Width = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["6px", "22px", "22px", "6px"])
+  const dot2Color = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot3Width = useTransform(smoothProgress, [0.68, 0.75, 1.0], ["6px", "22px", "22px"])
-  const dot3Color = useTransform(smoothProgress, [0.68, 0.75, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
+  const dot3Width = useTransform(scrollYProgress, [0.71, 0.77, 1.0], ["6px", "22px", "22px"])
+  const dot3Color = useTransform(scrollYProgress, [0.71, 0.77, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
 
   const renderCard = (study: typeof caseStudies[0], idx: number) => {
     const metaConfig = CASE_STUDY_METAS[study.slug] || {
@@ -262,7 +263,7 @@ export default function FeaturedCaseStudies() {
     <section
       id="case-studies"
       ref={containerRef}
-      className="relative w-full bg-black min-h-[380vh] md:min-h-[190vh] border-t border-white/5"
+      className="relative w-full bg-black min-h-[460vh] md:min-h-[190vh] border-t border-white/5"
     >
       {/* Background radial glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[140px] pointer-events-none rounded-full" />

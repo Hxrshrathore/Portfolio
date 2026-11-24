@@ -231,6 +231,7 @@ export const PRODUCTION_PROJECT_SLUGS = new Set([
 
 // Slugs of clearly designated prototypes and experimental lab systems
 export const LAB_PROTOTYPE_SLUGS = new Set([
+  "aerolux",
   "nexus-ai",
   "verinews",
   "viral-arc-mbti",

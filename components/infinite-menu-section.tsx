@@ -27,6 +27,20 @@ interface PortfolioItem {
 
 const portfolioItems: PortfolioItem[] = [
   {
+    image: "/projects/aerolux.jpg",
+    logo: "/logo/aerolux.svg",
+    link: "/projects/aerolux",
+    title: "AeroLux",
+    description: "Luxury private aviation platform & flight dispatch prototype",
+    projectImage: "/projects/aerolux.jpg",
+    category: "Luxury Aviation UI/UX Prototype",
+    role: "Full-Stack & Interaction Engineer",
+    organization: "Independent Lab",
+    stack: ["Next.js 16", "React 19", "Three.js", "Tailwind CSS v4", "GSAP 3"],
+    deliverables: ["3D Fluid Glass Navigation", "Empty Leg Radar", "Air Ambulance Simulation", "Cabin Explorer"],
+    overview: "High-fidelity private aviation platform combining 3D fluid glass WebGL shaders, empty leg charter discovery, scenic joyrides, and emergency aeromedical dispatch.",
+  },
+  {
     image: "/rip/frame1.png",
     logo: "/logo/ascent.png",
     link: "/projects/nutgram",
