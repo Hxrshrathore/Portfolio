@@ -38,6 +38,8 @@ const CRITICAL_ASSETS = [
   "/logo/pandav.png",
   "/logo/aerolux.png",
   "/projects/aerolux.jpg",
+  "/logo/rathore-developers.svg",
+  "/projects/rathore-developers.jpg",
   "/placeholder.jpg",
 ]
 
