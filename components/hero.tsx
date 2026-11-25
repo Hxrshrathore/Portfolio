@@ -4,7 +4,7 @@ import * as React from "react";
 import { TiltedGridHero, type TiltedGridImage } from "@/components/ui/tilted-grid-hero";
 import GlassSurface from "@/components/GlassSurface";
 import TransitionLink from "@/components/transition-link";
-import { ArrowUpRight, FileUser } from "lucide-react";
+import { ArrowUp, ArrowLeft } from "lucide-react";
 
 // Website mockup screenshots from the projects / work page hero section
 const CDN = "https://pub-546a6f9534fa4f7abd35b1c5c23bb394.r2.dev/projects";
@@ -112,7 +112,7 @@ export default function Hero() {
               >
                 <span className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-zinc-900 group-hover:text-black">
                   Portfolio
-                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUp className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:-translate-y-0.5" />
                 </span>
               </GlassSurface>
             </TransitionLink>
@@ -134,7 +134,7 @@ export default function Hero() {
               >
                 <span className="flex items-center justify-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-zinc-900 group-hover:text-black">
                   Résumé
-                  <FileUser className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:scale-110" />
+                  <ArrowLeft className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:-translate-x-0.5" />
                 </span>
               </GlassSurface>
             </a>

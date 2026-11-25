@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
-import { ArrowDown } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { useScroll } from "@/components/smooth-scroll"
 import RightResumeNotch from "./right-resume-notch"
 import { getSavedPosition, savePosition } from "@/lib/cookies"
@@ -558,10 +558,10 @@ export default function HeroPortfolioTransition({
                 />
               </svg>
 
-              {/* Bouncing arrow slowly pointing below */}
+              {/* Bouncing arrow pointing upward */}
               <div className="absolute inset-0 flex items-center justify-center pt-1 pointer-events-none">
                 <motion.div
-                  animate={{ y: [-1, 4, -1] }}
+                  animate={{ y: [1, -4, 1] }}
                   transition={{
                     duration: 1.8,
                     repeat: Infinity,
@@ -569,7 +569,7 @@ export default function HeroPortfolioTransition({
                   }}
                   className="flex items-center justify-center"
                 >
-                  <ArrowDown
+                  <ArrowUp
                     className="w-4 h-4 text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] transition-colors group-hover:text-white"
                     strokeWidth={2.4}
                   />
