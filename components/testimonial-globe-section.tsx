@@ -2,6 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { Clock } from "lucide-react";
+import { TooltipPill } from "@/components/ui/tooltip";
 import { TestimonialGlobe } from "@/components/ui/testimonial-globe";
 import type { GlobeTestimonial } from "@/components/ui/testimonial-globe";
 
@@ -120,6 +122,42 @@ function seededStars(count: number, seedInit = 42) {
 const SECTION_STARS = seededStars(85);
 
 export default function TestimonialGlobeSection({ autoplay = true }: { autoplay?: boolean }) {
+  const [time, setTime] = React.useState({ hh: "", mm: "", ss: "" });
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+    const updateTime = () => {
+      try {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        });
+        const parts = formatter.formatToParts(now);
+        const hh = parts.find((p) => p.type === "hour")?.value || "";
+        const mm = parts.find((p) => p.type === "minute")?.value || "";
+        const ss = parts.find((p) => p.type === "second")?.value || "";
+        setTime({ hh, mm, ss });
+      } catch {
+        const now = new Date();
+        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+        const istDate = new Date(utc + 3600000 * 5.5);
+        setTime({
+          hh: String(istDate.getHours()).padStart(2, "0"),
+          mm: String(istDate.getMinutes()).padStart(2, "0"),
+          ss: String(istDate.getSeconds()).padStart(2, "0"),
+        });
+      }
+    };
+
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
   return (
     <section
       id="global-collaboration-globe"
@@ -151,16 +189,34 @@ export default function TestimonialGlobeSection({ autoplay = true }: { autoplay?
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 flex flex-col">
         {/* ── Top: Title Row (Adapted from World Map Header) ── */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-12 shrink-0">
+        <div className="flex flex-col md:flex-row md:items-end justify-start gap-8 md:gap-14 lg:gap-24 mb-8 md:mb-12 shrink-0">
           <div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]"
+              className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]"
             >
-              <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">Based in India,</span>
+              <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">
+                Based in{" "}
+              </span>
+              <span
+                className="bg-clip-text text-transparent font-bold inline-block"
+                style={{
+                  backgroundImage: "url('/images/indian-flag2.jpg')",
+                  backgroundSize: "100% 100%",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                India
+              </span>
+              <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">
+                ,
+              </span>
               <br />
               <span className="font-light text-zinc-400">open to remote collaboration</span>
             </motion.h2>
@@ -172,22 +228,33 @@ export default function TestimonialGlobeSection({ autoplay = true }: { autoplay?
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="flex items-center gap-6 md:gap-10"
+            className="flex items-center gap-8 md:gap-12 lg:gap-14"
           >
-            {[
-              { value: "Remote", suffix: "", label: "Capability" },
-              { value: "UTC+5:30", suffix: "", label: "Base Timezone" },
-              { value: "Async", suffix: " Friendly", label: "Communication" },
-            ].map((stat, i) => (
-              <div key={i} className="text-left">
-                <div className="text-2xl md:text-3xl font-bold text-white tracking-tight tabular-nums leading-none">
-                  {stat.value}<span className="text-zinc-400 font-light text-base md:text-lg">{stat.suffix}</span>
-                </div>
-                <div className="text-[9px] uppercase tracking-[0.2em] text-zinc-400 mt-1 font-mono">
-                  {stat.label}
-                </div>
+            {/* UTC+5:30 with live 24-hour time suffix, thin clock icon, and custom tooltip */}
+            <div className="text-left group relative cursor-default">
+              <TooltipPill position="top">
+                India Standard Time (IST)
+              </TooltipPill>
+
+              <div className="text-2xl md:text-3xl font-bold text-white tracking-tight tabular-nums leading-none flex items-baseline">
+                <span>UTC+5:30</span>
+                <span className="text-zinc-400 font-light text-base md:text-lg ml-2.5 tabular-nums inline-flex items-center w-[5.4rem] shrink-0">
+                  <Clock className="w-3.5 h-3.5 text-zinc-400 stroke-[1.25] mr-1 shrink-0 self-center" />
+                  <span>{mounted && time.hh ? `${time.hh}:${time.mm}` : "19:30"}</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-zinc-300">
+                    :{mounted && time.ss ? time.ss : "00"}
+                  </span>
+                </span>
               </div>
-            ))}
+            </div>
+
+            {/* Async Friendly */}
+            <div className="text-left">
+              <div className="text-2xl md:text-3xl font-bold text-white tracking-tight tabular-nums leading-none flex items-baseline">
+                <span>Async</span>
+                <span className="text-zinc-400 font-light text-base md:text-lg ml-2.5">Friendly</span>
+              </div>
+            </div>
           </motion.div>
         </div>
 

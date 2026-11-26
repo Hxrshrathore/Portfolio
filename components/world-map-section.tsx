@@ -60,7 +60,7 @@ export default function WorldMapSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]"
+              className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]"
             >
               <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">Based in India,</span>
               <br />

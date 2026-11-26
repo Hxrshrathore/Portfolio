@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { ArrowUp } from "lucide-react"
+import { TooltipPill } from "@/components/ui/tooltip"
 import { useScroll } from "@/components/smooth-scroll"
 import RightResumeNotch from "./right-resume-notch"
 import { getSavedPosition, savePosition } from "@/lib/cookies"
@@ -136,6 +137,21 @@ export default function HeroPortfolioTransition({
       }, isMobile ? 450 : 600)
     }
   }, [lenis, springEase, updateTargetY])
+
+  // External trigger (e.g. from Hero Portfolio button)
+  const handleSnapFromHero = useCallback(() => {
+    setIsPulling(false)
+    setPullY(36)
+    setTimeout(() => {
+      setPullY(0)
+      triggerSnapToPortfolio()
+    }, 140)
+  }, [triggerSnapToPortfolio])
+
+  useEffect(() => {
+    window.addEventListener("snap-to-portfolio", handleSnapFromHero)
+    return () => window.removeEventListener("snap-to-portfolio", handleSnapFromHero)
+  }, [handleSnapFromHero])
 
   // ── Pull-up & Horizontal Slide Gestures on Bottom Half-Oval Tab ──
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -531,11 +547,9 @@ export default function HeroPortfolioTransition({
             data-no-cursor="true"
           >
             {/* Tooltip on hover */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-200 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 z-40">
-              <div className="flex items-center px-3 py-1 rounded-full bg-zinc-950/95 text-white text-[11px] sm:text-xs font-medium tracking-wide shadow-[0_4px_16px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-md whitespace-nowrap">
-                Explore Portfolio
-              </div>
-            </div>
+            <TooltipPill position="top">
+              Explore Portfolio
+            </TooltipPill>
 
             {/* Half-oval shape SVG with seamless curved flare into black bar */}
             <div className="relative w-32 sm:w-40 h-[34px] sm:h-[38px]">

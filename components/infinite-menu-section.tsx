@@ -643,8 +643,13 @@ export default function InfiniteMenuSection() {
     >
       {/* Header */}
       <div className="text-center pt-6 pb-2 px-4 shrink-0">
-        <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
-          Project Constellation
+        <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-1 px-2">
+          <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
+            Project{" "}
+          </span>
+          <span className="font-light text-zinc-400">
+            locker
+          </span>
         </h2>
         <p className="text-xs md:text-sm text-zinc-400 max-w-2xl mx-auto px-4 tracking-wide font-light">
           Rotate through verified full-stack applications, event platforms, and applied AI systems.

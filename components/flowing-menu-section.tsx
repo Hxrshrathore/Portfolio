@@ -56,7 +56,7 @@ export default function FlowingMenuSection() {
     <section id="capabilities" className="relative w-full bg-black overflow-hidden border-t border-white/5">
       {/* Header */}
       <div className="text-center py-16 md:py-24 px-4">
-        <h2 className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2">
+        <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2">
           From Problem Discovery to Production
         </h2>
         <p className="text-sm md:text-base text-zinc-400 max-w-2xl mx-auto tracking-wide px-4 leading-relaxed font-light">

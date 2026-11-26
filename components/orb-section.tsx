@@ -25,7 +25,7 @@ export default function OrbSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-none flex items-baseline gap-3 sm:gap-4 uppercase select-none cursor-default">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-none flex items-baseline gap-3 sm:gap-4 uppercase select-none cursor-default">
               <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">LET&apos;S</span>
               <span className="font-light text-zinc-400 transition-colors duration-300 hover:text-zinc-300">TALK</span>
             </h2>

@@ -85,7 +85,7 @@ export default function Hero() {
     >
       <div className="relative z-10 flex h-full flex-col items-center justify-between pt-20 md:pt-24 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] md:pb-16 text-center">
         <div className="px-6 pt-6 md:pt-10">
-          <h1 className="text-balance text-4xl font-medium tracking-tight text-zinc-950 sm:text-5xl">
+          <h1 className="text-balance text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-zinc-950">
             Harsh Kumar
             <br />
             <span className="text-zinc-600 font-normal text-2xl sm:text-3xl md:text-4xl block mt-1">
@@ -100,7 +100,16 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <TransitionLink href="/projects" className="inline-block group">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("snap-to-portfolio"))
+                }
+              }}
+              className="inline-block group focus:outline-none"
+              aria-label="Scroll to Portfolio"
+            >
               <GlassSurface
                 width={154}
                 height={46}
@@ -115,13 +124,17 @@ export default function Hero() {
                   <ArrowUp className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:-translate-y-0.5" />
                 </span>
               </GlassSurface>
-            </TransitionLink>
+            </button>
 
-            <a
-              href="/resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block group"
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("trigger-resume-pull"))
+                }
+              }}
+              className="inline-block group focus:outline-none"
+              aria-label="View Résumé"
             >
               <GlassSurface
                 width={154}
@@ -137,7 +150,7 @@ export default function Hero() {
                   <ArrowLeft className="w-3.5 h-3.5 text-zinc-600 transition-transform group-hover:-translate-x-0.5" />
                 </span>
               </GlassSurface>
-            </a>
+            </button>
           </div>
         </div>
       </div>

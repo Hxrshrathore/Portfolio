@@ -47,9 +47,14 @@ export default function TrustedBySection() {
 
           <motion.h2
             variants={itemVariants}
-            className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent mb-4 md:mb-6 tracking-tight px-2"
+            className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4 md:mb-6 px-2"
           >
-            Selected Collaborations
+            <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+              Collaborations &{" "}
+            </span>
+            <span className="font-light text-zinc-400">
+              Awards
+            </span>
           </motion.h2>
 
           <motion.p variants={itemVariants} className="text-sm md:text-lg text-gray-400 mb-12 md:mb-20 max-w-2xl mx-auto font-light tracking-wide px-4">

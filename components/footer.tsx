@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Github, Twitter, Linkedin, Mail, ArrowUpRight } from "lucide-react"
-import TextPressure from "./text-pressure"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 
@@ -44,10 +43,10 @@ export default function Footer() {
   ]
 
   return (
-    <footer ref={footerRef} className="relative bg-black pt-32 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
+    <footer ref={footerRef} className="relative bg-black pt-10 md:pt-14 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
       {/* ── Bottom-most Background Metallic Logo ── */}
-      <div className="absolute inset-x-0 bottom-0 h-[260px] sm:h-[340px] md:h-[420px] pointer-events-none z-0 overflow-hidden opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-[280px] sm:h-[380px] md:h-[480px] pointer-events-none z-0 overflow-hidden opacity-85">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/30 to-transparent z-10" />
         <MetallicPaint
           imageSrc="/logo/hersh-design-logo.svg"
           color="#ffffff"
@@ -81,31 +80,15 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
         
-        {/* ── @hxrshrathore Text Pressure Section (Kept exactly as it is) ── */}
-        <div className="mb-12 md:mb-24">
-          <div className="relative h-[100px] md:h-[250px] flex items-center justify-center mb-6">
-            <TextPressure
-              text="@hxrshrathore"
-              flex={true}
-              alpha={false}
-              stroke={false}
-              width={true}
-              weight={true}
-              italic={true}
-              textColor="#ffffff"
-              strokeColor="#ffffff"
-              minFontSize={28}
-            />
-          </div>
-          <div className="text-center px-4">
-            <p className="text-[9px] md:text-xs font-sans font-bold tracking-[0.4em] text-white/30 uppercase leading-relaxed">
-              Crafted with precision • Powered by innovation
-            </p>
-          </div>
+        {/* ── Tagline ── */}
+        <div className="text-center px-4 mb-6 md:mb-8">
+          <p className="text-xs sm:text-sm md:text-base font-medium tracking-[0.18em] text-white/60 uppercase leading-relaxed">
+            DESIGN × ENGINEERING × PRODUCT
+          </p>
         </div>
 
         {/* ── Divider ── */}
-        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-16 md:mb-24" />
+        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-10 md:mb-16" />
 
         {/* ── Main Footer Content ── */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-24 px-4 md:px-0">
@@ -118,7 +101,7 @@ export default function Footer() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-3xl md:text-5xl font-bold bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent mb-6 tracking-tighter leading-tight">
+              <h3 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
                 <span className="block md:inline whitespace-nowrap">READY TO START YOUR</span>
                 <br />
                 <span>NEXT <span className="italic font-light text-white/50">BIG THING?</span></span>

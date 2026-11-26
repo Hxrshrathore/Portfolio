@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft } from "lucide-react"
+import { TooltipPill } from "@/components/ui/tooltip"
 import { getSavedPosition, savePosition } from "@/lib/cookies"
 
 export default function RightResumeNotch() {
@@ -51,6 +52,22 @@ export default function RightResumeNotch() {
       sessionStorage.setItem("h-transition", "from-right")
     }
   }, [isWiping])
+
+  // Handle external trigger (e.g. from Hero Résumé button)
+  const handleTriggerPull = useCallback(() => {
+    if (isWiping) return
+    setIsPulling(false)
+    const pullDistance = typeof window !== "undefined" ? Math.min(window.innerWidth * 0.35, 340) : 260
+    setPullX(pullDistance)
+    setTimeout(() => {
+      triggerTransitionToResume()
+    }, 280)
+  }, [isWiping, triggerTransitionToResume])
+
+  useEffect(() => {
+    window.addEventListener("trigger-resume-pull", handleTriggerPull)
+    return () => window.removeEventListener("trigger-resume-pull", handleTriggerPull)
+  }, [handleTriggerPull])
 
   // ── Pointer Handlers on Right Notch (2D drag: vertical slider + horizontal pull) ──
   const handlePointerDown = useCallback(
@@ -327,11 +344,9 @@ export default function RightResumeNotch() {
           data-no-cursor="true"
         >
           {/* Tooltip on hover (appears to the left of the tab) */}
-          <div className="absolute right-[calc(100%+10px)] top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-200 opacity-0 group-hover:opacity-100 translate-x-1.5 group-hover:translate-x-0 z-50">
-            <div className="flex items-center px-3 py-1 rounded-full bg-zinc-950/95 text-white text-[11px] sm:text-xs font-medium tracking-wide shadow-[0_4px_16px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-md whitespace-nowrap">
-              View Résumé
-            </div>
-          </div>
+          <TooltipPill position="left">
+            View Résumé
+          </TooltipPill>
 
           {/* Half-oval shape SVG flaring inward from the right screen edge */}
           <div className="relative w-[34px] sm:w-[38px] h-28 sm:h-36">

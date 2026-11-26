@@ -16,7 +16,7 @@ export default function MagicBentoSection() {
           <span className="text-white/40 text-[10px] font-mono tracking-[0.25em] uppercase block mb-1">
             Engineering Craft
           </span>
-          <h2 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-1 tracking-tight px-2">
             Engineering Approach & Systems
           </h2>
           <p className="text-xs md:text-sm text-zinc-400 max-w-2xl mx-auto tracking-wide px-4 font-light">

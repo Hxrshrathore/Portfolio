@@ -275,8 +275,13 @@ export default function FeaturedCaseStudies() {
           <div className="flex flex-col md:flex-row md:items-start justify-between mb-2 sm:mb-4 md:mb-10 gap-2 sm:gap-4 md:gap-6 shrink-0 relative z-20">
             <div className="absolute -inset-x-8 -top-36 bottom-[-20px] bg-gradient-to-b from-black via-black/95 to-transparent pointer-events-none -z-10" />
             <div>
-              <h2 className="text-2xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent tracking-tight -mt-1 sm:-mt-1.5 md:-mt-2.5 leading-[1.08]">
-                Featured Case Studies
+              <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight -mt-1 sm:-mt-1.5 md:-mt-2.5 leading-[1.08]">
+                <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
+                  Case{" "}
+                </span>
+                <span className="font-light text-zinc-400">
+                  folders
+                </span>
               </h2>
             </div>
             <p className="text-zinc-400 text-xs sm:text-sm md:text-base max-w-md font-light leading-relaxed md:text-right pt-0.5 sm:pt-1">
