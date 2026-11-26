@@ -52,11 +52,7 @@ export default function HeroPortfolioTransition({
   const isSnappingRef = useRef(false)
   const [isSnapping, setIsSnapping] = useState(false)
   const [isHeroCovered, setIsHeroCovered] = useState(false)
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const isTouchingRef = useRef(false)
-  const lastScrollYRef = useRef(0)
   const lastIsBelowHeroRef = useRef<boolean | null>(null)
-  const directionTowardHeroRef = useRef(false)
   const targetYRef = useRef(0)
   const rafIdRef = useRef<number | null>(null)
   const scrollProgressRef = useRef(0)
@@ -265,65 +261,22 @@ export default function HeroPortfolioTransition({
     }, 100)
   }, [notchXPercent, syncScroll, triggerSnapToPortfolio])
 
-  // Snap back to Hero section (scrollY = 0, homepage) without locking wheel override
-  const triggerSpringBackToHero = useCallback(() => {
-    if (isSnappingRef.current) return
-    isSnappingRef.current = true
-    setIsSnapping(true)
-    updateArrowGeometry(0)
-
-    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
-
-    if (lenis) {
-      lenis.scrollTo(0, {
-        lock: false,
-        duration: isMobile ? 0.58 : 0.72,
-        easing: springEase,
-        onComplete: () => {
-          isSnappingRef.current = false
-          setIsSnapping(false)
-        },
-      })
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-      setTimeout(() => {
-        isSnappingRef.current = false
-        setIsSnapping(false)
-      }, isMobile ? 580 : 720)
-    }
-  }, [lenis, springEase, updateArrowGeometry])
-
-  // Proportional 1:1 Scroll Tracking + Direction-Aware Thresholds (Zero React state churn per frame)
+  // Natural 1:1 Scroll Tracking (Zero premature blackout near header and zero forced auto-snap)
   useEffect(() => {
-    const isMobileDevice = () =>
-      typeof window !== "undefined" &&
-      ("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.innerWidth <= 768)
-
     const handleScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset || 0
       const vh = window.innerHeight || 800
       const targetY = targetYRef.current || (vh + vh * 0.3)
-      const blackSectionHeight = gateRef.current?.offsetHeight || (vh * 0.30)
 
-      // ── EXACT THRESHOLD FORMULAS ──
-      const topToBottomThreshold = vh * 0.30
-      const bottomToTopThreshold = targetY - (0.30 * blackSectionHeight)
-
-      // Track scroll direction:
-      const isMovingTowardHero = scrollY < lastScrollYRef.current
-      directionTowardHeroRef.current = isMovingTowardHero
-      lastScrollYRef.current = scrollY
-
-      // Update browser theme color & document background dynamically only on state transition
-      const isBelowHero = scrollY >= topToBottomThreshold
+      // Update browser theme color once the black curtain reaches the top edge (never prematurely)
+      const isBelowHero = scrollY >= vh
       if (lastIsBelowHeroRef.current !== isBelowHero) {
         lastIsBelowHeroRef.current = isBelowHero
         updateBrowserTheme(isBelowHero)
       }
 
-      // Synchronously hide hero as soon as black portfolio begins covering it (vh * 0.92)
-      // to prevent any frozen hero background from bleeding through transparent/sticky sections on iOS Safari
-      const isCovered = scrollY >= (vh * 0.92)
+      // Only hide sticky hero AFTER the opaque black portfolio curtain + notch completely cover 100% of the viewport
+      const isCovered = scrollY >= vh + 48
       if (heroStickyRef.current) {
         heroStickyRef.current.style.visibility = isCovered ? "hidden" : "visible"
         heroStickyRef.current.style.pointerEvents = isCovered ? "none" : "auto"
@@ -331,7 +284,7 @@ export default function HeroPortfolioTransition({
       }
       setIsHeroCovered((prev) => (prev === isCovered ? prev : isCovered))
 
-      // Update rubber band stretch 1:1 directly in DOM via rAF (avoids full-page React re-renders)
+      // Update rubber band stretch 1:1 directly in DOM via rAF
       if (scrollY <= targetY) {
         if (rafIdRef.current === null) {
           rafIdRef.current = requestAnimationFrame(() => {
@@ -349,134 +302,7 @@ export default function HeroPortfolioTransition({
         scrollProgressRef.current = 1
         updateArrowGeometry(1)
       }
-
-      // If already animating a snap, do not run release checks
-      if (isSnappingRef.current) return
-
-      // While user is actively touching on a mobile device, never auto-snap
-      if (isTouchingRef.current) {
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
-          scrollTimeoutRef.current = null
-        }
-        return
-      }
-
-      // If user is already past the transition gate inside the portfolio, allow free scroll
-      if (scrollY >= targetY - 10) {
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
-          scrollTimeoutRef.current = null
-        }
-        return
-      }
-
-      // If user is at top of hero, reset
-      if (scrollY <= 0) {
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
-          scrollTimeoutRef.current = null
-        }
-        return
-      }
-
-      // ── SNAP-ON-RELEASE / PAUSE DETECTION (Direction-Aware Thresholds) ──
-      // On mobile devices, disable all automatic scroll snapping / scroll hijacking for natural touch scroll
-      if (isMobileDevice()) {
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current)
-          scrollTimeoutRef.current = null
-        }
-        return
-      }
-
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-      }
-
-      const timeoutDuration = 220
-      scrollTimeoutRef.current = setTimeout(() => {
-        if (isSnappingRef.current || isTouchingRef.current) return
-        const curY = window.scrollY || window.pageYOffset || 0
-
-        // Only snap if user stopped inside the transition zone
-        if (curY > 5 && curY < targetY - 10) {
-          if (directionTowardHeroRef.current) {
-            if (curY < bottomToTopThreshold) {
-              triggerSpringBackToHero()
-            } else {
-              triggerSnapToPortfolio()
-            }
-          } else {
-            if (curY <= topToBottomThreshold) {
-              triggerSpringBackToHero()
-            } else {
-              triggerSnapToPortfolio()
-            }
-          }
-        }
-      }, timeoutDuration)
     }
-
-    // Touch event handlers for fluid mobile gestures (auto-scroll disabled on mobile)
-    const handleTouchStart = () => {
-      isTouchingRef.current = true
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = null
-      }
-    }
-
-    const handleTouchMove = () => {
-      isTouchingRef.current = true
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = null
-      }
-    }
-
-    const handleTouchEnd = () => {
-      isTouchingRef.current = false
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
-        scrollTimeoutRef.current = null
-      }
-      // Automatic swipe snapping disabled on mobile to allow 100% natural touch scrolling
-    }
-
-    // Desktop pointerup handler
-    const handlePointerUp = () => {
-      if (isSnappingRef.current || isMobileDevice()) return
-      const scrollY = window.scrollY || window.pageYOffset || 0
-      const vh = window.innerHeight || 800
-      const targetY = targetYRef.current || (vh + vh * 0.3)
-      const blackSectionHeight = gateRef.current?.offsetHeight || (vh * 0.30)
-      const bottomToTopThreshold = targetY - (0.30 * blackSectionHeight)
-      const topToBottomThreshold = vh * 0.30
-
-      if (scrollY > 5 && scrollY < targetY - 10) {
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-
-        if (directionTowardHeroRef.current) {
-          if (scrollY < bottomToTopThreshold) {
-            triggerSpringBackToHero()
-          } else {
-            triggerSnapToPortfolio()
-          }
-        } else {
-          if (scrollY <= topToBottomThreshold) {
-            triggerSpringBackToHero()
-          } else {
-            triggerSnapToPortfolio()
-          }
-        }
-      }
-    }
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true })
-    window.addEventListener("touchmove", handleTouchMove, { passive: true })
-    window.addEventListener("touchend", handleTouchEnd, { passive: true })
-    window.addEventListener("pointerup", handlePointerUp, { passive: true })
 
     if (lenis) {
       lenis.on("scroll", handleScroll)
@@ -487,24 +313,17 @@ export default function HeroPortfolioTransition({
     handleScroll()
 
     return () => {
-      window.removeEventListener("touchstart", handleTouchStart)
-      window.removeEventListener("touchmove", handleTouchMove)
-      window.removeEventListener("touchend", handleTouchEnd)
-      window.removeEventListener("pointerup", handlePointerUp)
       if (lenis) {
         lenis.off("scroll", handleScroll)
       } else {
         window.removeEventListener("scroll", handleScroll)
-      }
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current)
       }
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current)
       }
       updateBrowserTheme(true)
     }
-  }, [lenis, triggerSnapToPortfolio, triggerSpringBackToHero, updateArrowGeometry])
+  }, [lenis, updateArrowGeometry])
 
   // Update rubber-band arrow geometry when user drags notch directly
   useEffect(() => {
@@ -528,7 +347,6 @@ export default function HeroPortfolioTransition({
           visibility: isHeroCovered ? "hidden" : "visible",
           pointerEvents: isHeroCovered ? "none" : "auto",
           opacity: isHeroCovered ? 0 : 1,
-          transition: "opacity 0.2s ease-out",
         }}
       >
         {hero}

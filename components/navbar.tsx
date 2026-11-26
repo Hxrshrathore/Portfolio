@@ -4,7 +4,7 @@ import { useCart } from "@/lib/store/use-cart"
 import { useEffect, useState } from "react"
 import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, X } from "lucide-react"
+import { ArrowUpRight, ShoppingCart, X } from "lucide-react"
 import GlassSurface from "./GlassSurface"
 import dynamic from "next/dynamic"
 
@@ -57,18 +57,19 @@ export default function Navbar() {
                 </div>
               </TransitionLink>
 
-              <div className="hidden md:flex items-center space-x-8">
-                <TransitionLink href="/projects" className="text-sm font-medium tracking-tight text-white/90 hover:text-white transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+              <div className="hidden md:flex items-center space-x-6">
+                <TransitionLink
+                  href="/projects"
+                  className="text-sm font-medium tracking-tight text-white/85 hover:text-white transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                >
                   Work
                 </TransitionLink>
-                <TransitionLink href="/bio" className="text-sm font-medium tracking-tight text-white/90 hover:text-white transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  Bio
-                </TransitionLink>
-                <TransitionLink href="/blog" className="text-sm font-medium tracking-tight text-white/90 hover:text-white transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  Insights
-                </TransitionLink>
-                <TransitionLink href="/contact" className="text-sm font-medium tracking-tight text-white/90 hover:text-white transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                  Contact
+                <TransitionLink
+                  href="/contact"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black hover:bg-zinc-200 text-sm font-medium tracking-tight transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_2px_12px_rgba(255,255,255,0.12)] group"
+                >
+                  <span>Contact</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </TransitionLink>
               </div>
 
@@ -132,14 +133,6 @@ export default function Navbar() {
                 {/* Nav Links */}
                 <nav className="flex flex-col space-y-6 px-6 pt-8">
                   <TransitionLink
-                    href="/"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
-                  >
-                    Home
-                  </TransitionLink>
-
-                  <TransitionLink
                     href="/projects"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
@@ -148,27 +141,12 @@ export default function Navbar() {
                   </TransitionLink>
 
                   <TransitionLink
-                    href="/bio"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
-                  >
-                    Bio
-                  </TransitionLink>
-
-                  <TransitionLink
-                    href="/blog"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
-                  >
-                    Insights
-                  </TransitionLink>
-
-                  <TransitionLink
                     href="/contact"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-black hover:bg-zinc-200 text-base font-medium tracking-tight transition-all w-fit"
                   >
-                    Contact
+                    <span>Contact</span>
+                    <ArrowUpRight className="w-4 h-4" />
                   </TransitionLink>
                 </nav>
               </div>
