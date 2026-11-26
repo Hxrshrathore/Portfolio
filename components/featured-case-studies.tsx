@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useRef, useEffect } from "react"
+import React, { useRef } from "react"
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
-import { useScroll as useSmoothScroll } from "@/components/smooth-scroll"
 import { ArrowUpRight } from "lucide-react"
 import { FEATURED_CASE_STUDIES, FEATURED_SLUGS } from "@/lib/curation"
 import GlassFolder from "@/components/ui/glass-folder"
@@ -83,36 +82,10 @@ const CASE_STUDY_METAS: Record<string, {
 
 export default function FeaturedCaseStudies() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const { setWeight } = useSmoothScroll()
   const caseStudies = FEATURED_SLUGS.map(slug => FEATURED_CASE_STUDIES[slug]).filter(Boolean)
 
   const pair1 = caseStudies.slice(0, 2)
   const pair2 = caseStudies.slice(2, 4)
-
-  // Dynamic Lenis scroll weight on mobile: gives case studies a velvety, controlled touch feel
-  useEffect(() => {
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768
-    if (!isMobile) return
-    const el = containerRef.current
-    if (!el) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setWeight(1.5) // Weighted, stable deceleration on mobile
-        } else {
-          setWeight(1.2)
-        }
-      },
-      { threshold: 0.05 }
-    )
-
-    observer.observe(el)
-    return () => {
-      observer.disconnect()
-      setWeight(1.2)
-    }
-  }, [setWeight])
 
   // Track raw scroll progress across the container
   const { scrollYProgress } = useScroll({
@@ -120,61 +93,70 @@ export default function FeaturedCaseStudies() {
     offset: ["start start", "end end"],
   })
 
-  // Damped spring creates light, responsive, liquid-smooth scroll hijacking
+  // Silky damped spring on desktop for buttery-smooth card staging without sudden linear stops
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 24,
-    mass: 0.1,
+    stiffness: 120,
+    damping: 26,
+    mass: 0.16,
     restDelta: 0.0005,
   })
 
-  // ── Desktop 2x2 Transitions: pair 1 slides up out, pair 2 slides up in ──
-  const pair1Y = useTransform(smoothProgress, [0, 0.15, 0.50], ["0vh", "0vh", "-110vh"])
-  const pair1Opacity = useTransform(smoothProgress, [0, 0.40, 0.50], [1, 1, 0])
-  const pair1PointerEvents = useTransform(smoothProgress, (v) => (v < 0.35 ? "auto" : "none"))
+  // Responsive, lightly damped spring on mobile for smooth wheel + touch continuity
+  const mobileSmooth = useSpring(scrollYProgress, {
+    stiffness: 260,
+    damping: 32,
+    mass: 0.14,
+    restDelta: 0.0005,
+  })
 
-  const pair2Y = useTransform(smoothProgress, [0.15, 0.50, 1], ["110vh", "0vh", "0vh"])
-  const pair2Opacity = useTransform(smoothProgress, [0.15, 0.25, 1], [0, 1, 1])
-  const pair2PointerEvents = useTransform(smoothProgress, (v) => (v >= 0.35 ? "auto" : "none"))
+  // ── Desktop 2x2 Transitions: continuous flow across [0..1] (eliminates dead 0.5-1.0 freeze) ──
+  const pair1Y = useTransform(smoothProgress, [0, 0.12, 0.56], ["0vh", "0vh", "-95vh"])
+  const pair1Scale = useTransform(smoothProgress, [0, 0.12, 0.56], [1, 1, 0.94])
+  const pair1Opacity = useTransform(smoothProgress, [0, 0.36, 0.54], [1, 1, 0])
+  const pair1PointerEvents = useTransform(smoothProgress, (v) => (v < 0.40 ? "auto" : "none"))
 
-  // ── Mobile 1-by-1 Transforms (Sequential 4-card staging: clean deck elevation, zero collisions) ──
-  // Using direct scrollYProgress on mobile ensures 1:1 tactile touch response without spring inertia lag
-  // Card 0 (Nutgram): dwell 0.00-0.20, dissolve 0.20-0.26
-  const mCard0Y = useTransform(scrollYProgress, [0, 0.20, 0.26], ["0vh", "0vh", "-16vh"])
-  const mCard0Opacity = useTransform(scrollYProgress, [0, 0.20, 0.25], [1, 1, 0])
-  const mCard0Scale = useTransform(scrollYProgress, [0, 0.20, 0.26], [1, 1, 0.92])
-  const mCard0Pointer = useTransform(scrollYProgress, (v) => (v < 0.22 ? "auto" : "none"))
+  const pair2Y = useTransform(smoothProgress, [0.22, 0.62, 0.88, 1], ["95vh", "0vh", "0vh", "-8vh"])
+  const pair2Scale = useTransform(smoothProgress, [0.22, 0.62, 0.88, 1], [0.94, 1, 1, 0.97])
+  const pair2Opacity = useTransform(smoothProgress, [0.22, 0.40, 0.90, 1], [0, 1, 1, 0.85])
+  const pair2PointerEvents = useTransform(smoothProgress, (v) => (v >= 0.40 ? "auto" : "none"))
 
-  // Card 1 (KIITFEST): enter 0.21-0.27, dwell 0.27-0.45, dissolve 0.45-0.51
-  const mCard1Y = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["16vh", "0vh", "0vh", "-16vh"])
-  const mCard1Opacity = useTransform(scrollYProgress, [0.21, 0.26, 0.45, 0.50], [0, 1, 1, 0])
-  const mCard1Scale = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], [0.92, 1, 1, 0.92])
-  const mCard1Pointer = useTransform(scrollYProgress, (v) => (v >= 0.23 && v < 0.48 ? "auto" : "none"))
+  // ── Mobile 1-by-1 Transforms (Sequential 4-card staging with silky overlap & eased scales) ──
+  // Card 0 (Nutgram): dwell 0.00-0.19, dissolve 0.19-0.27
+  const mCard0Y = useTransform(mobileSmooth, [0, 0.19, 0.27], ["0vh", "0vh", "-14vh"])
+  const mCard0Opacity = useTransform(mobileSmooth, [0, 0.19, 0.26], [1, 1, 0])
+  const mCard0Scale = useTransform(mobileSmooth, [0, 0.19, 0.27], [1, 1, 0.93])
+  const mCard0Pointer = useTransform(mobileSmooth, (v) => (v < 0.23 ? "auto" : "none"))
 
-  // Card 2 (Nexus AI): enter 0.46-0.52, dwell 0.52-0.70, dissolve 0.70-0.76
-  const mCard2Y = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["16vh", "0vh", "0vh", "-16vh"])
-  const mCard2Opacity = useTransform(scrollYProgress, [0.46, 0.51, 0.70, 0.75], [0, 1, 1, 0])
-  const mCard2Scale = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], [0.92, 1, 1, 0.92])
-  const mCard2Pointer = useTransform(scrollYProgress, (v) => (v >= 0.48 && v < 0.73 ? "auto" : "none"))
+  // Card 1 (KIITFEST): enter 0.20-0.28, dwell 0.28-0.44, dissolve 0.44-0.52
+  const mCard1Y = useTransform(mobileSmooth, [0.20, 0.28, 0.44, 0.52], ["14vh", "0vh", "0vh", "-14vh"])
+  const mCard1Opacity = useTransform(mobileSmooth, [0.20, 0.27, 0.44, 0.51], [0, 1, 1, 0])
+  const mCard1Scale = useTransform(mobileSmooth, [0.20, 0.28, 0.44, 0.52], [0.93, 1, 1, 0.93])
+  const mCard1Pointer = useTransform(mobileSmooth, (v) => (v >= 0.23 && v < 0.48 ? "auto" : "none"))
 
-  // Card 3 (RCOE Rajasthan): enter 0.71-0.77, full dwell 0.77-0.96, dissolve/unpin 0.96-1.0
-  const mCard3Y = useTransform(scrollYProgress, [0.71, 0.77, 0.96, 1], ["16vh", "0vh", "0vh", "-6vh"])
-  const mCard3Opacity = useTransform(scrollYProgress, [0.71, 0.76, 0.96, 1], [0, 1, 1, 0.2])
-  const mCard3Scale = useTransform(scrollYProgress, [0.71, 0.77, 0.96, 1], [0.92, 1, 1, 0.96])
-  const mCard3Pointer = useTransform(scrollYProgress, (v) => (v >= 0.73 ? "auto" : "none"))
+  // Card 2 (Nexus AI): enter 0.45-0.53, dwell 0.53-0.69, dissolve 0.69-0.77
+  const mCard2Y = useTransform(mobileSmooth, [0.45, 0.53, 0.69, 0.77], ["14vh", "0vh", "0vh", "-14vh"])
+  const mCard2Opacity = useTransform(mobileSmooth, [0.45, 0.52, 0.69, 0.76], [0, 1, 1, 0])
+  const mCard2Scale = useTransform(mobileSmooth, [0.45, 0.53, 0.69, 0.77], [0.93, 1, 1, 0.93])
+  const mCard2Pointer = useTransform(mobileSmooth, (v) => (v >= 0.48 && v < 0.73 ? "auto" : "none"))
+
+  // Card 3 (RCOE Rajasthan): enter 0.70-0.78, dwell 0.78-0.94, gentle unpin drift 0.94-1.0
+  const mCard3Y = useTransform(mobileSmooth, [0.70, 0.78, 0.94, 1], ["14vh", "0vh", "0vh", "-6vh"])
+  const mCard3Opacity = useTransform(mobileSmooth, [0.70, 0.77, 0.94, 1], [0, 1, 1, 0.45])
+  const mCard3Scale = useTransform(mobileSmooth, [0.70, 0.78, 0.94, 1], [0.93, 1, 1, 0.96])
+  const mCard3Pointer = useTransform(mobileSmooth, (v) => (v >= 0.73 ? "auto" : "none"))
 
   // Mobile dot indicators
-  const dot0Width = useTransform(scrollYProgress, [0, 0.20, 0.25], ["22px", "22px", "6px"])
-  const dot0Color = useTransform(scrollYProgress, [0, 0.20, 0.25], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot0Width = useTransform(mobileSmooth, [0, 0.19, 0.26], ["22px", "22px", "6px"])
+  const dot0Color = useTransform(mobileSmooth, [0, 0.19, 0.26], ["rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot1Width = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["6px", "22px", "22px", "6px"])
-  const dot1Color = useTransform(scrollYProgress, [0.21, 0.27, 0.45, 0.51], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot1Width = useTransform(mobileSmooth, [0.20, 0.28, 0.44, 0.52], ["6px", "22px", "22px", "6px"])
+  const dot1Color = useTransform(mobileSmooth, [0.20, 0.28, 0.44, 0.52], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot2Width = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["6px", "22px", "22px", "6px"])
-  const dot2Color = useTransform(scrollYProgress, [0.46, 0.52, 0.70, 0.76], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
+  const dot2Width = useTransform(mobileSmooth, [0.45, 0.53, 0.69, 0.77], ["6px", "22px", "22px", "6px"])
+  const dot2Color = useTransform(mobileSmooth, [0.45, 0.53, 0.69, 0.77], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.2)"])
 
-  const dot3Width = useTransform(scrollYProgress, [0.71, 0.77, 1.0], ["6px", "22px", "22px"])
-  const dot3Color = useTransform(scrollYProgress, [0.71, 0.77, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
+  const dot3Width = useTransform(mobileSmooth, [0.70, 0.78, 1.0], ["6px", "22px", "22px"])
+  const dot3Color = useTransform(mobileSmooth, [0.70, 0.78, 1.0], ["rgba(255,255,255,0.2)", "rgba(255,255,255,0.85)", "rgba(255,255,255,0.85)"])
 
   const renderCard = (study: typeof caseStudies[0], idx: number) => {
     const metaConfig = CASE_STUDY_METAS[study.slug] || {
@@ -296,6 +278,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: pair1Opacity,
                 y: pair1Y,
+                scale: pair1Scale,
                 pointerEvents: pair1PointerEvents,
               }}
               className="w-full grid grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"
@@ -308,6 +291,7 @@ export default function FeaturedCaseStudies() {
               style={{
                 opacity: pair2Opacity,
                 y: pair2Y,
+                scale: pair2Scale,
                 pointerEvents: pair2PointerEvents,
               }}
               className="w-full grid grid-cols-2 gap-8 lg:gap-14 place-items-center absolute inset-0 my-auto"

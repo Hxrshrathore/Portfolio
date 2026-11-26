@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /* ═══════════════════════════════════════════════════════════
@@ -126,7 +127,13 @@ export default function BorderedClientsGrid({
       className={cn("bg-background py-16 md:py-24", className)}
       aria-label="Trusted by"
     >
-      <div className="mx-auto max-w-5xl px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto max-w-5xl px-6"
+      >
         <div className="relative">
           {/* Decorative cross markers at the four corners */}
           <CornerCross className="left-0 top-0 -translate-x-1/2 -translate-y-1/2" />
@@ -145,7 +152,7 @@ export default function BorderedClientsGrid({
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

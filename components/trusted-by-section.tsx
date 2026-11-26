@@ -6,7 +6,7 @@ import { motion, useInView, useAnimation, type Variants } from "framer-motion"
 export default function TrustedBySection() {
   const ref = useRef(null)
   const controls = useAnimation()
-  const isInView = useInView(ref, { once: true })
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
 
   useEffect(() => {
     if (isInView) controls.start("visible")
@@ -18,11 +18,11 @@ export default function TrustedBySection() {
   }
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 22 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
     },
   }
 

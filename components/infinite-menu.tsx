@@ -523,7 +523,8 @@ class ArcballControl {
         vec2.set(this.pointerPos, e.clientX, e.clientY)
       }
     })
-    canvas.style.touchAction = "none"
+    // Allow native vertical page scrolling on touch devices while still dragging the globe horizontally
+    canvas.style.touchAction = "pan-y"
   }
 
   public update(deltaTime: number, targetFrameDuration = 16): void {

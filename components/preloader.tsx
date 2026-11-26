@@ -14,8 +14,21 @@ type Phase = "loading" | "exiting" | "done"
 
 const CRITICAL_CDN = "https://pub-546a6f9534fa4f7abd35b1c5c23bb394.r2.dev/projects"
 
-// Critical assets required for above-the-fold experience (Hero 3D cylinder, Flowing Menu, Case Studies)
-const CRITICAL_ASSETS = [
+const CORE_LOCAL_ASSETS = [
+  "/logo/hersh-design-logo.svg",
+  "/logo/aerolux.png",
+  "/projects/aerolux.jpg",
+  "/logo/rathore-developers.svg",
+  "/projects/rathore-developers.jpg",
+  "/logo/kiitmun.png",
+  "/logo/ascent.png",
+  "/logo/chimera.png",
+  "/logo/pandav.png",
+  "/placeholder.jpg",
+]
+
+// Additional CDN assets warmed in parallel in background
+const BACKGROUND_CDN_ASSETS = [
   `${CRITICAL_CDN}/Nutgram.png`,
   `${CRITICAL_CDN}/KIITFEST.png`,
   `${CRITICAL_CDN}/Kritarth.png`,
@@ -32,40 +45,10 @@ const CRITICAL_ASSETS = [
   `${CRITICAL_CDN}/Pandav%20Studio.png`,
   `${CRITICAL_CDN}/Acsent%20Choacing%20Center.png`,
   `${CRITICAL_CDN}/Bikash%20Vidalya.png`,
-  "/logo/kiitmun.png",
-  "/logo/ascent.png",
-  "/logo/chimera.png",
-  "/logo/pandav.png",
-  "/logo/aerolux.png",
-  "/projects/aerolux.jpg",
-  "/logo/rathore-developers.svg",
-  "/projects/rathore-developers.jpg",
-  "/logo/hersh-design-logo.svg",
-  "/placeholder.jpg",
 ]
 
-const CACHE_NAME = "portfolio-assets-v1"
-
-// Preloads and decodes into browser GPU bitmap cache + local Cache API
-async function preloadAndCacheAsset(url: string): Promise<void> {
-  // 1. Warm Cache API for persistent offline/local storage across visits
-  if (typeof window !== "undefined" && "caches" in window) {
-    try {
-      const cache = await window.caches.open(CACHE_NAME)
-      const match = await cache.match(url)
-      if (!match) {
-        fetch(url, { mode: "cors", cache: "force-cache" })
-          .then((res) => {
-            if (res.ok) cache.put(url, res.clone())
-          })
-          .catch(() => {})
-      }
-    } catch {
-      // Graceful fallback if caches is restricted (e.g. private mode)
-    }
-  }
-
-  // 2. Decode into browser bitmap memory for instantaneous zero-jank render
+// Preloads and decodes into browser bitmap cache
+function preloadImageAsset(url: string): Promise<void> {
   return new Promise<void>((resolve) => {
     const img = new Image()
     img.decoding = "async"
@@ -76,9 +59,14 @@ async function preloadAndCacheAsset(url: string): Promise<void> {
         resolve()
       }
     }
-    img.onerror = () => resolve() // Don't block loading if an image fails
+    img.onerror = () => resolve() // Never block preloader if an image fails
     img.src = url
   })
+}
+
+// Smooth easeInOutQuad so 0-35 accelerates naturally and 35-100 glides cleanly
+function easeInOutQuad(t: number): number {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
 }
 
 export default function Preloader({ children }: PreloaderProps) {
@@ -103,73 +91,97 @@ export default function Preloader({ children }: PreloaderProps) {
 
     const isAssetsCached = typeof window !== "undefined" && localStorage.getItem("portfolio_assets_cached_v1") === "true"
     const lastVisit = typeof window !== "undefined" ? localStorage.getItem("portfolio_last_visit") : null
-    const isRecentVisit = !!lastVisit && Date.now() - parseInt(lastVisit) < 1000 * 60 * 60 * 24 // <24h
+    const isRecentVisit = !!lastVisit && Date.now() - parseInt(lastVisit, 10) < 1000 * 60 * 60 * 24 // <24h
 
-    // Fast-path duration for returning visits with warm cache vs cold load
-    const minDuration = isAssetsCached && isRecentVisit ? 450 : 950
-    const maxDuration = 3600 // Maximum fail-safe so user is never trapped
+    // Smooth non-jumping duration even on warm cache
+    const minDuration = isAssetsCached && isRecentVisit ? 750 : 1250
+    const maxDuration = 2800
     const startTime = performance.now()
 
-    let completedTargets = 0
-    const totalTargets = CRITICAL_ASSETS.length + 2 // +1 fonts, +1 document ready
-    let targetProgress = isAssetsCached ? 30 : 10
+    let coreCompleted = 0
+    const totalCore = CORE_LOCAL_ASSETS.length + 2 // +1 fonts, +1 document load
+    let coreReady = false
 
-    const markTargetDone = () => {
-      completedTargets++
-      const calculated = Math.min(100, Math.round((completedTargets / totalTargets) * 100))
-      if (calculated > targetProgress) {
-        targetProgress = calculated
+    const markCoreDone = () => {
+      coreCompleted++
+      if (coreCompleted >= totalCore) {
+        coreReady = true
       }
     }
 
-    // 1. Parallel asset preloading & caching
-    CRITICAL_ASSETS.forEach((url) => {
-      preloadAndCacheAsset(url).then(markTargetDone)
+    // 1. Preload core local assets (gates completion cleanly without hanging on remote CDN)
+    CORE_LOCAL_ASSETS.forEach((url) => {
+      preloadImageAsset(url).then(markCoreDone)
     })
 
-    // 2. Font readiness
+    // 2. Warm background CDN assets in parallel without stalling mid-way
+    BACKGROUND_CDN_ASSETS.forEach((url) => {
+      preloadImageAsset(url)
+    })
+
+    // 3. Font readiness
     if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(markTargetDone).catch(markTargetDone)
+      document.fonts.ready.then(markCoreDone).catch(markCoreDone)
     } else {
-      markTargetDone()
+      markCoreDone()
     }
 
-    // 3. Document readiness
+    // 4. Document readiness
     if (typeof document !== "undefined") {
       if (document.readyState === "complete") {
-        markTargetDone()
+        markCoreDone()
       } else {
-        window.addEventListener("load", markTargetDone, { once: true })
+        window.addEventListener("load", markCoreDone, { once: true })
       }
     }
 
-    // 4. Smooth progression tick
-    let currentDisplay = isAssetsCached ? 20 : 0
+    // 5. Continuous delta-time smoothed progression starting from 0
+    let currentFloat = 0
+    let lastEmitted = 0
+    let lastFrameTime = startTime
     let rafId: number | null = null
+    let finishTimerId: number | null = null
 
     const tick = (now: number) => {
       const elapsed = now - startTime
-      const timeRatio = Math.min(1, elapsed / minDuration)
-      const allowedByTime = Math.round(timeRatio * 100)
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000))
+      lastFrameTime = now
 
-      // Fail safe check
+      const rawTimeRatio = Math.min(1, elapsed / minDuration)
+      // Blend linear + easeInOutQuad so early 0-35% is smooth and rhythmic rather than instant
+      const smoothCurve = 0.3 * rawTimeRatio + 0.7 * easeInOutQuad(rawTimeRatio)
       const timedOut = elapsed >= maxDuration
 
-      // Progress cannot race ahead of real loaded assets, but smoothly follows them
-      const effectiveCap = timedOut ? 100 : Math.min(targetProgress, allowedByTime)
-
-      if (currentDisplay < effectiveCap) {
-        const step = Math.max(1, Math.ceil((effectiveCap - currentDisplay) * 0.2))
-        currentDisplay = Math.min(effectiveCap, currentDisplay + step)
-        setProgress(currentDisplay)
+      let desiredProgress: number
+      if (coreReady || timedOut) {
+        desiredProgress = smoothCurve * 100
+      } else {
+        // Never freeze mid-way (e.g. 35%); glide smoothly up to 94% max while waiting for core readiness
+        const waitCeiling = 94
+        const timeTarget = smoothCurve * 92
+        const crawlExtra = Math.min(2, Math.max(0, (elapsed - minDuration) / 600) * 2)
+        desiredProgress = Math.min(waitCeiling, timeTarget + crawlExtra)
       }
 
-      const allLoaded = completedTargets >= totalTargets
-      const minTimeElapsed = elapsed >= minDuration
+      // Exponential smoothing toward target, frame-rate independent
+      const followSpeed = coreReady || timedOut ? 14 : 10
+      currentFloat += (desiredProgress - currentFloat) * Math.min(1, dt * followSpeed)
 
-      if ((currentDisplay >= 100 && (allLoaded || timedOut)) || (timedOut && minTimeElapsed)) {
-        setProgress(100)
-        setTimeout(finishLoading, 160)
+      // Snap cleanly to 100 only once close enough and ready
+      if ((coreReady || timedOut) && rawTimeRatio >= 1 && currentFloat >= 99.4) {
+        currentFloat = 100
+      }
+
+      // Strictly monotonic integer [0..100] so numbers never drop backward or exceed 100
+      const nextInt = Math.max(lastEmitted, Math.min(100, Math.round(currentFloat)))
+      if (nextInt !== lastEmitted) {
+        lastEmitted = nextInt
+        setProgress(nextInt)
+      }
+
+      if (nextInt >= 100 && rawTimeRatio >= 1 && (coreReady || timedOut)) {
+        // Give Counter's overdamped spring time to settle on 100 cleanly before exit slide
+        finishTimerId = window.setTimeout(finishLoading, 260)
       } else {
         rafId = requestAnimationFrame(tick)
       }
@@ -179,6 +191,8 @@ export default function Preloader({ children }: PreloaderProps) {
 
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId)
+      if (finishTimerId !== null) clearTimeout(finishTimerId)
+      window.removeEventListener("load", markCoreDone)
     }
   }, [finishLoading])
 

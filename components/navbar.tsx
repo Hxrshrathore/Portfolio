@@ -2,44 +2,24 @@
 
 import { useCart } from "@/lib/store/use-cart"
 import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
 import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart } from "lucide-react"
-import PixelBat from "./ui/pixel-bat"
+import { ShoppingCart, X } from "lucide-react"
 import GlassSurface from "./GlassSurface"
+import dynamic from "next/dynamic"
+
+const MetallicPaint = dynamic(() => import("./MetallicPaint"), {
+  ssr: false,
+})
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [isOnHero, setIsOnHero] = useState(false)
-  const pathname = usePathname()
   const cartItems = useCart((state) => state.totalItems())
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (pathname !== "/") {
-      setIsOnHero(false)
-      return
-    }
-
-    const updateLogoTone = () => {
-      const vh = window.innerHeight || 800
-      const scrollY = window.scrollY || window.pageYOffset || 0
-      setIsOnHero(scrollY < vh * 0.85)
-    }
-
-    updateLogoTone()
-    window.addEventListener("scroll", updateLogoTone, { passive: true })
-    window.addEventListener("resize", updateLogoTone, { passive: true })
-    return () => {
-      window.removeEventListener("scroll", updateLogoTone)
-      window.removeEventListener("resize", updateLogoTone)
-    }
-  }, [pathname])
 
   return (
     <>
@@ -55,26 +35,26 @@ export default function Navbar() {
             className="w-full"
           >
             <div className="relative flex items-center justify-between w-full px-4 sm:px-6">
-              <TransitionLink href="/" className="flex items-center space-x-2 relative z-10">
-                <div className="relative -top-5">
-                  <PixelBat />
+              {/* Left Brand: Hersh Design Logo with MetallicPaint Effect */}
+              <TransitionLink href="/" aria-label="Hersh Design" className="flex items-center relative z-10 group">
+                <div className="relative w-[112px] sm:w-[128px] h-[40px] sm:h-[46px] overflow-hidden pointer-events-auto">
+                  <MetallicPaint
+                    imageSrc="/logo/hersh-design-logo.svg"
+                    color="#ffffff"
+                    density={2}
+                    softness={0.19}
+                    dispersion={0.34}
+                    distortion={0.07}
+                    edgeBend={0.16}
+                    angle={70}
+                    scale={0.95}
+                    speed={0.55}
+                    rotation={1}
+                    mouseTilt={0.5}
+                    intro={false}
+                    paused={!mounted}
+                  />
                 </div>
-                <span className="text-white font-medium text-lg tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">HxrshRathore</span>
-              </TransitionLink>
-
-              {/* Centered Hersh Design Logo (solid black on Hero, solid white after Hero) */}
-              <TransitionLink
-                href="/"
-                aria-label="Hersh Design"
-                className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center justify-center z-10"
-              >
-                <img
-                  src="/logo/hersh-design-logo.svg"
-                  alt="Hersh Design"
-                  className={`h-12 md:h-14 w-auto object-contain transition-[filter] duration-300 ${
-                    isOnHero ? "brightness-0" : "brightness-0 invert"
-                  }`}
-                />
               </TransitionLink>
 
               <div className="hidden md:flex items-center space-x-8">
@@ -124,7 +104,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] md:hidden"
             />
 
             {/* Mobile menu drawer */}
@@ -133,10 +113,24 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-64 bg-black/95 backdrop-blur-xl border-l border-white/10 z-50 md:hidden"
+              className="fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] bg-black/95 backdrop-blur-2xl border-l border-white/10 z-[70] md:hidden shadow-2xl flex flex-col justify-between"
             >
-              <div className="flex flex-col h-full pt-32 px-8">
-                <nav className="flex flex-col space-y-6">
+              <div>
+                {/* Header with Close Cross Button */}
+                <div className="flex items-center justify-between px-6 pt-[max(1.25rem,env(safe-area-inset-top,1.25rem))] pb-5 border-b border-white/10">
+                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-white/40">Menu</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-5 h-5 text-white" />
+                  </button>
+                </div>
+
+                {/* Nav Links */}
+                <nav className="flex flex-col space-y-6 px-6 pt-8">
                   <TransitionLink
                     href="/"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -154,11 +148,19 @@ export default function Navbar() {
                   </TransitionLink>
 
                   <TransitionLink
+                    href="/bio"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
+                  >
+                    Bio
+                  </TransitionLink>
+
+                  <TransitionLink
                     href="/blog"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-white text-2xl font-medium tracking-tight hover:text-gray-300 transition-colors"
                   >
-                    Blog
+                    Insights
                   </TransitionLink>
 
                   <TransitionLink
@@ -169,6 +171,11 @@ export default function Navbar() {
                     Contact
                   </TransitionLink>
                 </nav>
+              </div>
+
+              {/* Bottom Quick Info */}
+              <div className="px-6 pb-8 border-t border-white/5 pt-4 text-xs font-mono text-white/30">
+                <p>UTC+5:30 • Bhubaneswar, IN</p>
               </div>
             </motion.div>
           </>

@@ -194,8 +194,8 @@ export default function TestimonialGlobeSection({ autoplay = true }: { autoplay?
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.05 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]"
             >
               <span className="bg-gradient-to-r from-white via-gray-200 to-white/80 bg-clip-text text-transparent">

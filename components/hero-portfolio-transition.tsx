@@ -59,7 +59,35 @@ export default function HeroPortfolioTransition({
   const directionTowardHeroRef = useRef(false)
   const targetYRef = useRef(0)
   const rafIdRef = useRef<number | null>(null)
-  const [scrollProgress, setScrollProgress] = useState(0)
+  const scrollProgressRef = useRef(0)
+  const arrowSvgRef = useRef<SVGSVGElement>(null)
+  const arrowTailPathRef = useRef<SVGPathElement>(null)
+  const arrowHeadPathRef = useRef<SVGPathElement>(null)
+
+  const updateArrowGeometry = useCallback((stretch: number) => {
+    const svg = arrowSvgRef.current
+    const tail = arrowTailPathRef.current
+    const head = arrowHeadPathRef.current
+    if (!svg || !tail || !head) return
+
+    const stemHeight = Math.round(20 + stretch * 42)
+    const arrowTotalHeight = stemHeight + 14
+    const topW = 3.5
+    const botW = 2.5
+    const midW = Math.max(0.75, 3.2 - stretch * 2.3)
+    const midY = (6 + stemHeight) / 2
+
+    svg.setAttribute("height", String(arrowTotalHeight))
+    svg.setAttribute("viewBox", `0 0 36 ${arrowTotalHeight}`)
+    tail.setAttribute(
+      "d",
+      `M ${18 - topW},6 Q ${18 - midW},${midY} ${18 - botW},${stemHeight} L ${18 + botW},${stemHeight} Q ${18 + midW},${midY} ${18 + topW},6 Z`
+    )
+    head.setAttribute(
+      "d",
+      `M 9,${stemHeight - 6} L 18,${stemHeight + 2} L 27,${stemHeight - 6}`
+    )
+  }, [])
 
   // ── Drag & Pull Handle State for Bottom Hero Notch ──
   const [isPulling, setIsPulling] = useState(false)
@@ -77,9 +105,9 @@ export default function HeroPortfolioTransition({
     setNotchXPercent(saved)
   }, [])
 
-  // Fluid spring ease for snaps
+  // Fluid quintic-out ease for silky transition settle
   const springEase = useCallback((t: number) => {
-    return 1 - Math.pow(1 - t, 3.2)
+    return 1 - Math.pow(1 - t, 3.6)
   }, [])
 
   // Sync scroll position immediately before animated snapping
@@ -109,11 +137,12 @@ export default function HeroPortfolioTransition({
     return () => window.removeEventListener("resize", updateTargetY)
   }, [updateTargetY])
 
-  // Snap forward to Portfolio (curved line section)
+  // Snap forward to Portfolio (curved line section) without locking wheel override
   const triggerSnapToPortfolio = useCallback(() => {
     if (isSnappingRef.current) return
     isSnappingRef.current = true
     setIsSnapping(true)
+    updateArrowGeometry(0)
 
     updateTargetY()
     const targetY = targetYRef.current
@@ -121,8 +150,8 @@ export default function HeroPortfolioTransition({
 
     if (lenis) {
       lenis.scrollTo(targetY, {
-        lock: !isMobile, // Do not lock touch input on mobile
-        duration: isMobile ? 0.45 : 0.6,
+        lock: false,
+        duration: isMobile ? 0.58 : 0.78,
         easing: springEase,
         onComplete: () => {
           isSnappingRef.current = false
@@ -134,9 +163,9 @@ export default function HeroPortfolioTransition({
       setTimeout(() => {
         isSnappingRef.current = false
         setIsSnapping(false)
-      }, isMobile ? 450 : 600)
+      }, isMobile ? 580 : 780)
     }
-  }, [lenis, springEase, updateTargetY])
+  }, [lenis, springEase, updateArrowGeometry, updateTargetY])
 
   // External trigger (e.g. from Hero Portfolio button)
   const handleSnapFromHero = useCallback(() => {
@@ -236,18 +265,19 @@ export default function HeroPortfolioTransition({
     }, 100)
   }, [notchXPercent, syncScroll, triggerSnapToPortfolio])
 
-  // Snap back to Hero section (scrollY = 0, homepage)
+  // Snap back to Hero section (scrollY = 0, homepage) without locking wheel override
   const triggerSpringBackToHero = useCallback(() => {
     if (isSnappingRef.current) return
     isSnappingRef.current = true
     setIsSnapping(true)
+    updateArrowGeometry(0)
 
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 768
 
     if (lenis) {
       lenis.scrollTo(0, {
-        lock: !isMobile,
-        duration: isMobile ? 0.45 : 0.55,
+        lock: false,
+        duration: isMobile ? 0.58 : 0.72,
         easing: springEase,
         onComplete: () => {
           isSnappingRef.current = false
@@ -259,11 +289,11 @@ export default function HeroPortfolioTransition({
       setTimeout(() => {
         isSnappingRef.current = false
         setIsSnapping(false)
-      }, isMobile ? 450 : 550)
+      }, isMobile ? 580 : 720)
     }
-  }, [lenis, springEase])
+  }, [lenis, springEase, updateArrowGeometry])
 
-  // Proportional 1:1 Scroll Tracking + Direction-Aware Thresholds
+  // Proportional 1:1 Scroll Tracking + Direction-Aware Thresholds (Zero React state churn per frame)
   useEffect(() => {
     const isMobileDevice = () =>
       typeof window !== "undefined" &&
@@ -301,17 +331,23 @@ export default function HeroPortfolioTransition({
       }
       setIsHeroCovered((prev) => (prev === isCovered ? prev : isCovered))
 
-      // Update rubber band stretch 1:1 in real time with user's scroll
+      // Update rubber band stretch 1:1 directly in DOM via rAF (avoids full-page React re-renders)
       if (scrollY <= targetY) {
         if (rafIdRef.current === null) {
           rafIdRef.current = requestAnimationFrame(() => {
             rafIdRef.current = null
             const p = Math.min(1, Math.max(0, scrollY / (vh * 0.30)))
-            setScrollProgress((prev) => (Math.abs(prev - p) < 0.005 ? prev : p))
+            if (Math.abs(scrollProgressRef.current - p) >= 0.005) {
+              scrollProgressRef.current = p
+              if (!isSnappingRef.current) {
+                updateArrowGeometry(p)
+              }
+            }
           })
         }
-      } else {
-        setScrollProgress((prev) => (prev === 1 ? prev : 1))
+      } else if (scrollProgressRef.current !== 1) {
+        scrollProgressRef.current = 1
+        updateArrowGeometry(1)
       }
 
       // If already animating a snap, do not run release checks
@@ -358,7 +394,7 @@ export default function HeroPortfolioTransition({
         clearTimeout(scrollTimeoutRef.current)
       }
 
-      const timeoutDuration = 140
+      const timeoutDuration = 220
       scrollTimeoutRef.current = setTimeout(() => {
         if (isSnappingRef.current || isTouchingRef.current) return
         const curY = window.scrollY || window.pageYOffset || 0
@@ -437,7 +473,6 @@ export default function HeroPortfolioTransition({
       }
     }
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
     window.addEventListener("touchstart", handleTouchStart, { passive: true })
     window.addEventListener("touchmove", handleTouchMove, { passive: true })
     window.addEventListener("touchend", handleTouchEnd, { passive: true })
@@ -445,18 +480,21 @@ export default function HeroPortfolioTransition({
 
     if (lenis) {
       lenis.on("scroll", handleScroll)
+    } else {
+      window.addEventListener("scroll", handleScroll, { passive: true })
     }
 
     handleScroll()
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("touchstart", handleTouchStart)
       window.removeEventListener("touchmove", handleTouchMove)
       window.removeEventListener("touchend", handleTouchEnd)
       window.removeEventListener("pointerup", handlePointerUp)
       if (lenis) {
         lenis.off("scroll", handleScroll)
+      } else {
+        window.removeEventListener("scroll", handleScroll)
       }
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current)
@@ -466,24 +504,19 @@ export default function HeroPortfolioTransition({
       }
       updateBrowserTheme(true)
     }
-  }, [lenis, triggerSnapToPortfolio, triggerSpringBackToHero])
+  }, [lenis, triggerSnapToPortfolio, triggerSpringBackToHero, updateArrowGeometry])
 
-  // ── Rubber Band Stretchy Arrow Physics (1:1 Proportional) ──
-  // The arrow acts like a rubber band: stretches in length while thinning in the middle
-  // in direct proportion to how far the user pulls up or scrolls down.
-  const bottomThreshold = typeof window !== "undefined" ? window.innerHeight * 0.30 : 250
-  const pullFactor = Math.min(1, pullY / (bottomThreshold || 250))
-  const stretchFactor = isSnapping ? 0 : Math.max(scrollProgress, pullFactor)
-  const stemHeight = Math.round(20 + stretchFactor * 42) // 20px -> 62px
-  const arrowTotalHeight = stemHeight + 14
-
-  // Top anchor width = 7px (topW = 3.5)
-  // Bottom arrowhead anchor width = 5px (botW = 2.5)
-  const topW = 3.5
-  const botW = 2.5
-  // Waist pinches dynamically from 3.2px down to 0.75px as tension increases!
-  const midW = Math.max(0.75, 3.2 - stretchFactor * 2.3)
-  const midY = (6 + stemHeight) / 2
+  // Update rubber-band arrow geometry when user drags notch directly
+  useEffect(() => {
+    if (isSnapping) {
+      updateArrowGeometry(0)
+      return
+    }
+    const bottomThreshold = typeof window !== "undefined" ? window.innerHeight * 0.30 : 250
+    const pullFactor = Math.min(1, pullY / (bottomThreshold || 250))
+    const stretch = Math.max(scrollProgressRef.current, pullFactor)
+    updateArrowGeometry(stretch)
+  }, [isSnapping, pullY, updateArrowGeometry])
 
   return (
     <div className="relative w-full bg-black">
@@ -607,9 +640,10 @@ export default function HeroPortfolioTransition({
             {/* The Rubber Band Stretchy Arrow: pinches in the middle under tension */}
             <div className="flex flex-col items-center">
               <svg
+                ref={arrowSvgRef}
                 width="36"
-                height={arrowTotalHeight}
-                viewBox={`0 0 36 ${arrowTotalHeight}`}
+                height="34"
+                viewBox="0 0 36 34"
                 className="w-7 sm:w-8 h-auto text-white transition-all duration-150 ease-out"
                 style={{
                   transitionTimingFunction: isSnapping
@@ -622,13 +656,15 @@ export default function HeroPortfolioTransition({
 
                 {/* Elastic Rubber Band Tail: Curves inward and pinches under tension */}
                 <path
-                  d={`M ${18 - topW},6 Q ${18 - midW},${midY} ${18 - botW},${stemHeight} L ${18 + botW},${stemHeight} Q ${18 + midW},${midY} ${18 + topW},6 Z`}
+                  ref={arrowTailPathRef}
+                  d="M 14.5,6 Q 14.8,13 15.5,20 L 20.5,20 Q 21.2,13 21.5,6 Z"
                   fill="currentColor"
                 />
 
                 {/* Arrowhead anchored at the bottom of the stretched rubber band */}
                 <path
-                  d={`M 9,${stemHeight - 6} L 18,${stemHeight + 2} L 27,${stemHeight - 6}`}
+                  ref={arrowHeadPathRef}
+                  d="M 9,14 L 18,22 L 27,14"
                   stroke="currentColor"
                   strokeWidth="2.5"
                   strokeLinecap="round"

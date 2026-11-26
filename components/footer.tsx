@@ -14,6 +14,19 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
   const footerRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [logoScale, setLogoScale] = useState(0.7)
+
+  useEffect(() => {
+    const updateScale = () => {
+      const w = window.innerWidth || 1200
+      if (w < 640) setLogoScale(0.95)
+      else if (w < 1024) setLogoScale(0.85)
+      else setLogoScale(0.7)
+    }
+    updateScale()
+    window.addEventListener("resize", updateScale, { passive: true })
+    return () => window.removeEventListener("resize", updateScale)
+  }, [])
 
   useEffect(() => {
     const el = footerRef.current
@@ -45,7 +58,7 @@ export default function Footer() {
   return (
     <footer ref={footerRef} className="relative bg-black pt-10 md:pt-14 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
       {/* ── Bottom-most Background Metallic Logo ── */}
-      <div className="absolute inset-x-0 bottom-0 h-[280px] sm:h-[380px] md:h-[480px] pointer-events-none z-0 overflow-hidden opacity-85">
+      <div className="absolute inset-x-0 bottom-0 h-[360px] sm:h-[460px] md:h-[480px] lg:h-[520px] pointer-events-none z-0 overflow-hidden opacity-85">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-black/30 to-transparent z-10" />
         <MetallicPaint
           imageSrc="/logo/hersh-design-logo.svg"
@@ -56,7 +69,7 @@ export default function Footer() {
           distortion={0.07}
           edgeBend={0.16}
           angle={70}
-          scale={0.6}
+          scale={logoScale}
           speed={0.55}
           rotation={1}
           mouseTilt={0.5}

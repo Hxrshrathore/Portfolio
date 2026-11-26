@@ -65,11 +65,12 @@ export default function BlendedCursor() {
   }, []);
 
   const onOver = useCallback((e: MouseEvent) => {
-    const target = e.target as HTMLElement;
+    const target = e.target as HTMLElement | null;
+    if (!target || typeof target.closest !== "function") return;
     const s = state.current;
 
     if (target.closest('[data-no-cursor]')) {
-      s.mode = STATE.HIDDEN;
+      s.mode = STATE.DEFAULT;
       s.hoverEl = null;
       return;
     }

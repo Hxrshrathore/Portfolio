@@ -101,9 +101,11 @@ export default function DualWheelSection() {
 
       // When the top of the container hits the top of the viewport
       const scrolled = -rect.top
-      const progress = Math.min(1, Math.max(0, scrolled / totalScrollable))
+      const rawProgress = Math.min(1, Math.max(0, scrolled / totalScrollable))
+      // Map [0.06, 0.94] across channels for clean entry/exit dwell before unpinning
+      const normalized = Math.min(1, Math.max(0, (rawProgress - 0.06) / 0.88))
       const count = CHANNELS.length
-      const index = Math.min(count - 1, Math.floor(progress * count))
+      const index = Math.min(count - 1, Math.floor(normalized * count))
       setActiveIndex((prev) => (prev === index ? prev : index))
     }
 
@@ -113,17 +115,19 @@ export default function DualWheelSection() {
       }
     }
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
     if (lenis) {
       lenis.on("scroll", handleScroll)
+    } else {
+      window.addEventListener("scroll", handleScroll, { passive: true })
     }
     updateScroll()
 
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId)
-      window.removeEventListener("scroll", handleScroll)
       if (lenis) {
         lenis.off("scroll", handleScroll)
+      } else {
+        window.removeEventListener("scroll", handleScroll)
       }
     }
   }, [lenis])
@@ -150,8 +154,8 @@ export default function DualWheelSection() {
     <section
       ref={containerRef}
       data-no-cursor="true"
-      className="relative w-full bg-black text-white select-none min-h-[180vh] md:min-h-[260vh]"
-      style={{ height: isMobile ? "180vh" : "260vh" }}
+      className="relative w-full bg-black text-white select-none min-h-[165vh] md:min-h-[210vh]"
+      style={{ height: isMobile ? "165vh" : "210vh" }}
     >
       {/* ── Sticky Fullscreen Viewport Pinning ── */}
       <div 
@@ -179,7 +183,7 @@ export default function DualWheelSection() {
               tilt={5.5}
               blur={1.25}
               fade={0.25}
-              smoothing={380}
+              smoothing={440}
               inset={leftInset}
               loop={false}
               draggable={!isMobile}
@@ -206,7 +210,7 @@ export default function DualWheelSection() {
               tilt={5.5}
               blur={1.25}
               fade={0.25}
-              smoothing={380}
+              smoothing={440}
               inset={rightInset}
               loop={false}
               draggable={!isMobile}

@@ -32,21 +32,21 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
 
   useEffect(() => {
     const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)
-    
-    // Initialize Lenis natively. 
-    // Higher duration = heavier/floaty feel. Lower = snappier/faster.
+
+    // Unified global Lenis physics across all homepage sections:
+    // Frame-rate-independent lerp on desktop wheel gives silky, consistent glide without mid-page speed shifts.
     const lenis = new Lenis({
-      duration: isTouch ? 1.0 : 1.2, 
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      lerp: isTouch ? 0.12 : 0.082,
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.0, // Match natural finger swipe velocity on mobile/touch
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.0,
+      syncTouch: false,
     })
 
     setLenisInstance(lenis)
-    
+
     // Sync Lenis scroll events to GSAP ScrollTrigger to keep pinned headers & animations working
-    lenis.on('scroll', ScrollTrigger.update)
+    lenis.on("scroll", ScrollTrigger.update)
 
     // Assign the callback to a stable reference so it can be cleanly removed on unmount
     const update = (time: number) => {
@@ -59,8 +59,27 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     // Smooth out lag spikes rather than hard-jumping (500ms threshold, 33ms max step)
     gsap.ticker.lagSmoothing(500, 33)
 
+    // Keep Lenis & ScrollTrigger synced whenever dynamic sections hydrate or resize
+    let resizeRaf: number | null = null
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            if (resizeRaf !== null) cancelAnimationFrame(resizeRaf)
+            resizeRaf = requestAnimationFrame(() => {
+              resizeRaf = null
+              lenis.resize()
+              ScrollTrigger.refresh()
+            })
+          })
+        : null
+    if (ro && document.body) {
+      ro.observe(document.body)
+    }
+
     return () => {
       // Must pass the exact same function reference to remove it!
+      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf)
+      ro?.disconnect()
       gsap.ticker.remove(update)
       lenis.destroy()
     }

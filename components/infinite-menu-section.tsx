@@ -642,7 +642,13 @@ export default function InfiniteMenuSection() {
       className="relative w-full min-h-screen md:h-screen md:min-h-0 bg-black overflow-x-hidden md:overflow-hidden border-t border-white/5 flex flex-col pb-12 md:pb-4"
     >
       {/* Header */}
-      <div className="text-center pt-6 pb-2 px-4 shrink-0">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="text-center pt-6 pb-2 px-4 shrink-0"
+      >
         <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-1 px-2">
           <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
             Project{" "}
@@ -654,7 +660,7 @@ export default function InfiniteMenuSection() {
         <p className="text-xs md:text-sm text-zinc-400 max-w-2xl mx-auto px-4 tracking-wide font-light">
           Rotate through verified full-stack applications, event platforms, and applied AI systems.
         </p>
-      </div>
+      </motion.div>
 
       {/* 3-Column Grid Layout */}
       <div className="flex-1 min-h-0 max-w-[1400px] w-full mx-auto px-4 md:px-8 pb-4">

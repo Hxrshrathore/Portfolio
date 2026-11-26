@@ -67,7 +67,13 @@ function Digit({ place, value, height, digitStyle }: DigitProps) {
 
   // Numeric digit
   const valueRoundedToPlace = getValueRoundedToPlace(value, place);
-  const animatedValue = useSpring(valueRoundedToPlace);
+  // Overdamped spring prevents counting overshoot past 100 and bounce-back
+  const animatedValue = useSpring(valueRoundedToPlace, {
+    stiffness: 240,
+    damping: 34,
+    mass: 0.6,
+    restDelta: 0.001,
+  });
 
   useEffect(() => {
     animatedValue.set(valueRoundedToPlace);

@@ -31,15 +31,7 @@ function ProximityWrapper({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Immediately mount on touch/mobile to prevent stalling while scrolling on Safari
-          const isTouch = "ontouchstart" in window || (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0)
-          if (isTouch) {
-            setShouldMount(true)
-          } else if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(() => setShouldMount(true), { timeout: 600 })
-          } else {
-            setTimeout(() => setShouldMount(true), 20)
-          }
+          setShouldMount(true)
           observer.disconnect()
         }
       },
@@ -76,7 +68,7 @@ const DynamicInfiniteMenu = dynamic(() => import("@/components/infinite-menu-sec
 
 export const InfiniteMenuClient = () => (
   <ProximityWrapper
-    rootMargin="800px 0px"
+    rootMargin="1600px 0px"
     className="w-full min-h-[600px] md:h-screen"
     fallback={<div className="min-h-[600px] md:h-screen w-full bg-black" />}
   >
@@ -91,7 +83,7 @@ const DynamicMagicBento = dynamic(() => import("@/components/magic-bento-section
 
 export const MagicBentoClient = () => (
   <ProximityWrapper
-    rootMargin="800px 0px"
+    rootMargin="1600px 0px"
     className="w-full min-h-[500px] md:h-screen"
     fallback={<div className="min-h-[500px] md:h-screen w-full bg-black" />}
   >
@@ -106,7 +98,7 @@ const DynamicWorldMap = dynamic(() => import("@/components/world-map-section"), 
 
 export const WorldMapClient = () => (
   <ProximityWrapper
-    rootMargin="800px 0px"
+    rootMargin="1600px 0px"
     className="w-full min-h-[600px] md:h-screen"
     fallback={<div className="min-h-[600px] md:h-screen w-full bg-black" />}
   >
@@ -114,7 +106,7 @@ export const WorldMapClient = () => (
   </ProximityWrapper>
 )
 
-// ── 3. Far-fold sections (staged in background when scrolling within 1000px) ──
+// ── 3. Far-fold sections (staged in background when scrolling within 1800px) ──
 const DynamicTestimonialGlobe = dynamic(() => import("@/components/testimonial-globe-section"), {
   ssr: false,
   loading: () => <div className="min-h-[500px] md:h-screen w-full bg-black" />
@@ -122,9 +114,9 @@ const DynamicTestimonialGlobe = dynamic(() => import("@/components/testimonial-g
 
 export const TestimonialGlobeClient = () => (
   <ProximityWrapper
-    rootMargin="1000px 0px"
+    rootMargin="1800px 0px"
     className="w-full min-h-[500px] md:h-screen"
-    fallback={<div className="min-h-[500px] md:h-screen w-full bg-black" />}
+    fallback={<div className="min-h-[500px] md:min-h-screen w-full bg-black" />}
   >
     <DynamicTestimonialGlobe />
   </ProximityWrapper>
@@ -132,14 +124,14 @@ export const TestimonialGlobeClient = () => (
 
 const DynamicDualWheel = dynamic(() => import("@/components/dual-wheel-section"), {
   ssr: false,
-  loading: () => <div className="min-h-[180vh] md:min-h-[260vh] w-full bg-black" />
+  loading: () => <div className="min-h-[165vh] md:min-h-[210vh] w-full bg-black" />
 })
 
 export const DualWheelSectionClient = () => (
   <ProximityWrapper
-    rootMargin="1000px 0px"
-    className="w-full min-h-[180vh] md:min-h-[260vh]"
-    fallback={<div className="min-h-[180vh] md:min-h-[260vh] w-full bg-black" />}
+    rootMargin="1800px 0px"
+    className="w-full min-h-[165vh] md:min-h-[210vh]"
+    fallback={<div className="min-h-[165vh] md:min-h-[210vh] w-full bg-black" />}
   >
     <DynamicDualWheel />
   </ProximityWrapper>
@@ -152,7 +144,7 @@ const DynamicOrb = dynamic(() => import("@/components/orb-section"), {
 
 export const OrbClient = () => (
   <ProximityWrapper
-    rootMargin="1000px 0px"
+    rootMargin="1800px 0px"
     className="w-full min-h-[500px] md:min-h-screen"
     fallback={<div className="min-h-[500px] md:min-h-screen w-full bg-black" />}
   >
