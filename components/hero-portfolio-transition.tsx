@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
-import { ArrowUp } from "lucide-react"
 import { TooltipPill } from "@/components/ui/tooltip"
 import { useScroll } from "@/components/smooth-scroll"
 import RightResumeNotch from "./right-resume-notch"
@@ -66,23 +65,20 @@ export default function HeroPortfolioTransition({
     const head = arrowHeadPathRef.current
     if (!svg || !tail || !head) return
 
-    const stemHeight = Math.round(20 + stretch * 42)
-    const arrowTotalHeight = stemHeight + 14
-    const topW = 3.5
-    const botW = 2.5
-    const midW = Math.max(0.75, 3.2 - stretch * 2.3)
-    const midY = (6 + stemHeight) / 2
+    const stemHeight = Math.round(54 + stretch * 26)
+    const arrowTotalHeight = stemHeight + 8
+    const topW = 1.6
+    const botW = 0.75
+    const midW = Math.max(0.45, 1.35 - stretch * 0.85)
+    const midY = (4 + stemHeight) / 2
 
     svg.setAttribute("height", String(arrowTotalHeight))
     svg.setAttribute("viewBox", `0 0 36 ${arrowTotalHeight}`)
     tail.setAttribute(
       "d",
-      `M ${18 - topW},6 Q ${18 - midW},${midY} ${18 - botW},${stemHeight} L ${18 + botW},${stemHeight} Q ${18 + midW},${midY} ${18 + topW},6 Z`
+      `M ${18 - topW},4 Q ${18 - midW},${midY} ${18 - botW},${stemHeight} L ${18 + botW},${stemHeight} Q ${18 + midW},${midY} ${18 + topW},4 Z`
     )
-    head.setAttribute(
-      "d",
-      `M 9,${stemHeight - 6} L 18,${stemHeight + 2} L 27,${stemHeight - 6}`
-    )
+    head.setAttribute("d", "M 10,11 L 18,3 L 26,11")
   }, [])
 
   // ── Drag & Pull Handle State for Bottom Hero Notch ──
@@ -356,6 +352,7 @@ export default function HeroPortfolioTransition({
 
       {/* ── 2. Black Portfolio Section (NO shadow, flush seam) ── */}
       <div
+        id="hero-black-curtain"
         style={{
           transform: pullY > 0 ? `translateY(${-pullY}px)` : "none",
           transition: isPulling ? "none" : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -422,28 +419,62 @@ export default function HeroPortfolioTransition({
                   strokeWidth="1.5"
                 />
               </svg>
-
-              {/* Bouncing arrow pointing upward */}
-              <div className="absolute inset-0 flex items-center justify-center pt-1 pointer-events-none">
-                <motion.div
-                  animate={{ y: [1, -4, 1] }}
-                  transition={{
-                    duration: 1.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="flex items-center justify-center"
-                >
-                  <ArrowUp
-                    className="w-4 h-4 text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] transition-colors group-hover:text-white"
-                    strokeWidth={2.4}
-                  />
-                </motion.div>
-              </div>
             </div>
 
             {/* Seamless extension below SVG to prevent any gap when user pulls up */}
             <div className="w-full h-8 bg-black -mt-[1px]" />
+
+            {/* Single Unified Upward Arrow with Long Tapered Tail */}
+            <div className="absolute top-[16px] sm:top-[18px] inset-x-0 z-20 pointer-events-none flex justify-center">
+              <motion.div
+                animate={isPulling || isSnapping ? { y: 0 } : { y: [0, -2.5, 0] }}
+                transition={{
+                  duration: 2.0,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="flex justify-center"
+              >
+                <svg
+                  ref={arrowSvgRef}
+                  width="36"
+                  height="62"
+                  viewBox="0 0 36 62"
+                  className="w-7 sm:w-8 h-auto text-white overflow-visible drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]"
+                  style={{
+                    transitionTimingFunction: isSnapping
+                      ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+                      : "cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  <defs>
+                    <linearGradient id="portfolioUpArrowTail" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+                      <stop offset="55%" stopColor="currentColor" stopOpacity="0.65" />
+                      <stop offset="100%" stopColor="currentColor" stopOpacity="0.1" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Long Tapered Tail descending smoothly from the upward arrowhead */}
+                  <path
+                    ref={arrowTailPathRef}
+                    d="M 16.4,4 Q 16.65,29 17.25,54 L 18.75,54 Q 19.35,29 19.6,4 Z"
+                    fill="url(#portfolioUpArrowTail)"
+                  />
+
+                  {/* Upward Arrowhead positioned cleanly inside the half-oval pull tab */}
+                  <path
+                    ref={arrowHeadPathRef}
+                    d="M 10,11 L 18,3 L 26,11"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </svg>
+              </motion.div>
+            </div>
           </button>
         </div>
 
@@ -451,51 +482,8 @@ export default function HeroPortfolioTransition({
         <section
           ref={gateRef}
           data-no-cursor="true"
-          className="relative w-full h-[24vh] min-h-[160px] max-h-[220px] bg-black flex flex-col items-center justify-between pt-2 pb-1 px-4 select-none overflow-hidden"
+          className="relative w-full h-[24vh] min-h-[172px] max-h-[220px] bg-black flex flex-col items-center justify-end pt-14 sm:pt-16 pb-1 px-4 select-none overflow-hidden"
         >
-          {/* ── Top Area: Rubber Band Arrow Point & Top Line Segment ── */}
-          <div className="w-full flex flex-col items-center z-20 pt-1 pointer-events-none">
-            {/* The Rubber Band Stretchy Arrow: pinches in the middle under tension */}
-            <div className="flex flex-col items-center">
-              <svg
-                ref={arrowSvgRef}
-                width="36"
-                height="34"
-                viewBox="0 0 36 34"
-                className="w-7 sm:w-8 h-auto text-white transition-all duration-150 ease-out"
-                style={{
-                  transitionTimingFunction: isSnapping
-                    ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
-                    : "cubic-bezier(0.16, 1, 0.3, 1)",
-                }}
-              >
-                {/* Top Anchor Pin */}
-                <circle cx="18" cy="6" r="3" fill="currentColor" />
-
-                {/* Elastic Rubber Band Tail: Curves inward and pinches under tension */}
-                <path
-                  ref={arrowTailPathRef}
-                  d="M 14.5,6 Q 14.8,13 15.5,20 L 20.5,20 Q 21.2,13 21.5,6 Z"
-                  fill="currentColor"
-                />
-
-                {/* Arrowhead anchored at the bottom of the stretched rubber band */}
-                <path
-                  ref={arrowHeadPathRef}
-                  d="M 9,14 L 18,22 L 27,14"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </svg>
-            </div>
-
-            {/* Top vertical line segment descending toward text without overlapping */}
-            <div className="w-[1.5px] h-4 sm:h-6 bg-gradient-to-b from-white via-white/50 to-white/10 mt-1" />
-          </div>
-
           {/* ── Center: Clean "Portfolio" Typography (Exact Match to Hero Section Title Font) ── */}
           <div className="relative z-20 flex flex-col items-center justify-center my-auto">
             <button
