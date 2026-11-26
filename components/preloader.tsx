@@ -40,6 +40,7 @@ const CRITICAL_ASSETS = [
   "/projects/aerolux.jpg",
   "/logo/rathore-developers.svg",
   "/projects/rathore-developers.jpg",
+  "/logo/hersh-design-logo.svg",
   "/placeholder.jpg",
 ]
 

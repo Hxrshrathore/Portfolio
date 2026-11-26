@@ -6,8 +6,8 @@ import {
   CurvedLoopClient,
   FlowingMenuClient,
   InfiniteMenuClient,
-  MagicBentoClient,
-  WorldMapClient,
+  // MagicBentoClient,
+  // WorldMapClient,
   TestimonialGlobeClient,
   DualWheelSectionClient,
   OrbClient,
@@ -30,11 +30,11 @@ export default function Home() {
         {/* 5. Interactive Project Archive: 3D Infinite Menu with distinct project links */}
         <InfiniteMenuClient />
 
-        {/* 6. Engineering Approach: Magic Bento architecture, reliability & trade-offs */}
-        <MagicBentoClient />
+        {/* 6. Engineering Approach: Magic Bento architecture, reliability & trade-offs (Hidden) */}
+        {/* <MagicBentoClient /> */}
 
-        {/* 7. Remote Collaboration: India timezone (UTC+5:30) and global sync windows */}
-        <WorldMapClient />
+        {/* 7. Remote Collaboration: India timezone (UTC+5:30) and global sync windows (Hidden) */}
+        {/* <WorldMapClient /> */}
 
         {/* 7b. Interactive 3D Collaboration Globe: Regional collaboration hubs & reviews */}
         <TestimonialGlobeClient />

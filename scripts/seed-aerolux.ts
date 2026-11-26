@@ -153,3 +153,4 @@ seedAeroLux().catch(err => {
   console.error("Error seeding AeroLux:", err);
   process.exit(1);
 });
+

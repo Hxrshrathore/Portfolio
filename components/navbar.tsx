@@ -2,6 +2,7 @@
 
 import { useCart } from "@/lib/store/use-cart"
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import TransitionLink from "./transition-link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ShoppingCart } from "lucide-react"
@@ -11,11 +12,34 @@ import GlassSurface from "./GlassSurface"
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isOnHero, setIsOnHero] = useState(false)
+  const pathname = usePathname()
   const cartItems = useCart((state) => state.totalItems())
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setIsOnHero(false)
+      return
+    }
+
+    const updateLogoTone = () => {
+      const vh = window.innerHeight || 800
+      const scrollY = window.scrollY || window.pageYOffset || 0
+      setIsOnHero(scrollY < vh * 0.85)
+    }
+
+    updateLogoTone()
+    window.addEventListener("scroll", updateLogoTone, { passive: true })
+    window.addEventListener("resize", updateLogoTone, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", updateLogoTone)
+      window.removeEventListener("resize", updateLogoTone)
+    }
+  }, [pathname])
 
   return (
     <>
@@ -30,12 +54,27 @@ export default function Navbar() {
             backgroundOpacity={0.1}
             className="w-full"
           >
-            <div className="flex items-center justify-between w-full px-4 sm:px-6">
-              <TransitionLink href="/" className="flex items-center space-x-2">
+            <div className="relative flex items-center justify-between w-full px-4 sm:px-6">
+              <TransitionLink href="/" className="flex items-center space-x-2 relative z-10">
                 <div className="relative -top-5">
                   <PixelBat />
                 </div>
                 <span className="text-white font-medium text-lg tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">HxrshRathore</span>
+              </TransitionLink>
+
+              {/* Centered Hersh Design Logo (solid black on Hero, solid white after Hero) */}
+              <TransitionLink
+                href="/"
+                aria-label="Hersh Design"
+                className="hidden sm:flex absolute left-1/2 -translate-x-1/2 items-center justify-center z-10"
+              >
+                <img
+                  src="/logo/hersh-design-logo.svg"
+                  alt="Hersh Design"
+                  className={`h-12 md:h-14 w-auto object-contain transition-[filter] duration-300 ${
+                    isOnHero ? "brightness-0" : "brightness-0 invert"
+                  }`}
+                />
               </TransitionLink>
 
               <div className="hidden md:flex items-center space-x-8">

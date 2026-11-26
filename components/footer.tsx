@@ -1,12 +1,34 @@
 "use client"
 
+import { useRef, useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Github, Twitter, Linkedin, Mail, ArrowUpRight } from "lucide-react"
 import TextPressure from "./text-pressure"
 import Link from "next/link"
+import dynamic from "next/dynamic"
+
+const MetallicPaint = dynamic(() => import("./MetallicPaint"), {
+  ssr: false,
+})
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const footerRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const el = footerRef.current
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setIsVisible(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: "200px 0px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const socialLinks = [
     { name: "GitHub", icon: <Github className="w-4 h-4" />, url: "https://github.com/hxrshrathore" },
@@ -22,7 +44,28 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="relative bg-black pt-32 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
+    <footer ref={footerRef} className="relative bg-black pt-32 pb-[calc(3rem+env(safe-area-inset-bottom,0px))] overflow-hidden border-t border-white/5">
+      {/* ── Bottom-most Background Metallic Logo ── */}
+      <div className="absolute inset-x-0 bottom-0 h-[260px] sm:h-[340px] md:h-[420px] pointer-events-none z-0 overflow-hidden opacity-30">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-transparent z-10" />
+        <MetallicPaint
+          imageSrc="/logo/hersh-design-logo.svg"
+          color="#ffffff"
+          density={2}
+          softness={0.19}
+          dispersion={0.34}
+          distortion={0.07}
+          edgeBend={0.16}
+          angle={70}
+          scale={0.6}
+          speed={0.55}
+          rotation={1}
+          mouseTilt={0.5}
+          intro={false}
+          paused={!isVisible}
+        />
+      </div>
+
       {/* ── Background Elements ── */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Subtle top glow */}
@@ -174,11 +217,11 @@ export default function Footer() {
           transition={{ duration: 0.6, delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <p className="text-white/30 font-mono text-[10px] uppercase tracking-widest">
+          <p className="text-white/40 font-sans font-light text-xs tracking-wide">
             © {currentYear} Harsh Kumar. All rights reserved.
           </p>
           
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 sm:gap-6 text-[10px] font-mono uppercase tracking-[0.12em] text-white/40">
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 sm:gap-6 text-xs font-sans font-light tracking-wide text-white/50">
             <span className="inline-flex items-center gap-2 text-white/60">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Available for Select Projects</span>
